@@ -1,71 +1,41 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import { Panel } from 'FunBlocks/Components/UILibrary'
+import { InterpreterMode } from 'FunBlocks/Reducers/Interpreter'
 import { RootState } from 'FunBlocks/Store'
-import { Rule, Term } from 'FunBlocks/AST/Terms'
-import Block from 'FunBlocks/Components/Block'
-import RuleBlock from 'FunBlocks/Components/RuleBlock'
-
-import { Panel, Button, ButtonGroup } from 'FunBlocks/Components/UILibrary'
+import DebuggingWorkspace from './DebuggingWorkspace'
 
 const styles = require('./Workspace.module')
 
 type WorkspaceProps = {
-  history: Array<Term>,
-  ruleSet: Array<Rule>,
+  mode: InterpreterMode,
 }
 
-type WorkspaceState = {
-}
-
-class Workspace extends React.Component<WorkspaceProps, WorkspaceState> {
-
-  state = {
-  }
+class Workspace extends React.PureComponent<WorkspaceProps> {
 
   render() {
-    const buttons = this.props.history.map((term) => (
-      <button key={ term.id } />
-    ))
-
-    const rules = this.props.ruleSet.map((rule) => (
-      <RuleBlock key={ rule.id } rule={ rule } />
-    ))
-
     return (
       <Panel mode="fill">
         <Panel.Frame center={ <Panel.Frame.TitleBar title="State Viewer" /> } />
         <Panel.Body>
-          <div className={ styles.workspace }>
-            <div className={ styles.history }>
-              { buttons }
-            </div>
-            <div className={ styles.stateViewer }>
-              {
-                (this.props.history.length > 0) && (
-                  <Block
-                    term={ this.props.history[this.props.history.length - 1] }
-                    onClick={ this.didTermClick.bind(this) }
-                  />
-                )
-              }
-            </div>
-            <div className={ styles.rulesViewer }>{ rules }</div>
-          </div>
+          { (() => {
+            switch (this.props.mode) {
+            case InterpreterMode.Debugging:
+              return <DebuggingWorkspace />
+            default:
+              return null
+            }
+          })() }
         </Panel.Body>
       </Panel>
     )
   }
 
-  didTermClick(term: Term) {
-  }
-
 }
 
 const mapStateToProps = (state: RootState) => ({
-  history: state.interpreterHistory,
-  ruleSet: state.ruleSet,
+  mode: state.interpreter.mode,
 })
 
 export default connect(mapStateToProps)(Workspace)

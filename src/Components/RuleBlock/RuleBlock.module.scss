@@ -1,12 +1,27 @@
 .ruleBlock {
-  padding: 8px;
+  // Override button's default style.
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+  background: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:active {
+    color: inherit;
+  }
+
+  // Component-specific style.
   display: inline-flex;
   align-items: center;
+  padding: 8px;
   border: 4px solid transparent;
   border-radius: 32px;
+  cursor: pointer;
 
-  &:hover {
-    border-color: #f0f0f0;
+  &:hover, &.selected {
+    border-color: #e6e6e6;
+    background-color: #f0f0f0;
   }
 
   & > .left {

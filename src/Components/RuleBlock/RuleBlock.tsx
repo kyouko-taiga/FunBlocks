@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -8,14 +9,23 @@ const styles = require('./RuleBlock.module')
 
 type RuleBlockProps = {
   rule: Rule,
+  selected?: boolean,
   onClick?(e: React.MouseEvent): void
 }
 
 class RuleBlock extends React.Component<RuleBlockProps> {
 
+  static defaultProps = {
+    selected: false,
+  }
+
   render() {
+    const className = classNames(styles.ruleBlock, {
+      [styles.selected]: this.props.selected,
+    })
+
     return (
-      <div className={ styles.ruleBlock }>
+      <button className={ className } onClick={ this.props.onClick }>
         <div className={ styles.left }>
           <Block term={ this.props.rule.left } />
         </div>
@@ -23,7 +33,7 @@ class RuleBlock extends React.Component<RuleBlockProps> {
         <div className={ styles.right }>
           <Block term={ this.props.rule.right } />
         </div>
-      </div>
+      </button>
     )
   }
 
