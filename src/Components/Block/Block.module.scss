@@ -1,0 +1,94 @@
+/// The height of a term block.
+$term-height: 32px;
+
+/// The width of a term block's border.
+$border-width: 4px;
+
+/// The minimum width of a label.
+$label-min-width: $term-height / 2;
+
+/// The length of the adjacent side of a right isosceles triangle whose hypothenuse's length is
+/// `$term-height + 2 * $border-width`, i.e. `sqrt(hyp * hyp / 2)`.
+$var-side: 28.2842712475px;
+
+.expr {
+  height: $term-height;
+  padding: 0 ($term-height / 4);
+  border: $border-width solid;
+  border-radius: $term-height;
+  font-size: ($term-height / 2);
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  & > .expr {
+    margin-left: 8px;
+  }
+}
+
+// .expr:hover {
+//   box-shadow: 0 0 100px 100px rgba(255, 255, 255, 0.3) inset;
+// }
+
+.expr-label {
+  min-width: $label-min-width;
+}
+
+.var {
+  position: relative;
+  height: $term-height;
+  font-size: ($term-height / 2);
+  display: inline-flex;
+  align-items: center;
+  margin: $border-width ($var-side / 2 + $border-width + 4) $border-width ($var-side / 2 + $border-width + 10);
+  cursor: pointer;
+}
+
+.var-side {
+  position: absolute;
+  width: $var-side;
+  height: $var-side;
+  transform: rotate(45deg);
+  z-index: 1;
+
+  &.left {
+    left: (-$term-height / 2 + 4);
+    border-bottom-left-radius: ($border-width / 2);
+    & > div {
+      border-bottom-left-radius: ($border-width / 2);
+      margin: 0 0 0 $border-width;
+    }
+  }
+
+  &.right {
+    right: (-$term-height / 2 + 4);
+    border-top-right-radius: ($border-width / 2);
+    & > div {
+      border-top-right-radius: ($border-width / 2);
+      margin: $border-width 0 0 0;
+    }
+  }
+
+  & > div {
+    width: ($var-side - $border-width);
+    height: ($var-side - $border-width);
+  }
+}
+
+.var-back {
+  position: absolute;
+  width: 100%;
+  height: $term-height;
+  z-index: 0;
+}
+
+.var-label {
+  min-width: $label-min-width;
+  height: $term-height;
+  line-height: $term-height;
+  text-align: center;
+  border: $border-width solid;
+  border-right: transparent;
+  border-left: transparent;
+  z-index: 2;
+}

@@ -1,0 +1,44 @@
+.workspace {
+}
+
+.history {
+  display: flex;
+  height: 34px;
+  background: #f0f0f0;
+
+  & > button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 5px;
+    border-radius: 24px;
+    border: none;
+    font-size: 1rem;
+    background-color: #b3b3b3;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    &:focus {
+      outline: 1px solid #fff;
+      outline-offset: -4px;
+    }
+  }
+}
+
+.stateViewer {
+  padding: 24px 0;
+  margin: 0 12px 12px 12px;
+  text-align: center;
+  border-bottom: 4px solid #f0f0f0;
+}
+
+.rulesViewer {
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.ruleItem {
+  & > *:first-child {
+    margin-right: 8px;
+  }
+}

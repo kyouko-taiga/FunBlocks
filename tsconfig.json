@@ -1,0 +1,19 @@
+
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "types": ["webpack-env"],
+    "jsx": "preserve",
+    "target": "es2016",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "outDir": "./dist/"
+  }
+}

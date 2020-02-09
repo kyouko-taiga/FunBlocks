@@ -1,0 +1,8 @@
+# Built bundles
+dist/build
+
+# Dependency directories
+node_modules/
+
+# macOS
+.DS_Store
