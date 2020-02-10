@@ -12,15 +12,39 @@ import History from './History'
 
 const styles = require('./Workspace.module')
 
-type DebuggingWorkspaceProps = DebuggingContext & {
+type _Props = DebuggingContext & {
   ruleSet: Array<Rule>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
 }
 
-class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
+type _State = {
+  lastInvalidTermID: string
+}
+
+class DebuggingWorkspace extends React.PureComponent<_Props, _State> {
+
+  state = {
+    lastInvalidTermID: null as string,
+  }
 
   render() {
+    // Compute the optional metadata that should be provided to the nested subterms.
+    const meta = {} as { [key: string]: any }
+    if (this.state.lastInvalidTermID !== null) {
+      meta[this.state.lastInvalidTermID] = { invalid: true }
+    }
+
+    // Create the representation of the currently selected computation state.
+    const state = (this.props.historyIndex >= 0) && (
+      <Block
+        term={ this.props.history[this.props.historyIndex] }
+        meta={ meta }
+        onClick={ this.didClickOnExpr.bind(this) }
+      />
+    )
+
+    // Create the representation of the program's rewriting rules.
     const rules = this.props.ruleSet.map((rule) => (
       <RuleBlock
         key={ rule.id }
@@ -34,14 +58,7 @@ class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
       <div className={ styles.workspace }>
         <History />
         <div className={ styles.stateViewer }>
-          {
-            (this.props.historyIndex >= 0) && (
-              <Block
-                term={ this.props.history[this.props.historyIndex] }
-                onClick={ this.didClickOnExpr.bind(this) }
-              />
-            )
-          }
+          { state }
         </div>
         <div className={ styles.rulesViewer }>
           { rules }
@@ -76,15 +93,22 @@ class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
       // Check if the left part of the rule matches the selected term.
       const mapping = expr.match(rule.left)
       if (mapping === null) {
-        console.error('TODO')
+        // FIXME: This is a dirty hack to incur a slight delay between the moment the subterm's
+        // block removes the invalid state and the moments it puts it back, so that the animation
+        // can properly trigger. This code may trigger an error if the component is unmount before
+        // the timeout expires.
+        this.setState({ lastInvalidTermID: null })
+        window.setTimeout(() => this.setState({ lastInvalidTermID: expr.id }), 5);
         return
       }
 
       // Compute the substitution.
-      const result = rule.right.reifying(mapping)
-      const successor = this.props.history[this.props.historyIndex]
-        .substituting(expr.id, result)
-      this.props.pushState(successor)
+      this.setState({ lastInvalidTermID: null }, () => {
+        const result = rule.right.reifying(mapping)
+        const successor = this.props.history[this.props.historyIndex]
+          .substituting(expr.id, result)
+        this.props.pushState(successor)
+      })
     }
   }
 

@@ -6,11 +6,17 @@
   margin: 0 12px 12px 12px;
   text-align: center;
   border-bottom: 4px solid #f0f0f0;
+  overflow-x: scroll;
+
+  & > *:not(:first-child) {
+    margin-top: 24px;
+  }
 }
 
 .rulesViewer {
   padding: 24px 12px;
   text-align: center;
+  overflow-x: scroll;
 }
 
 .ruleItem {

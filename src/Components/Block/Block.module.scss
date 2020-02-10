@@ -26,11 +26,7 @@ $var-side: 28.2842712475px;
   }
 }
 
-// .expr:hover {
-//   box-shadow: 0 0 100px 100px rgba(255, 255, 255, 0.3) inset;
-// }
-
-.expr-label {
+.exprLabel {
   min-width: $label-min-width;
 }
 
@@ -44,7 +40,7 @@ $var-side: 28.2842712475px;
   cursor: pointer;
 }
 
-.var-side {
+.varSide {
   position: absolute;
   width: $var-side;
   height: $var-side;
@@ -75,14 +71,14 @@ $var-side: 28.2842712475px;
   }
 }
 
-.var-back {
+.varBack {
   position: absolute;
   width: 100%;
   height: $term-height;
   z-index: 0;
 }
 
-.var-label {
+.varLabel {
   margin: 0 2px;
   min-width: $label-min-width;
   height: $term-height;
@@ -92,4 +88,26 @@ $var-side: 28.2842712475px;
   border-right: transparent;
   border-left: transparent;
   z-index: 2;
+}
+
+.invalid {
+  animation: shake .5s linear;
+}
+
+@keyframes shake {
+  8%, 41% {
+    transform: translateX(-6px);
+  }
+  25%, 58% {
+    transform: translateX(6px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+  92% {
+    transform: translateX(3px);
+  }
+  0%, 100% {
+    transform: translateX(0);
+  }
 }

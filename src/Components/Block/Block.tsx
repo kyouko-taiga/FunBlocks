@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 
 import { Term, Expression, Variable } from 'FunBlocks/AST/Terms'
@@ -7,13 +8,19 @@ const styles = require('./Block.module')
 
 type BlockProps = {
   term: Term,
+  meta?: { [key: string]: any },
   onClick?(term: Term): void,
   unsetParentHoverState?(): void,
 }
 
-class Block extends React.Component<BlockProps, { hovered: boolean }> {
+type BlockState = {
+  hovered: boolean,
+}
+
+class Block extends React.Component<BlockProps, BlockState> {
 
   static defaultProps = {
+    meta: {},
     onClick: () => {},
   }
 
@@ -26,6 +33,7 @@ class Block extends React.Component<BlockProps, { hovered: boolean }> {
     if (this.props.term instanceof Expression) {
       return <ExprBlock
         term={ this.props.term }
+        meta={ this.props.meta }
         colors={ this.colors() }
         onClick={ this.props.onClick }
         changeHoverState={ this.changeHoverState.bind(this) }
@@ -33,6 +41,7 @@ class Block extends React.Component<BlockProps, { hovered: boolean }> {
     } else if (this.props.term instanceof Variable) {
       return <VarBlock
         term={ this.props.term }
+        meta={ this.props.meta }
         colors={ this.colors() }
         onClick={ this.props.onClick }
         changeHoverState={ this.changeHoverState.bind(this) }
@@ -69,6 +78,7 @@ class Block extends React.Component<BlockProps, { hovered: boolean }> {
 
 type ExprBlockProps = {
   term: Expression,
+  meta?: { [key: string]: any },
   colors: {
     backgroundColor: string,
     borderColor: string,
@@ -88,21 +98,25 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         <Block
           key={ subterm.id }
           term={ subterm }
+          meta={ this.props.meta }
           onClick={ this.props.onClick }
           unsetParentHoverState={ () => this.props.changeHoverState(false) }
         />
       ))
 
+    // Query the meta-properties.
+    const { invalid } = (this.props.meta[this.props.term.id] || {})
+
     return (
       <div
         data-term={ true }
-        className={ styles['expr'] }
+        className={ classNames(styles.expr, { [styles.invalid]: invalid }) }
         style={ this.props.colors }
         onClick={ this.didClick.bind(this) }
         onMouseOver={ this.didEnter.bind(this) }
         onMouseLeave={ this.didLeave.bind(this) }
       >
-        <div className={ styles['expr-label'] }>{ term.label }</div>
+        <div className={ styles.exprLabel }>{ term.label }</div>
         { subterms }
       </div>
     )
@@ -132,6 +146,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
 type VarBlockProps = {
   term: Variable,
+  meta?: { [key: string]: any },
   colors: {
     backgroundColor: string,
     borderColor: string,
@@ -148,29 +163,32 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
     const outerSideStyle = { backgroundColor: this.props.colors.borderColor }
     const innerSideStyle = { backgroundColor: this.props.colors.backgroundColor }
 
+    // Query the meta-properties.
+    const { invalid } = (this.props.meta[this.props.term.id] || {})
+
     return (
       <div
         data-term={ true }
-        className={ styles['var'] }
+        className={ classNames(styles.var, { [styles.invalid]: invalid }) }
         onClick={ this.didClick.bind(this) }
         onMouseOver={ this.didEnter.bind(this) }
         onMouseLeave={ this.didLeave.bind(this) }
       >
         <div
-          className={ `${styles['var-side']} ${styles['left']}` }
+          className={ `${styles.varSide} ${styles.left}` }
           style={ outerSideStyle }
         >
           <div style={ innerSideStyle } />
         </div>
         <div
-          className={ `${styles['var-side']} ${styles['right']}` }
+          className={ `${styles.varSide} ${styles.right}` }
           style={ outerSideStyle }
         >
           <div style={ innerSideStyle } />
         </div>
-        <div className={ styles['var-back'] } style={ innerSideStyle } />
+        <div className={ styles.varBack } style={ innerSideStyle } />
         <div
-          className={ styles['var-label'] }
+          className={ styles.varLabel }
           style={ { borderColor: this.props.colors.borderColor, color: this.props.colors.color } }
         >
           { this.props.term.label }
