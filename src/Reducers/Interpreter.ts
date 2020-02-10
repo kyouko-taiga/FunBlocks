@@ -14,7 +14,7 @@ export type EditingContext = { }
 
 export type DebuggingContext = {
   history: Array<Term>,
-  selectedRule: string,
+  selectedRuleID: string,
 }
 
 export type RunningContext = { }
@@ -30,7 +30,7 @@ const init: InterpreterState = {
   mode: InterpreterMode.Debugging,
   context: {
     history: [] as Array<Term>,
-    selectedRule: null as string,
+    selectedRuleID: null as string,
   },
 }
 
@@ -52,7 +52,7 @@ const interpreter = (state: InterpreterState = init, action: AnyAction): Interpr
       const context = state.context as DebuggingContext
       return {
         ...state,
-        context: { ...context, selectedRule: action.payload },
+        context: { ...context, selectedRuleID: action.payload },
       }
     }
 

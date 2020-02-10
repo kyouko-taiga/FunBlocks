@@ -83,6 +83,7 @@ $var-side: 28.2842712475px;
 }
 
 .var-label {
+  margin: 0 2px;
   min-width: $label-min-width;
   height: $term-height;
   line-height: $term-height;

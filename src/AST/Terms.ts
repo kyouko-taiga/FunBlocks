@@ -15,6 +15,14 @@ export interface Term {
   /// This term's parent, if any.
   parent: Expression
 
+  /// Returns a new term in which occurrences of variables bound in the given mapping are
+  /// substituted by their corresponding term.
+  reifying(mapping: { [key: string]: Term }): Term
+
+  /// Returns a new term in which occurrences of subterms with the given ID are replaced by the
+  /// given term.
+  substituting(subtermID: string, newTerm: Term): Term
+
 }
 
 /// An expression.
@@ -47,6 +55,76 @@ export class Expression implements Term {
     }
   }
 
+  /// Computes a binding mapping variables to terms for which this term matches the given pattern.
+  public match(pattern: Term, context: { [key: string]: Term } = {}): { [key: string]: Term } {
+    // Check for trivial cases.
+    if (this === pattern) {
+      return {}
+    }
+
+    // The pattern's type has to match that of this term.
+    if (this.type !== null && pattern.type !== null && this.type !== pattern.type) {
+      return null
+    }
+
+    if (pattern instanceof Variable) {
+      // Recall that patterns do not need to be linear. Hence if the pattern is a variable, we've
+      // to check if it's already bound in the current context.
+      if (pattern.label in context) {
+        // Check whether the value bound to the variable matches this term.
+        return this.match(context[pattern.label], context)
+      } else {
+        // Free variables always match.
+        return { ...context, [pattern.label]: this }
+      }
+    }
+
+    // Expressions match if their labels are the same, if they have the same arity and if there
+    // exists a binding for which their subterms match.
+    if (pattern instanceof Expression) {
+      if (this.label != pattern.label || this.subterms.length != pattern.subterms.length) {
+        return null
+      }
+
+      let mapping = context
+      for (let i = 0; i < this.subterms.length; ++i) {
+        // The receiver of `match()` is supposed to be a state and therefore it should not contain
+        // any variable in its subterms.
+        console.assert(this.subterms[i] instanceof Expression)
+
+        // Check if the subterms match, given the current context.
+        mapping = (this.subterms[i] as Expression).match(pattern.subterms[i], mapping)
+        if (mapping === null) {
+          return null
+        }
+      }
+      return mapping
+    }
+
+    // This term does not match the pattern.
+    return null
+  }
+
+  public reifying(mapping: { [key: string]: Term }): Term {
+    return new Expression({
+      label: this.label,
+      type: this.type,
+      subterms: this.subterms.map((subterm) => subterm.reifying(mapping)),
+    })
+  }
+
+  public substituting(subtermID: string, newTerm: Term): Term {
+    if (this.id === subtermID) {
+      return newTerm
+    } else {
+      return new Expression({
+        label: this.label,
+        type: this.type,
+        subterms: this.subterms.map((subterm) => subterm.substituting(subtermID, newTerm)),
+      })
+    }
+  }
+
 }
 
 /// A variable.
@@ -69,6 +147,16 @@ export class Variable implements Term {
     this.label = args.label
     this.type = args.type || null
     this.parent = null
+  }
+
+  public reifying(mapping: { [key: string]: Term }): Term {
+    return mapping[this.label] || this
+  }
+
+  public substituting(subtermID: string, newTerm: Term): Term {
+    return this.id === subtermID
+      ? newTerm
+      : this
   }
 
 }

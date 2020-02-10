@@ -10,13 +10,14 @@ const styles = require('./RuleBlock.module')
 type RuleBlockProps = {
   rule: Rule,
   selected?: boolean,
-  onClick?(e: React.MouseEvent): void
+  onClick?(rule: Rule): void
 }
 
 class RuleBlock extends React.Component<RuleBlockProps> {
 
   static defaultProps = {
     selected: false,
+    // onClick: () => {},
   }
 
   render() {
@@ -25,7 +26,7 @@ class RuleBlock extends React.Component<RuleBlockProps> {
     })
 
     return (
-      <button className={ className } onClick={ this.props.onClick }>
+      <button className={ className } onClick={ () => this.props.onClick(this.props.rule) }>
         <div className={ styles.left }>
           <Block term={ this.props.rule.left } />
         </div>

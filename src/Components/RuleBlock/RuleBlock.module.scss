@@ -18,10 +18,17 @@
   border: 4px solid transparent;
   border-radius: 32px;
   cursor: pointer;
+  transition: box-shadow 200ms ease-out;
 
-  &:hover, &.selected {
+  &:hover {
     border-color: #e6e6e6;
     background-color: #f0f0f0;
+  }
+
+  &.selected {
+    border-color: #e6e6e6;
+    background-color: #f0f0f0;
+    box-shadow: 0 0 6px rgba(35, 173, 278, 1);
   }
 
   & > .left {
