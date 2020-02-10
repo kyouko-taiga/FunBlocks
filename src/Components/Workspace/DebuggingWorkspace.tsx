@@ -8,6 +8,7 @@ import Block from 'FunBlocks/Components/Block'
 import RuleBlock from 'FunBlocks/Components/RuleBlock'
 import { DebuggingContext } from 'FunBlocks/Reducers/Interpreter'
 import { RootState } from 'FunBlocks/Store'
+import History from './History'
 
 const styles = require('./Workspace.module')
 
@@ -31,12 +32,12 @@ class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
 
     return (
       <div className={ styles.workspace }>
-        <History states={ this.props.history } />
+        <History />
         <div className={ styles.stateViewer }>
           {
-            (history.length > 0) && (
+            (this.props.historyIndex >= 0) && (
               <Block
-                term={ this.props.history[this.props.history.length - 1] }
+                term={ this.props.history[this.props.historyIndex] }
                 onClick={ this.didClickOnExpr.bind(this) }
               />
             )
@@ -81,10 +82,9 @@ class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
 
       // Compute the substitution.
       const result = rule.right.reifying(mapping)
-      const successor = this.props.history[this.props.history.length - 1]
+      const successor = this.props.history[this.props.historyIndex]
         .substituting(expr.id, result)
       this.props.pushState(successor)
-      this.props.selectRule(null)
     }
   }
 
@@ -94,19 +94,6 @@ class DebuggingWorkspace extends React.PureComponent<DebuggingWorkspaceProps> {
     } else {
       this.props.selectRule(null)
     }
-  }
-
-}
-
-class History extends React.PureComponent<{ states: Array<Term> }> {
-
-  render() {
-    const buttons = this.props.states.map((term) => (<button key={ term.id } />))
-    return (
-      <div className={ styles.history }>
-        { buttons }
-      </div>
-    )
   }
 
 }

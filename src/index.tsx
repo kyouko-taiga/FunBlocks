@@ -43,7 +43,7 @@ store.dispatch(pushState(list([foo(), foo(), bar()])))
 store.dispatch(insertRule(
   new Rule({
     left: list([foo(), v('x')]),
-    right: v('x'),
+    right: list([v('x')]),
   })))
 
 // const planetType = new EnumType({

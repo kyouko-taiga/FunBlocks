@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux'
 
-import { PUSH_STATE, SELECT_RULE } from 'FunBlocks/Actions/Interpreter'
+import { PUSH_STATE, SELECT_RULE, SET_HISTORY_INDEX } from 'FunBlocks/Actions/Interpreter'
 import { Term } from 'FunBlocks/AST/Terms'
 
 /// An enumeration of the modes of the interpreter.
@@ -14,6 +14,7 @@ export type EditingContext = { }
 
 export type DebuggingContext = {
   history: Array<Term>,
+  historyIndex: number,
   selectedRuleID: string,
 }
 
@@ -30,6 +31,7 @@ const init: InterpreterState = {
   mode: InterpreterMode.Debugging,
   context: {
     history: [] as Array<Term>,
+    historyIndex: -1,
     selectedRuleID: null as string,
   },
 }
@@ -38,14 +40,18 @@ const interpreter = (state: InterpreterState = init, action: AnyAction): Interpr
   switch (action.type) {
   case PUSH_STATE:
     if (state.mode == InterpreterMode.Debugging) {
-      const context = state.context as DebuggingContext
+      // Keep the history up to the current index and append the new state.
+      const { history, historyIndex, ...rest } = state.context as DebuggingContext
+      const newContext = {
+        ...rest,
+        history: history.slice(0, historyIndex + 1).concat([ action.payload ]),
+        historyIndex: historyIndex + 1,
+      }
       return {
         ...state,
-        context: { ...context, history: context.history.concat([ action.payload ]) },
+        context: newContext,
       }
     }
-
-    throw new Error(`unexpected action '${action.type} in state '${state.mode}'`)
 
   case SELECT_RULE:
     if (state.mode == InterpreterMode.Debugging) {
@@ -56,11 +62,20 @@ const interpreter = (state: InterpreterState = init, action: AnyAction): Interpr
       }
     }
 
-    throw new Error(`unexpected action '${action.type} in state '${state.mode}'`)
+  case SET_HISTORY_INDEX:
+  if (state.mode == InterpreterMode.Debugging) {
+    const context = state.context as DebuggingContext
+    return {
+      ...state,
+      context: { ...context, historyIndex: action.payload },
+    }
+  }
 
   default:
     return state
   }
+
+  throw new Error(`unexpected action '${action.type} in state '${state.mode}'`)
 }
 
 export default interpreter
