@@ -2,18 +2,22 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "types": ["webpack-env"],
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src",
     "jsx": "preserve",
-    "target": "es2016",
+    "preserveConstEnums": true,
     "module": "es2015",
     "moduleResolution": "node",
     "noImplicitAny": true,
+    "outDir": "./dist/",
+    "paths": {
+      "FunBlocks/*": ["./*"]
+    },
     "removeComments": false,
-    "preserveConstEnums": true,
-    "sourceMap": true,
     "skipLibCheck": true,
-    "outDir": "./dist/"
+    "sourceMap": true,
+    "target": "es2016",
+    "types": ["webpack-env"]
   }
 }
