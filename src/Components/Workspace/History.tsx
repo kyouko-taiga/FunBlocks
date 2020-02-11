@@ -9,7 +9,7 @@ import { RootState } from 'FunBlocks/Store'
 
 const styles = require('./Workspace.module')
 
-type HistoryProps = DebuggingContext & {
+type HistoryProps = {
   states: Array<Term>,
   historyIndex: number,
   setHistoryIndex(index: number): void,
@@ -35,10 +35,13 @@ class History extends React.PureComponent<HistoryProps> {
 
 }
 
-const mapStateToProps = (state: RootState) => ({
-  states      : (state.interpreter.context as DebuggingContext).history,
-  historyIndex: (state.interpreter.context as DebuggingContext).historyIndex,
-})
+const mapStateToProps = (state: RootState) => {
+  const ctx = state.interpreter.context as DebuggingContext
+  return {
+    states: ctx.history,
+    historyIndex: ctx.historyIndex,
+  }
+}
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   setHistoryIndex: (index: number) => dispatch(setHistoryIndex(index)),

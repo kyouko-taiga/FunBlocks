@@ -12,13 +12,13 @@ import History from './History'
 
 const styles = require('./Workspace.module')
 
-type _Props = DebuggingContext & {
+type Props = DebuggingContext & {
   ruleSet: Array<Rule>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
 }
 
-class DebuggingWorkspace extends React.PureComponent<_Props> {
+class DebuggingWorkspace extends React.PureComponent<Props> {
 
   render() {
     // Create the representation of the currently selected computation state.
@@ -101,7 +101,7 @@ class DebuggingWorkspace extends React.PureComponent<_Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  ...state.interpreter.context,
+  ...(state.interpreter.context as DebuggingContext),
   ruleSet: state.ruleSet,
 })
 
