@@ -6,17 +6,42 @@ import Color from 'FunBlocks/Utils/Color'
 
 const styles = require('./Block.module')
 
+// ----- Block component --------------------------------------------------------------------------
+
 type BlockProps = {
+  /** The term to represent graphically. */
   term: Term,
-  meta?: { [key: string]: any },
-  onClick?(term: Term): void,
+
+  /**
+   * A callback that is called whenever the representation is clicked.
+   *
+   * The second argument of the callback is a function `startAnimation()`. A handler may use this
+   * function to "imperatively" trigger an animation on this block. While this approach may not fit
+   * the usual "React-way" to exchange data from parent to children, it offers a simpler way to
+   * implement one-shot animations without using Redux' store.
+   */
+  onClick?(term: Term, startAnimation?: (animation: string) => void): void,
+
+  /** A callback that remove the hovered state on the representation of this term's parent */
   unsetParentHoverState?(): void,
 }
 
 type BlockState = {
-  hovered: boolean,
+  /** Indicates whether the component is hovered by the mouse. */
+  isHovered: boolean,
+
+  /** Indicates whether the component should be rendered with the shaking animation. */
+  isShaking: boolean,
 }
 
+/**
+ * Component representing the graphical representation of a term.
+ * @extends React.Component
+ *
+ * This component acts as a wrapper for either {ExprBlock} or {VarBlock}, depending on whether the
+ * term given as props is an expression or a variable, respectively. It factorizes the logic of a
+ * few UI handlers, manages animations and generates color schemes.
+ */
 class Block extends React.Component<BlockProps, BlockState> {
 
   static defaultProps = {
@@ -25,25 +50,29 @@ class Block extends React.Component<BlockProps, BlockState> {
   }
 
   state = {
-    hovered: false,
+    isHovered: false,
+    isShaking: false,
   }
+
+  private animationTimeoutID: number
 
   render() {
     // Compute the colors for the frame, text and borders.
     if (this.props.term instanceof Expression) {
       return <ExprBlock
         term={ this.props.term }
-        meta={ this.props.meta }
+        isShaking={ this.state.isShaking }
         colors={ this.colors() }
-        onClick={ this.props.onClick }
+        onClick={ this.didClick.bind(this) }
+        onSubtermClick={ this.props.onClick }
         changeHoverState={ this.changeHoverState.bind(this) }
       />
     } else if (this.props.term instanceof Variable) {
       return <VarBlock
         term={ this.props.term }
-        meta={ this.props.meta }
+        isShaking={ this.state.isShaking }
         colors={ this.colors() }
-        onClick={ this.props.onClick }
+        onClick={ this.didClick.bind(this) }
         changeHoverState={ this.changeHoverState.bind(this) }
       />
     } else {
@@ -56,7 +85,7 @@ class Block extends React.Component<BlockProps, BlockState> {
     let baseColor = !!this.props.term.type
       ? this.props.term.type.baseColor
       : Color.gray
-    if (this.state.hovered) {
+    if (this.state.isHovered) {
       baseColor = baseColor.tint.tint
     }
 
@@ -67,8 +96,31 @@ class Block extends React.Component<BlockProps, BlockState> {
     }
   }
 
+  didClick(e: React.MouseEvent) {
+    let elm = e.target as Element
+    while ((elm !== e.currentTarget) && !elm.getAttribute('data-term')) {
+      elm = elm.parentElement
+    }
+    if (elm === e.currentTarget) {
+      this.props.onClick(this.props.term, this.startAnimation.bind(this))
+    }
+  }
+
+  startAnimation(animation: string) {
+    switch (animation) {
+    case 'shake':
+      window.clearTimeout(this.animationTimeoutID)
+      this.setState({ isShaking: true }, () => {
+        this.animationTimeoutID = window.setTimeout(() => this.setState({ isShaking: false }), 500)
+      })
+
+    default:
+      break
+    }
+  }
+
   changeHoverState(value: boolean) {
-    this.setState({ hovered: value })
+    this.setState({ isHovered: value })
     if (value && !!this.props.unsetParentHoverState) {
       this.props.unsetParentHoverState()
     }
@@ -76,15 +128,18 @@ class Block extends React.Component<BlockProps, BlockState> {
 
 }
 
+// ----- ExprBlock component ----------------------------------------------------------------------
+
 type ExprBlockProps = {
   term: Expression,
-  meta?: { [key: string]: any },
+  isShaking: boolean,
   colors: {
     backgroundColor: string,
     borderColor: string,
     color: string,
   },
-  onClick(term: Term): void,
+  onClick(e: React.MouseEvent): void,
+  onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
   changeHoverState(value: boolean): void,
 }
 
@@ -98,21 +153,17 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         <Block
           key={ subterm.id }
           term={ subterm }
-          meta={ this.props.meta }
-          onClick={ this.props.onClick }
+          onClick={ this.props.onSubtermClick }
           unsetParentHoverState={ () => this.props.changeHoverState(false) }
         />
       ))
 
-    // Query the meta-properties.
-    const { invalid } = (this.props.meta[this.props.term.id] || {})
-
     return (
       <div
         data-term={ true }
-        className={ classNames(styles.expr, { [styles.invalid]: invalid }) }
+        className={ classNames(styles.expr, { [styles.shaking]: this.props.isShaking }) }
         style={ this.props.colors }
-        onClick={ this.didClick.bind(this) }
+        onClick={ this.props.onClick }
         onMouseOver={ this.didEnter.bind(this) }
         onMouseLeave={ this.didLeave.bind(this) }
       >
@@ -120,16 +171,6 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         { subterms }
       </div>
     )
-  }
-
-  didClick(e: React.MouseEvent) {
-    let elm = e.target as Element
-    while ((elm !== e.currentTarget) && !elm.getAttribute('data-term')) {
-      elm = elm.parentElement
-    }
-    if (elm === e.currentTarget) {
-      this.props.onClick(this.props.term)
-    }
   }
 
   didEnter(e: React.MouseEvent) {
@@ -146,15 +187,17 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
 type VarBlockProps = {
   term: Variable,
-  meta?: { [key: string]: any },
+  isShaking: boolean,
   colors: {
     backgroundColor: string,
     borderColor: string,
     color: string,
   },
-  onClick(term: Term): void,
+  onClick(e: React.MouseEvent): void,
   changeHoverState(value: boolean): void,
 }
+
+// ----- VarBlock component -----------------------------------------------------------------------
 
 class VarBlock extends React.PureComponent<VarBlockProps> {
 
@@ -163,14 +206,11 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
     const outerSideStyle = { backgroundColor: this.props.colors.borderColor }
     const innerSideStyle = { backgroundColor: this.props.colors.backgroundColor }
 
-    // Query the meta-properties.
-    const { invalid } = (this.props.meta[this.props.term.id] || {})
-
     return (
       <div
         data-term={ true }
-        className={ classNames(styles.var, { [styles.invalid]: invalid }) }
-        onClick={ this.didClick.bind(this) }
+        className={ classNames(styles.var, { [styles.shaking]: this.props.isShaking }) }
+        onClick={ this.props.onClick }
         onMouseOver={ this.didEnter.bind(this) }
         onMouseLeave={ this.didLeave.bind(this) }
       >
@@ -195,16 +235,6 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
         </div>
       </div>
     )
-  }
-
-  didClick(e: React.MouseEvent) {
-    let elm = e.target as Element
-    while ((elm !== e.currentTarget) && !elm.getAttribute('data-term')) {
-      elm = elm.parentElement
-    }
-    if (elm === e.currentTarget) {
-      this.props.onClick(this.props.term)
-    }
   }
 
   didEnter(e: React.MouseEvent) {

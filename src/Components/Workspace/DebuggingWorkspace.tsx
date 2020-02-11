@@ -18,28 +18,13 @@ type _Props = DebuggingContext & {
   selectRule(ruleID: string): void,
 }
 
-type _State = {
-  lastInvalidTermID: string
-}
-
-class DebuggingWorkspace extends React.PureComponent<_Props, _State> {
-
-  state = {
-    lastInvalidTermID: null as string,
-  }
+class DebuggingWorkspace extends React.PureComponent<_Props> {
 
   render() {
-    // Compute the optional metadata that should be provided to the nested subterms.
-    const meta = {} as { [key: string]: any }
-    if (this.state.lastInvalidTermID !== null) {
-      meta[this.state.lastInvalidTermID] = { invalid: true }
-    }
-
     // Create the representation of the currently selected computation state.
     const state = (this.props.historyIndex >= 0) && (
       <Block
         term={ this.props.history[this.props.historyIndex] }
-        meta={ meta }
         onClick={ this.didClickOnExpr.bind(this) }
       />
     )
@@ -82,7 +67,7 @@ class DebuggingWorkspace extends React.PureComponent<_Props, _State> {
     }
   }
 
-  private didClickOnExpr(expr: Expression) {
+  private didClickOnExpr(expr: Expression, startAnimation: (animation: string) => void) {
     // If a rule has been selected, we shall try to apply it on the clicked term to rewrite it.
     const selectedRuleID = this.props.selectedRuleID
     if (selectedRuleID !== null) {
@@ -93,22 +78,15 @@ class DebuggingWorkspace extends React.PureComponent<_Props, _State> {
       // Check if the left part of the rule matches the selected term.
       const mapping = expr.match(rule.left)
       if (mapping === null) {
-        // FIXME: This is a dirty hack to incur a slight delay between the moment the subterm's
-        // block removes the invalid state and the moments it puts it back, so that the animation
-        // can properly trigger. This code may trigger an error if the component is unmount before
-        // the timeout expires.
-        this.setState({ lastInvalidTermID: null })
-        window.setTimeout(() => this.setState({ lastInvalidTermID: expr.id }), 5);
+        startAnimation('shake')
         return
       }
 
       // Compute the substitution.
-      this.setState({ lastInvalidTermID: null }, () => {
-        const result = rule.right.reifying(mapping)
-        const successor = this.props.history[this.props.historyIndex]
-          .substituting(expr.id, result)
-        this.props.pushState(successor)
-      })
+      const result = rule.right.reifying(mapping)
+      const successor = this.props.history[this.props.historyIndex]
+        .substituting(expr.id, result)
+      this.props.pushState(successor)
     }
   }
 
