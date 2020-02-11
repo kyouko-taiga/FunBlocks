@@ -6,14 +6,14 @@ import { pushState, selectRule } from 'FunBlocks/Actions/IDE'
 import { Expression, Term, Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
 import RuleBlock from 'FunBlocks/Components/RuleBlock'
-import { DebugContext } from 'FunBlocks/Reducers/IDE'
+import { DebugContext } from 'FunBlocks/Reducers/Contexts/DebugContext'
 import { RootState } from 'FunBlocks/Store'
 import History from './History'
 
 const styles = require('./Workspace.module')
 
 type Props = DebugContext & {
-  ruleSet: Array<Rule>,
+  rules: Array<Rule>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
 }
@@ -30,7 +30,7 @@ class DebuggingWorkspace extends React.PureComponent<Props> {
     )
 
     // Create the representation of the program's rewriting rules.
-    const rules = this.props.ruleSet.map((rule) => (
+    const rules = this.props.rules.map((rule) => (
       <RuleBlock
         key={ rule.id }
         rule={ rule }
@@ -72,7 +72,7 @@ class DebuggingWorkspace extends React.PureComponent<Props> {
     const selectedRuleID = this.props.selectedRuleID
     if (selectedRuleID !== null) {
       // Load the rule to apply.
-      const rule = this.props.ruleSet.find((r) => r.id == selectedRuleID)
+      const rule = this.props.rules.find((r) => r.id == selectedRuleID)
       console.assert(rule !== undefined, `rule not found '${selectedRuleID}'`)
 
       // Check if the left part of the rule matches the selected term.
@@ -101,8 +101,8 @@ class DebuggingWorkspace extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  ...(state.ide.context as DebugContext),
-  ruleSet: state.ruleSet,
+  ...(state.context as DebugContext),
+  rules: state.program.rules,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

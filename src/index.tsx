@@ -18,8 +18,7 @@ import IDE from './Components/IDE'
 import Color from './Utils/Color'
 import { store } from './Store'
 
-import { pushState } from './Actions/IDE'
-import { insertRule } from './Actions/Program'
+import { insertRule, updateInitialState } from './Actions/IDE'
 
 const ty = new EnumType({
   name: 'Ty', cases: [ new Expression({ label: 'unit' }), new Expression({ label: 'bar' }) ]
@@ -41,7 +40,7 @@ const list = (terms: Array<Term>): Expression => {
 
 const v = (label: string): Variable => new Variable({ label, type: ty })
 
-store.dispatch(pushState(list([foo(), foo(), bar()])))
+store.dispatch(updateInitialState(list([foo(), foo(), bar()])))
 store.dispatch(insertRule(
   new Rule({
     left: list([foo(), v('x')]),

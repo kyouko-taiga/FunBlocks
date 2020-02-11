@@ -17,7 +17,7 @@ class RuleBlock extends React.Component<RuleBlockProps> {
 
   static defaultProps = {
     selected: false,
-    // onClick: () => {},
+    onClick: () => {},
   }
 
   render() {

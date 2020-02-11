@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { IDEMode } from 'FunBlocks/Reducers/IDE'
+import { IDEMode } from 'FunBlocks/Reducers'
 import { RootState } from 'FunBlocks/Store'
 import DebuggingWorkspace from './DebuggingWorkspace'
 
@@ -27,7 +27,7 @@ class Workspace extends React.PureComponent<{ mode: IDEMode }> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  mode: state.ide.mode,
+  mode: state.mode,
 })
 
 export default connect(mapStateToProps)(Workspace)

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { setMode } from 'FunBlocks/Actions/IDE'
-import { IDEMode } from 'FunBlocks/Reducers/IDE'
+import { IDEMode } from 'FunBlocks/Reducers'
 import { RootState } from 'FunBlocks/Store'
 import MenuBarItem from './MenuBarItem'
 
@@ -45,7 +45,7 @@ class MenuBar extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  mode: state.ide.mode,
+  mode: state.mode,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
