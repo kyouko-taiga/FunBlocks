@@ -1,3 +1,72 @@
+.alert {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  text-align: left;
+  opacity: 0.80;
+
+  & > .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: black;
+    }
+  }
+}
+
+.btn {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #f3f3f3;
+  color: #737373;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:hover {
+    color: black;
+  }
+}
+
+.btn-group {
+  display: flex;
+
+  & > .btn {
+    border-left-style: none;
+
+    &:first-child {
+      border-left-style: solid;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    &.active {
+      background-color: #737373;
+      color: white;
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+}
+
 .panel {
   border: 1px solid #cccccc;
   border-radius: 6px;
@@ -32,7 +101,7 @@
       justify-content: center;
       width: 30%;
 
-      & > .titleBar {
+      & > .title-bar {
         height: 44px;
         line-height: 44px;
         text-align: center;
@@ -43,52 +112,6 @@
       display: flex;
       justify-content: flex-end;
       width: 30%;
-    }
-  }
-}
-
-.btn {
-  min-width: 28px;
-  min-height: 28px;
-  padding: 0;
-  margin: 0;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: #f3f3f3;
-  color: #737373;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  &:hover {
-    color: black;
-  }
-}
-
-.buttonGroup {
-  display: flex;
-
-  & > .btn {
-    border-left-style: none;
-
-    &:first-child {
-      border-left-style: solid;
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-    }
-
-    &:last-child {
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-
-    &.active {
-      background-color: #737373;
-      color: white;
-
-      &:hover {
-        color: white;
-      }
     }
   }
 }
