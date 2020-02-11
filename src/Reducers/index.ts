@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux'
 
-import interpreter from './Interpreter'
+import ide from './IDE'
 import ruleSet from './RuleSet'
 
 export default combineReducers({
-  interpreter,
+  ide,
   ruleSet,
 })

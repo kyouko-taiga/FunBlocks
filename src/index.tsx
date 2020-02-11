@@ -14,11 +14,11 @@ import './Icons'
 
 import { Expression, Variable, Rule, Term } from './AST/Terms'
 import { EnumType } from './AST/Types'
-import Workspace from './Components/Workspace'
+import IDE from './Components/IDE'
 import Color from './Utils/Color'
 import { store } from './Store'
 
-import { pushState } from './Actions/Interpreter'
+import { pushState } from './Actions/IDE'
 import { insertRule } from './Actions/Program'
 
 const ty = new EnumType({
@@ -96,7 +96,7 @@ class View extends React.PureComponent {
     return (
       <React.StrictMode>
         <Provider store={ store }>
-          <Workspace />
+          <IDE />
         </Provider>
       </React.StrictMode>
     )

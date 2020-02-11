@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { setHistoryIndex } from 'FunBlocks/Actions/Interpreter'
+import { setHistoryIndex } from 'FunBlocks/Actions/IDE'
 import { Term } from 'FunBlocks/AST/Terms'
-import { DebuggingContext } from 'FunBlocks/Reducers/Interpreter'
+import { DebugContext } from 'FunBlocks/Reducers/IDE'
 import { RootState } from 'FunBlocks/Store'
 
 const styles = require('./Workspace.module')
@@ -36,7 +36,7 @@ class History extends React.PureComponent<HistoryProps> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const ctx = state.interpreter.context as DebuggingContext
+  const ctx = state.ide.context as DebugContext
   return {
     states: ctx.history,
     historyIndex: ctx.historyIndex,

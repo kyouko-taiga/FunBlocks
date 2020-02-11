@@ -1,41 +1,33 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Panel } from 'FunBlocks/Components/UILibrary'
-import { InterpreterMode } from 'FunBlocks/Reducers/Interpreter'
+import { IDEMode } from 'FunBlocks/Reducers/IDE'
 import { RootState } from 'FunBlocks/Store'
 import DebuggingWorkspace from './DebuggingWorkspace'
 
 const styles = require('./Workspace.module')
 
-type WorkspaceProps = {
-  mode: InterpreterMode,
-}
-
-class Workspace extends React.PureComponent<WorkspaceProps> {
+/**
+ * Component representing the workspace area of the IDE.
+ *
+ * The workspace area is the part of the IDE that can be used to edit and debug the program. It
+ * will present a different view, depending on the IDE's mode.
+ */
+class Workspace extends React.PureComponent<{ mode: IDEMode }> {
 
   render() {
-    return (
-      <Panel mode="fill">
-        <Panel.Frame center={ <Panel.Frame.TitleBar title="State Viewer" /> } />
-        <Panel.Body>
-          { (() => {
-            switch (this.props.mode) {
-            case InterpreterMode.Debugging:
-              return <DebuggingWorkspace />
-            default:
-              return null
-            }
-          })() }
-        </Panel.Body>
-      </Panel>
-    )
+    switch (this.props.mode) {
+    case IDEMode.Debug:
+      return <DebuggingWorkspace />
+    default:
+      return null
+    }
   }
 
 }
 
 const mapStateToProps = (state: RootState) => ({
-  mode: state.interpreter.mode,
+  mode: state.ide.mode,
 })
 
 export default connect(mapStateToProps)(Workspace)

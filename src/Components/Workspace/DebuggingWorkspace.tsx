@@ -2,17 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { pushState, selectRule } from 'FunBlocks/Actions/Interpreter'
+import { pushState, selectRule } from 'FunBlocks/Actions/IDE'
 import { Expression, Term, Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
 import RuleBlock from 'FunBlocks/Components/RuleBlock'
-import { DebuggingContext } from 'FunBlocks/Reducers/Interpreter'
+import { DebugContext } from 'FunBlocks/Reducers/IDE'
 import { RootState } from 'FunBlocks/Store'
 import History from './History'
 
 const styles = require('./Workspace.module')
 
-type Props = DebuggingContext & {
+type Props = DebugContext & {
   ruleSet: Array<Rule>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
@@ -101,7 +101,7 @@ class DebuggingWorkspace extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  ...(state.interpreter.context as DebuggingContext),
+  ...(state.ide.context as DebugContext),
   ruleSet: state.ruleSet,
 })
 
