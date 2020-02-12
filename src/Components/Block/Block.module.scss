@@ -19,9 +19,13 @@ $var-side: 28.2842712475px;
   font-size: ($term-height / 2);
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
+  cursor: default;
 
-  & > .expr {
+  &.clickable {
+    cursor: pointer;
+  }
+
+  & > .expr, & > .var, & .dropPlaceholder {
     margin-left: 8px;
   }
 }
@@ -30,14 +34,24 @@ $var-side: 28.2842712475px;
   min-width: $label-min-width;
 }
 
-.var {
+.dropPlaceholder {
+  width: ($term-height * 1.5);
+  height: $term-height + ($border-width * 2);
+  background: transparent;
+}
+
+.var-inner {
   position: relative;
   height: $term-height;
   font-size: ($term-height / 2);
   display: inline-flex;
   align-items: center;
-  margin: $border-width ($var-side / 2 + $border-width + 4) $border-width ($var-side / 2 + $border-width + 10);
-  cursor: pointer;
+  margin: $border-width ($var-side / 2 + $border-width) $border-width ($var-side / 2 + $border-width);
+  cursor: default;
+
+  &.clickable {
+    cursor: pointer;
+  }
 }
 
 .var-side {

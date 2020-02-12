@@ -18,7 +18,7 @@ type Props = DebugContext & {
   selectRule(ruleID: string): void,
 }
 
-class DebuggingWorkspace extends React.PureComponent<Props> {
+class DebugWorkspace extends React.PureComponent<Props> {
 
   render() {
     // Create the representation of the currently selected computation state.
@@ -110,4 +110,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   selectRule: (ruleID: string) => dispatch(selectRule(ruleID)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(DebuggingWorkspace)
+export default connect(mapStateToProps, mapDispatchToProps)(DebugWorkspace)

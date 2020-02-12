@@ -5,15 +5,11 @@ import MenuBar from './MenuBar'
 
 const styles = require('./IDE.module')
 
-type State = {
-
-}
-
-class IDE extends React.Component<{}, State> {
+class IDE extends React.PureComponent {
 
   render() {
     return (
-      <div>
+      <div className={ styles.ide }>
         <MenuBar />
         <Workspace />
       </div>

@@ -1,6 +1,7 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
+import { BlockDataStore, blockDataStore } from './BlockDataStore'
 import { DebugContext, debugContext } from './Contexts/DebugContext'
 import { EditContext, editContext } from './Contexts/EditContext'
 import { RunContext, runContext } from './Contexts/RunContext'
@@ -15,6 +16,7 @@ type IDEState = {
   mode: IDEMode,
   program: Program,
   context: IDEContext,
+  blockDataStore: BlockDataStore,
 }
 
 const contextReducers = {
@@ -27,6 +29,7 @@ const initialState: IDEState = {
   mode: IDEMode.Edit,
   program: program(undefined, { type: null }),
   context: editContext(undefined, { type: null }),
+  blockDataStore: {},
 }
 
 const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
@@ -49,17 +52,21 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   }
 
   // Forward the action to the sub-reducers.
-  const newProgram = program(newState.program, action)
+  const newRemainer = {
+    program: program(newState.program, action),
+    blockDataStore: blockDataStore(newState.blockDataStore, action),
 
-  // Notice that `state.context` must be cast as `any`, because the compiler cannot statically
-  // guarantee that it has the same type as the reducer denoted by `contextReducers[state.mode]`.
-  // A safer version would be to compute the context in a switch case for all possible modes, so
-  // that the compiler may guarantee that it has the appropriate type.
-  const newContext = contextReducers[newState.mode](newState.context as any, action)
+    // Notice that `state.context` must be cast as `any`, because the compiler cannot statically
+    // guarantee that it has the same type as the reducer denoted by `contextReducers[state.mode]`.
+    // A safer version would be to compute the context in a switch case for all possible modes, so
+    // that the compiler may guarantee that it has the appropriate type.
+    context: contextReducers[newState.mode](newState.context as any, action),
+  }
 
   // Create a new state only if one of the sub-reducers produced a different object.
-  return (newProgram !== newState.program) || (newContext !== newState.context)
-    ? { ...newState, program: newProgram, context: newContext }
+  const didChange = Object.keys(newRemainer).some((k) => (newRemainer as any)[k] !== (newState as any)[k])
+  return didChange
+    ? { ...newState, ...newRemainer }
     : newState
 }
 

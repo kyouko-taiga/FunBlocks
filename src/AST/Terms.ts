@@ -13,7 +13,10 @@ export interface Term {
   readonly type?: Type
 
   /// This term's parent, if any.
-  parent: Expression
+  parent: Term
+
+  /// This term's root.
+  root: Term
 
   /// Returns a new term in which occurrences of variables bound in the given mapping are
   /// substituted by their corresponding term.
@@ -41,7 +44,14 @@ export class Expression implements Term {
   public readonly subterms: Array<Term>
 
   /// The parent term of this expression.
-  public parent: Expression
+  public parent: Term
+
+  /// The root term of this expression.
+  public get root(): Term {
+    return this.parent !== null
+      ? this.parent.root
+      : this
+  }
 
   public constructor(args: { label: string, type?: Type, subterms?: Term[] }) {
     this.id = `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
@@ -130,7 +140,7 @@ export class Expression implements Term {
 /// A variable.
 export class Variable implements Term {
 
-  /// A unique identifier for this expression.
+  /// A unique identifier for this variable.
   public readonly id: string
 
   /// The label of this variable.
@@ -139,8 +149,15 @@ export class Variable implements Term {
   /// The type of this variable, if defined.
   public readonly type: Type
 
-  /// The parent term of this expression.
-  public parent: Expression
+  /// The parent term of this variable.
+  public parent: Term
+
+  /// The root term of this variable.
+  public get root(): Term {
+    return this.parent !== null
+      ? this.parent.root
+      : this
+  }
 
   public constructor(args: { label: string, type?: Type }) {
     this.id = `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`

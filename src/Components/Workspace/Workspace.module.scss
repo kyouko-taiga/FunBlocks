@@ -1,5 +1,74 @@
 .workspace {
+  flex-grow: 1;
 }
+
+// Edit Workspace
+
+.workspace.edit {
+  display: flex;
+}
+
+.toolbox {
+  padding: 16px 32px;
+  background: #515258;
+  color: white;
+
+  & > .sectionHeading {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+  }
+
+  & > .tool-matrix {
+    & .row {
+      display: flex;
+      padding: 8px 0;
+
+      &:not(:last-child) {
+        border-bottom: 1px groove white;
+      }
+    }
+
+    & .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 96px;
+      height: 96px;
+      // background: #2c2d30;
+
+      // &:hover {
+      //   background: darken(#2c2d30, 10);
+      //   cursor: default;
+      // }
+
+      &.colspan-2 {
+        width: 196px;
+        margin-right: none;
+      }
+
+      & > .btn-icon > svg {
+        margin: 0 16px;
+      }
+
+      & > span {
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+.program {
+
+  .block-editor {
+    margin: 16px;
+  }
+
+}
+
+// Debug Workspace
 
 .state-viewer {
   padding: 24px 0;

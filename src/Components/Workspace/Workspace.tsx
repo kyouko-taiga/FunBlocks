@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 
 import { IDEMode } from 'FunBlocks/Reducers'
 import { RootState } from 'FunBlocks/Store'
-import DebuggingWorkspace from './DebuggingWorkspace'
+import DebugWorkspace from './DebugWorkspace'
+import EditWorkspace from './EditWorkspace'
 
 const styles = require('./Workspace.module')
 
@@ -18,7 +19,9 @@ class Workspace extends React.PureComponent<{ mode: IDEMode }> {
   render() {
     switch (this.props.mode) {
     case IDEMode.Debug:
-      return <DebuggingWorkspace />
+      return <DebugWorkspace />
+    case IDEMode.Edit:
+      return <EditWorkspace />
     default:
       return null
     }
