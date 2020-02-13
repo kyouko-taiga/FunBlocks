@@ -71,14 +71,14 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Generate the subterms, if any.
     const term = this.props.term
     const subterms = term.subterms
-      .map((subterm) => (
+      .map((subterm, i) => (
         <BlockContainer
           key={ subterm.id }
           term={ subterm }
           editable={ this.props.editable }
           data={ this.props.data }
           onClick={ this.props.onSubtermClick }
-          onChange={ this.props.onChange }
+          onChange={ (newSubterm: Term) => this.didSubtermChange(i, newSubterm) }
           unsetParentHovered={ () => this.props.changeHovered(false) }
           updateData={ this.props.updateData }
         />
@@ -97,6 +97,23 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
   dropPlaceholderData(): { termID: string, placeholderIndex: number } {
     return this.props.data?.dropPlaceholderPosition || { termID: null, placeholderIndex: -1 }
+  }
+
+  didSubtermChange(index: number, newSubterm: Term) {
+    // Propagate the change.
+    const newSubterms = [ ...this.props.term.subterms ]
+    if (newSubterm !== null) {
+      newSubterms[index] = newSubterm
+    } else {
+      delete newSubterms[index]
+    }
+
+    const newTerm = new Expression({
+      label: this.props.term.label,
+      type: this.props.term.type,
+      subterms: newSubterms
+    })
+    this.props.onChange?.(newTerm)
   }
 
   didMouseOver(e: React.MouseEvent<HTMLDivElement>) {
@@ -200,7 +217,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       type: this.props.term.type,
       subterms: newSubterms
     })
-    this.props.onChange(newTerm)
+    this.props.onChange?.(newTerm)
   }
 
   didDoubleClick(e: React.MouseEvent<HTMLDivElement>) {
