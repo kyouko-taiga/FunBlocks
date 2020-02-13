@@ -8,27 +8,28 @@ import { BlockContainer } from './BlockContainer'
 const styles = require('./Block.module')
 
 type ExprBlockProps = {
+
   term: Expression,
   data: { [key: string]: any },
   collapsible: boolean,
+  isCollapsed: boolean,
   isShaking: boolean,
   colors: {
     backgroundColor: string,
     borderColor: string,
     color: string,
   },
+
   onClick?(e: React.MouseEvent): void,
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
   onDropSubterm?(): void,
   changeHoverState(value: boolean): void,
+  changeCollapsed(value: boolean): void,
   updateData(data: { [key: string]: any }): void,
+
 }
 
 class ExprBlock extends React.PureComponent<ExprBlockProps> {
-
-  private get extraProps(): { [key: string]: any } {
-    return (this.props.data && this.props.data[this.props.term.id]) || {}
-  }
 
   render() {
     const className = classNames(styles.expr, 'no-text-select', {
@@ -58,7 +59,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   renderSubterms() {
-    if (this.extraProps.isCollapsed) {
+    if (this.props.isCollapsed) {
       return [
         <span key="ellipsis" className={ styles.ellipsis }>
           <FontAwesomeIcon icon="ellipsis-h" />
@@ -115,7 +116,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     if (!this.props.onDropSubterm) { return }
 
     // Ignore this event if the component is collapsed.
-    if (this.extraProps.isCollapsed) { return }
+    if (this.props.isCollapsed) { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
@@ -145,7 +146,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     if (!this.props.onDropSubterm) { return }
 
     // Ignore this event if the component is collapsed.
-    if (this.extraProps.isCollapsed) { return }
+    if (this.props.isCollapsed) { return }
 
     // Ignore this event unless this block is root, and a drop placeholder is being rendered in
     // either this block or one of its children.
@@ -166,7 +167,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     if (!this.props.onDropSubterm) { return }
 
     // Ignore this event if the component is collapsed.
-    if (this.extraProps.isCollapsed) { return }
+    if (this.props.isCollapsed) { return }
 
     this.props.updateData({ dropPlaceholderPosition: null })
     this.props.onDropSubterm()
@@ -186,10 +187,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     }
     if (elm !== e.currentTarget) { return }
 
-    const extraProps = this.extraProps
-    this.props.updateData({
-      [this.props.term.id]: { ...extraProps, isCollapsed: !extraProps.isCollapsed },
-    })
+    // Toggle the collapsed change.
+    this.props.changeCollapsed(!this.props.isCollapsed)
   }
 
 }

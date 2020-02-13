@@ -16,7 +16,7 @@ export interface BlockProps {
   /** The term to represent graphically. */
   term: Term
 
-  /** Indicates whether or not the block and its subterms are collapsible. */
+  /** Indicates whether the block and its subterms are collapsible. */
   collapsible?: boolean,
 
   /**
@@ -45,6 +45,8 @@ type BlockContainerProps = BlockProps & {
 type BlockContainerState = {
   /** Indicates whether the component is hovered by the mouse. */
   isHovered: boolean,
+  /** Indicates whether the component is collapsed. */
+  isCollapsed: boolean,
   /** Indicates whether the component should be rendered with the shaking animation. */
   isShaking: boolean,
 }
@@ -65,6 +67,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
 
   state = {
     isHovered: false,
+    isCollapsed: false,
     isShaking: false,
   }
 
@@ -73,13 +76,13 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
   render() {
     // Compute component-independent properties.
     const childProps = {
-      data            : this.props.data,
-      onClick         : this.props.onClick && this.didClick.bind(this),
-      onDropSubterm   : this.props.onDropSubterm,
-      updateData      : this.props.updateData,
-      isShaking       : this.state.isShaking,
-      colors          : this.colors(),
       changeHoverState: this.changeHoverState.bind(this),
+      data          : this.props.data,
+      onClick       : this.props.onClick && this.didClick.bind(this),
+      onDropSubterm : this.props.onDropSubterm,
+      updateData    : this.props.updateData,
+      isShaking     : this.state.isShaking,
+      colors        : this.colors(),
     }
 
     // Select and render the appropriate component.
@@ -89,7 +92,9 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
         { ...childProps }
         term={ term }
         collapsible={ this.props.collapsible }
+        isCollapsed={ this.state.isCollapsed }
         onSubtermClick={ this.props.onClick }
+        changeCollapsed={ this.changeCollapsed.bind(this) }
       />
     } else if (term instanceof Variable) {
       return <VarBlock { ...childProps } term={ term } />
@@ -122,6 +127,10 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     if (elm === e.currentTarget) {
       this.props.onClick(this.props.term, this.startAnimation.bind(this))
     }
+  }
+
+  changeCollapsed(value: boolean) {
+    this.setState({ isCollapsed: value })
   }
 
   startAnimation(animation: string) {
