@@ -3,3 +3,11 @@ body {
   padding: 0;
   margin: 0;
 }
+
+.no-text-select {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
