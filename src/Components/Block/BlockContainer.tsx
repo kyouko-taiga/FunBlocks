@@ -33,7 +33,7 @@ export interface BlockProps {
   onDropSubterm?(): void,
 
   /** A callback that removes the hovered state on the representation of this term's parent. */
-  unsetParentHoverState?(): void
+  unsetParentHovered?(): void
 
 }
 
@@ -76,13 +76,13 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
   render() {
     // Compute component-independent properties.
     const childProps = {
-      changeHoverState: this.changeHoverState.bind(this),
       data          : this.props.data,
       onClick       : this.props.onClick && this.didClick.bind(this),
       onDropSubterm : this.props.onDropSubterm,
       updateData    : this.props.updateData,
       isShaking     : this.state.isShaking,
       colors        : this.colors(),
+      changeHovered : this.changeHovered.bind(this),
     }
 
     // Select and render the appropriate component.
@@ -129,6 +129,13 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     }
   }
 
+  changeHovered(value: boolean) {
+    this.setState({ isHovered: value })
+    if (value && !!this.props.unsetParentHovered) {
+      this.props.unsetParentHovered()
+    }
+  }
+
   changeCollapsed(value: boolean) {
     this.setState({ isCollapsed: value })
   }
@@ -143,13 +150,6 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
 
     default:
       break
-    }
-  }
-
-  changeHoverState(value: boolean) {
-    this.setState({ isHovered: value })
-    if (value && !!this.props.unsetParentHoverState) {
-      this.props.unsetParentHoverState()
     }
   }
 

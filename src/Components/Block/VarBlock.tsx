@@ -15,7 +15,7 @@ type VarBlockProps = {
     color: string,
   },
   onClick?(e: React.MouseEvent): void,
-  changeHoverState(value: boolean): void,
+  changeHovered(value: boolean): void,
 }
 
 class VarBlock extends React.PureComponent<VarBlockProps> {
@@ -64,12 +64,12 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
   }
 
   didMouseOver(e: React.MouseEvent) {
-    this.props.changeHoverState(true)
+    this.props.changeHovered(true)
     e.stopPropagation()
   }
 
   didMouseLeave(e: React.MouseEvent) {
-    this.props.changeHoverState(false)
+    this.props.changeHovered(false)
     e.stopPropagation()
   }
 

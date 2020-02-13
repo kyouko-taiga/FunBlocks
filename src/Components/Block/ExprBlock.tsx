@@ -23,7 +23,7 @@ type ExprBlockProps = {
   onClick?(e: React.MouseEvent): void,
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
   onDropSubterm?(): void,
-  changeHoverState(value: boolean): void,
+  changeHovered(value: boolean): void,
   changeCollapsed(value: boolean): void,
   updateData(data: { [key: string]: any }): void,
 
@@ -77,7 +77,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
           data={ this.props.data }
           onClick={ this.props.onSubtermClick }
           onDropSubterm={ this.props.onDropSubterm }
-          unsetParentHoverState={ () => this.props.changeHoverState(false) }
+          unsetParentHovered={ () => this.props.changeHovered(false) }
           updateData={ this.props.updateData }
         />
       ))
@@ -102,12 +102,12 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   didMouseOver(e: React.MouseEvent<HTMLDivElement>) {
-    this.props.changeHoverState(true)
+    this.props.changeHovered(true)
     e.stopPropagation()
   }
 
   didMouseLeave(e: React.MouseEvent<HTMLDivElement>) {
-    this.props.changeHoverState(false)
+    this.props.changeHovered(false)
     e.stopPropagation()
   }
 
