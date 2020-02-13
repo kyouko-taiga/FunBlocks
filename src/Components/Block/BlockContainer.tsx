@@ -16,8 +16,17 @@ export interface BlockProps {
   /** The term to represent graphically. */
   term: Term
 
-  /** Indicates whether the block and its subterms are collapsible. */
+  /** Indicates whether the block and its subterms are collapsible (default: true). */
   collapsible?: boolean,
+
+  /**
+   * Indicates whether the block and its subterms are editable (default: `false`).
+   *
+   * Setting this flag will make this block react to the user interactions that can trigger its
+   * modification. This include drag and drop events originating from the program editor's toolbox
+   * (for additions) and drag events originating from a subterm (for deletions).
+   */
+  editable?: boolean,
 
   /**
    * A callback that is called whenever the representation is clicked.
@@ -29,8 +38,8 @@ export interface BlockProps {
    */
   onClick?(term: Term, startAnimation?: (animation: string) => void): void
 
-  /** A callback that is called when another block is dropped onto this one. */
-  onDropSubterm?(): void,
+  /** A callback that is called when the term has been modified. */
+  onChange?(newTerm: Term): void,
 
   /** A callback that removes the hovered state on the representation of this term's parent. */
   unsetParentHovered?(): void
@@ -63,6 +72,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
 
   static defaultProps = {
     collapsible: true,
+    editable: false,
   }
 
   state = {
@@ -78,7 +88,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     const childProps = {
       data          : this.props.data,
       onClick       : this.props.onClick && this.didClick.bind(this),
-      onDropSubterm : this.props.onDropSubterm,
+      onChange      : this.props.onChange,
       updateData    : this.props.updateData,
       isShaking     : this.state.isShaking,
       colors        : this.colors(),
@@ -93,6 +103,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
         term={ term }
         collapsible={ this.props.collapsible }
         isCollapsed={ this.state.isCollapsed }
+        editable={ this.props.editable }
         onSubtermClick={ this.props.onClick }
         changeCollapsed={ this.changeCollapsed.bind(this) }
       />

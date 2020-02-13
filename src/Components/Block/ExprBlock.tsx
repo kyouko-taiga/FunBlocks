@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Expression, Term } from 'FunBlocks/AST/Terms'
+import { Expression, Term, Variable } from 'FunBlocks/AST/Terms'
 import { BlockContainer } from './BlockContainer'
 
 const styles = require('./Block.module')
@@ -13,6 +13,7 @@ type ExprBlockProps = {
   data: { [key: string]: any },
   collapsible: boolean,
   isCollapsed: boolean,
+  editable: boolean,
   isShaking: boolean,
   colors: {
     backgroundColor: string,
@@ -22,7 +23,7 @@ type ExprBlockProps = {
 
   onClick?(e: React.MouseEvent): void,
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
-  onDropSubterm?(): void,
+  onChange?(newTerm: Term): void,
   changeHovered(value: boolean): void,
   changeCollapsed(value: boolean): void,
   updateData(data: { [key: string]: any }): void,
@@ -74,9 +75,10 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         <BlockContainer
           key={ subterm.id }
           term={ subterm }
+          editable={ this.props.editable }
           data={ this.props.data }
           onClick={ this.props.onSubtermClick }
-          onDropSubterm={ this.props.onDropSubterm }
+          onChange={ this.props.onChange }
           unsetParentHovered={ () => this.props.changeHovered(false) }
           updateData={ this.props.updateData }
         />
@@ -94,11 +96,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   dropPlaceholderData(): { termID: string, placeholderIndex: number } {
-    if (!!this.props.data && !!this.props.data.dropPlaceholderPosition) {
-      return this.props.data.dropPlaceholderPosition
-    } else {
-      return { termID: null, placeholderIndex: -1 }
-    }
+    return this.props.data?.dropPlaceholderPosition || { termID: null, placeholderIndex: -1 }
   }
 
   didMouseOver(e: React.MouseEvent<HTMLDivElement>) {
@@ -112,8 +110,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   didDragOver(e: React.DragEvent<HTMLDivElement>) {
-    // Ignore this event id there's the component didn't recieve any drop handler.
-    if (!this.props.onDropSubterm) { return }
+    // Ignore this event if the block isn't editable.
+    if (!this.props.editable) { return }
 
     // Ignore this event if the component is collapsed.
     if (this.props.isCollapsed) { return }
@@ -142,8 +140,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   didDragLeave(e: React.DragEvent<HTMLDivElement>) {
-    // Ignore this event id there's the component didn't recieve any drop handler.
-    if (!this.props.onDropSubterm) { return }
+    // Ignore this event if the block isn't editable.
+    if (!this.props.editable) { return }
 
     // Ignore this event if the component is collapsed.
     if (this.props.isCollapsed) { return }
@@ -163,14 +161,46 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   didDrop(e: React.DragEvent<HTMLDivElement>) {
-    // Ignore this event if there's the component didn't recieve any drop handler.
-    if (!this.props.onDropSubterm) { return }
+    // Ignore this event if the block isn't editable.
+    if (!this.props.editable) { return }
 
     // Ignore this event if the component is collapsed.
     if (this.props.isCollapsed) { return }
 
+    // Ignore this event if this block is not the direct target of the drop.
+    const { termID, placeholderIndex } = this.dropPlaceholderData()
+    if (this.props.term.id !== termID) { return }
+
+    // Remove the drop placeholder.
     this.props.updateData({ dropPlaceholderPosition: null })
-    this.props.onDropSubterm()
+
+    // Parse the data transferred along with the drag event.
+    const rawEventData = e.dataTransfer.getData('text/plain')
+    const eventData = JSON.parse(rawEventData)
+    e.dataTransfer.clearData()
+
+    // Modify the term and notify the parent with the updated version.
+    const newSubterms = [ ...this.props.term.subterms ]
+    switch (eventData?.kind) {
+    case 'expression':
+      newSubterms.splice(placeholderIndex, 0, new Expression({ label: 'abc' }))
+      break
+
+    case 'variable':
+      newSubterms.splice(placeholderIndex, 0, new Variable({ label: 'x' }))
+      break
+
+    default:
+      console.warn('ignored unexpected drop')
+      return
+    }
+
+    const newTerm = new Expression({
+      label: this.props.term.label,
+      type: this.props.term.type,
+      subterms: newSubterms
+    })
+    this.props.onChange(newTerm)
   }
 
   didDoubleClick(e: React.MouseEvent<HTMLDivElement>) {
