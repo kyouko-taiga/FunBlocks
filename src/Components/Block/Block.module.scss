@@ -17,13 +17,12 @@ $var-side: 28.2842712475px;
   border: $border-width solid;
   border-radius: $term-height;
   font-size: ($term-height / 2);
-  display: inline-flex;
   align-items: center;
   cursor: default;
 
-  &.clickable {
-    cursor: pointer;
-  }
+  // FIXME: `inline-flex` might be a better choice here. Unfortunately it seems to break dragging
+  // for children in Safari 13.0.5.
+  display: flex;
 
   & > .expr, & > .var, & > .ellipsis, & > .dropPlaceholder {
     margin-left: 8px;
@@ -55,10 +54,6 @@ $var-side: 28.2842712475px;
   align-items: center;
   margin: $border-width ($var-side / 2 + $border-width) $border-width ($var-side / 2 + $border-width);
   cursor: default;
-
-  &.clickable {
-    cursor: pointer;
-  }
 }
 
 .var-side {
