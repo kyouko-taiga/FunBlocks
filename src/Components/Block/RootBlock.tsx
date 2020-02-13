@@ -8,7 +8,7 @@ import { RootState } from 'FunBlocks/Store'
 import { BlockContainer, BlockProps } from './BlockContainer'
 
 const mapStateToProps = (state: RootState, ownProps: BlockProps) => ({
-  data: state.blockDataStore[ownProps.term.id] || null,
+  data: state.blockData[ownProps.term.id] || null,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch, ownProps: BlockProps) => {

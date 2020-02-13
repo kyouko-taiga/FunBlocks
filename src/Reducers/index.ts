@@ -1,10 +1,11 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
-import { BlockDataStore, blockDataStore } from './BlockDataStore'
+import { BlockData, blockData } from './BlockData'
 import { DebugContext, debugContext } from './Contexts/DebugContext'
 import { EditContext, editContext } from './Contexts/EditContext'
 import { RunContext, runContext } from './Contexts/RunContext'
+import { DragData, dragData } from './DragData'
 import { Program, program } from './Program'
 
 /// An enumeration of the modes of the IDE.
@@ -16,7 +17,8 @@ type IDEState = {
   mode: IDEMode,
   program: Program,
   context: IDEContext,
-  blockDataStore: BlockDataStore,
+  blockData: BlockData,
+  dragData: DragData,
 }
 
 const contextReducers = {
@@ -29,7 +31,8 @@ const initialState: IDEState = {
   mode: IDEMode.Edit,
   program: program(undefined, { type: null }),
   context: editContext(undefined, { type: null }),
-  blockDataStore: {},
+  blockData: blockData(undefined, { type: null }),
+  dragData: dragData(undefined, { type: null }),
 }
 
 const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
@@ -54,7 +57,8 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   // Forward the action to the sub-reducers.
   const newRemainer = {
     program: program(newState.program, action),
-    blockDataStore: blockDataStore(newState.blockDataStore, action),
+    blockData: blockData(newState.blockData, action),
+    dragData: dragData(newState.dragData, action),
 
     // Notice that `state.context` must be cast as `any`, because the compiler cannot statically
     // guarantee that it has the same type as the reducer denoted by `contextReducers[state.mode]`.

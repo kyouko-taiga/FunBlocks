@@ -2,11 +2,9 @@ import { AnyAction } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/BlockData'
 
-export type BlockDataStore = {
-  [key: string]: { [key: string]: any },
-}
+export type BlockData = StringDictionary<StringDictionary>
 
-export const blockDataStore = (state: BlockDataStore = {}, action: AnyAction): BlockDataStore => {
+export const blockData = (state: BlockData = {}, action: AnyAction): BlockData => {
   switch (action.type) {
   case ACTION_TYPES.CLEAR_BLOCKDATA: {
     const newState = { ...state }
