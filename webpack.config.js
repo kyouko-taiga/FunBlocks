@@ -22,7 +22,9 @@ module.exports = {
                 '@babel/typescript',
                 '@babel/react',
               ],
-              plugins: [],
+              plugins: [
+                '@babel/plugin-proposal-optional-chaining',
+              ],
             },
           },
           {
