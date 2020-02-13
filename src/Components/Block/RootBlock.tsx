@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch: Dispatch, ownProps: BlockProps) => {
   const key = ownProps.term.id
   return {
     clearData: () => dispatch(clearBlockData(key)),
-    updateData: (data: { [key: string]: any }) => (
+    updateData: (data: Dictionary) => (
       dispatch(updateBlockData(key, data))),
   }
 }

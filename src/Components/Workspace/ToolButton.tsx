@@ -12,7 +12,7 @@ type Props = {
   kind: string,
   colspan?: number,
   children?: React.ReactNode,
-  setDragData(type: string, payload?: StringDictionary): void,
+  setDragData(type: string, payload?: Dictionary): void,
   clearDragData(): void,
 }
 
@@ -52,7 +52,7 @@ class ToolButton extends React.PureComponent<Props> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  setDragData: (type: string, payload?: StringDictionary) => dispatch(setData(type, payload)),
+  setDragData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
   clearDragData: () => dispatch(clearData()),
 })
 

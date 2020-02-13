@@ -12,7 +12,7 @@ const styles = require('./Block.module')
 type ExprBlockProps = {
 
   term: Expression,
-  data: { [key: string]: any },
+  data: Dictionary,
   collapsible: boolean,
   isCollapsed: boolean,
   editable: boolean,
@@ -22,14 +22,14 @@ type ExprBlockProps = {
     borderColor: string,
     color: string,
   },
-  dragData: { type: string, payload: StringDictionary },
+  dragData: { type: string, payload: Dictionary },
 
   onClick?(e: React.MouseEvent): void,
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
   onChange?(newTerm: Term): void,
   changeHovered(value: boolean): void,
   changeCollapsed(value: boolean): void,
-  updateData(data: { [key: string]: any }): void,
+  updateData(data: Dictionary): void,
 
 }
 

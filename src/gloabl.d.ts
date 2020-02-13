@@ -1,1 +1,1 @@
-type StringDictionary<T=any> = { [key: string]: T }
+type Dictionary<T=any> = { [key: string]: T }

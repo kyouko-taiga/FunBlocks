@@ -47,8 +47,8 @@ export interface BlockProps {
 }
 
 type BlockContainerProps = BlockProps & {
-  data: { [key: string]: any },
-  updateData(data: { [key: string]: any }): void,
+  data: Dictionary,
+  updateData(data: Dictionary): void,
 }
 
 type BlockContainerState = {

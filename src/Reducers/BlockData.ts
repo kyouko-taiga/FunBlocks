@@ -2,7 +2,7 @@ import { AnyAction } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/BlockData'
 
-export type BlockData = StringDictionary<StringDictionary>
+export type BlockData = Dictionary<Dictionary>
 
 export const blockData = (state: BlockData = {}, action: AnyAction): BlockData => {
   switch (action.type) {

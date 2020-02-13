@@ -1,6 +1,6 @@
 import { Dispatch, Middleware, MiddlewareAPI } from 'redux'
 
-const throttled: { [key: string]: boolean } = {}
+const throttled: Dictionary<boolean> = {}
 
 const throttler: Middleware = ({ getState }: MiddlewareAPI) => (next: Dispatch) => (action) => {
   const delay = action.meta && action.meta.throttlingDelay

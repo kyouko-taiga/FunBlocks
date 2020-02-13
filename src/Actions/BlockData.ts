@@ -12,8 +12,8 @@ export const clearBlockData = (key: string): PayloadAction<string> => ({
 
 export const updateBlockData = (
   key: string,
-  data: { [key: string]: any }
-): PayloadAction<{ key: string, data: { [key: string]: any } }> => ({
+  data: Dictionary
+): PayloadAction<{ key: string, data: Dictionary }> => ({
   type: ACTION_TYPES.UPDATE_BLOCKDATA,
   payload: { key, data },
 })

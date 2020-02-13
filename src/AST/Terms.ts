@@ -20,7 +20,7 @@ export interface Term {
 
   /// Returns a new term in which occurrences of variables bound in the given mapping are
   /// substituted by their corresponding term.
-  reifying(mapping: { [key: string]: Term }): Term
+  reifying(mapping: Dictionary<Term>): Term
 
   /// Returns a new term in which occurrences of subterms with the given ID are replaced by the
   /// given term.
@@ -66,7 +66,7 @@ export class Expression implements Term {
   }
 
   /// Computes a binding mapping variables to terms for which this term matches the given pattern.
-  public match(pattern: Term, context: { [key: string]: Term } = {}): { [key: string]: Term } {
+  public match(pattern: Term, context: Dictionary<Term> = {}): Dictionary<Term> {
     // Check for trivial cases.
     if (this === pattern) {
       return {}
@@ -115,7 +115,7 @@ export class Expression implements Term {
     return null
   }
 
-  public reifying(mapping: { [key: string]: Term }): Term {
+  public reifying(mapping: Dictionary<Term>): Term {
     return new Expression({
       label: this.label,
       type: this.type,
@@ -166,7 +166,7 @@ export class Variable implements Term {
     this.parent = null
   }
 
-  public reifying(mapping: { [key: string]: Term }): Term {
+  public reifying(mapping: Dictionary<Term>): Term {
     return mapping[this.label] || this
   }
 

@@ -7,7 +7,7 @@ const styles = require('./Block.module')
 
 type VarBlockProps = {
   term: Variable,
-  data: { [key: string]: any },
+  data: Dictionary,
   isShaking: boolean,
   colors: {
     backgroundColor: string,

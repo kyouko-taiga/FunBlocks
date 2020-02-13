@@ -9,7 +9,7 @@ export const ACTION_TYPES = {
 
 export const clearData = (): Action => ({ type: ACTION_TYPES.CLEAR_DATA })
 
-export const setData = (type: string, payload?: StringDictionary): PayloadAction<DragData> => ({
+export const setData = (type: string, payload?: Dictionary): PayloadAction<DragData> => ({
   type: ACTION_TYPES.SET_DATA,
   payload: { type, payload },
 })

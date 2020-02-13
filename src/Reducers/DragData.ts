@@ -4,7 +4,7 @@ import { ACTION_TYPES } from 'FunBlocks/Actions/DragData'
 
 export type DragData = {
   type: string,
-  payload: StringDictionary,
+  payload: Dictionary,
 }
 
 const initialState: DragData = { type: null, payload: null }
