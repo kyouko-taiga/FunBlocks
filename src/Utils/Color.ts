@@ -108,11 +108,12 @@ class Color {
     }
   }
 
-  public static black = Color.hsl(0, 0, 0)
-
-  public static gray = Color.hsl(0, 0, 0.7)
-
-  public static white = Color.hsl(0, 0, 1)
+  public static black   = Color.hsl(0, 0, 0)
+  public static gray    = Color.hsl(0, 0, 0.7)
+  public static white   = Color.hsl(0, 0, 1)
+  public static red     = Color.rgb(244, 67, 54)
+  public static blue    = Color.rgb(33, 150, 243)
+  public static orange  = Color.rgb(255, 152, 0)
 
 }
 
