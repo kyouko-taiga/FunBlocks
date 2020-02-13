@@ -25,13 +25,20 @@ $var-side: 28.2842712475px;
     cursor: pointer;
   }
 
-  & > .expr, & > .var, & .dropPlaceholder {
+  & > .expr, & > .var, & > .ellipsis, & > .dropPlaceholder {
     margin-left: 8px;
   }
 }
 
 .expr-label {
   min-width: $label-min-width;
+  height: $term-height + ($border-width * 2);
+  line-height: $term-height + ($border-width * 2);
+}
+
+.ellipsis {
+  height: $term-height + ($border-width * 2);
+  line-height: $term-height + ($border-width * 2);
 }
 
 .dropPlaceholder {

@@ -32,7 +32,7 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
 
     return (
       <div
-        data-term
+        data-term={ this.props.term.id }
         className={ className }
         onClick={ this.props.onClick }
         onMouseOver={ this.didMouseOver.bind(this) }

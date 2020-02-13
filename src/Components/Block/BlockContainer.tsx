@@ -16,6 +16,9 @@ export interface BlockProps {
   /** The term to represent graphically. */
   term: Term
 
+  /** Indicates whether or not the block and its subterms are collapsible. */
+  collapsible?: boolean,
+
   /**
    * A callback that is called whenever the representation is clicked.
    *
@@ -56,6 +59,10 @@ type BlockContainerState = {
  */
 export class BlockContainer extends React.Component<BlockContainerProps, BlockContainerState> {
 
+  static defaultProps = {
+    collapsible: true,
+  }
+
   state = {
     isHovered: false,
     isShaking: false,
@@ -78,7 +85,12 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     // Select and render the appropriate component.
     const term = this.props.term
     if (term instanceof Expression) {
-      return <ExprBlock { ...childProps } term={ term } onSubtermClick={ this.props.onClick } />
+      return <ExprBlock
+        { ...childProps }
+        term={ term }
+        collapsible={ this.props.collapsible }
+        onSubtermClick={ this.props.onClick }
+      />
     } else if (term instanceof Variable) {
       return <VarBlock { ...childProps } term={ term } />
     } else {

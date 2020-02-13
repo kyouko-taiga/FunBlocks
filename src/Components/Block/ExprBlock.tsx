@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Expression, Term } from 'FunBlocks/AST/Terms'
 import { BlockContainer } from './BlockContainer'
@@ -9,6 +10,7 @@ const styles = require('./Block.module')
 type ExprBlockProps = {
   term: Expression,
   data: { [key: string]: any },
+  collapsible: boolean,
   isShaking: boolean,
   colors: {
     backgroundColor: string,
@@ -24,7 +26,46 @@ type ExprBlockProps = {
 
 class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
+  private get extraProps(): { [key: string]: any } {
+    return (this.props.data && this.props.data[this.props.term.id]) || {}
+  }
+
   render() {
+    const className = classNames(styles.expr, 'no-text-select', {
+      [styles.clickable]: !!this.props.onClick,
+      [styles.shaking]: this.props.isShaking,
+    })
+
+    return (
+      <div
+        data-term={ this.props.term.id }
+        className={ className }
+        style={ this.props.colors }
+        onClick={ this.props.onClick }
+        onMouseOver={ this.didMouseOver.bind(this) }
+        onMouseLeave={ this.didMouseLeave.bind(this) }
+        onDragOver={ this.didDragOver.bind(this) }
+        onDragLeave={ this.didDragLeave.bind(this) }
+        onDrop={ this.didDrop.bind(this) }
+        onDoubleClick={ this.didDoubleClick.bind(this) }
+      >
+        <div className={ styles.exprLabel }>
+          { this.props.term.label }
+        </div>
+        { this.renderSubterms() }
+      </div>
+    )
+  }
+
+  renderSubterms() {
+    if (this.extraProps.isCollapsed) {
+      return [
+        <span key="ellipsis" className={ styles.ellipsis }>
+          <FontAwesomeIcon icon="ellipsis-h" />
+        </span>
+      ]
+    }
+
     // Generate the subterms, if any.
     const term = this.props.term
     const subterms = term.subterms
@@ -48,27 +89,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       ))
     }
 
-    const className = classNames(styles.expr, 'no-text-select', {
-      [styles.clickable]: !!this.props.onClick,
-      [styles.shaking]: this.props.isShaking,
-    })
-
-    return (
-      <div
-        data-term
-        className={ className }
-        style={ this.props.colors }
-        onClick={ this.props.onClick }
-        onMouseOver={ this.didMouseOver.bind(this) }
-        onMouseLeave={ this.didMouseLeave.bind(this) }
-        onDragOver={ this.didDragOver.bind(this) }
-        onDragLeave={ this.didDragLeave.bind(this) }
-        onDrop={ this.didDrop.bind(this) }
-      >
-        <div className={ styles.exprLabel }>{ term.label }</div>
-        { subterms }
-      </div>
-    )
+    return subterms
   }
 
   dropPlaceholderData(): { termID: string, placeholderIndex: number } {
@@ -79,12 +100,12 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     }
   }
 
-  didMouseOver(e: React.MouseEvent) {
+  didMouseOver(e: React.MouseEvent<HTMLDivElement>) {
     this.props.changeHoverState(true)
     e.stopPropagation()
   }
 
-  didMouseLeave(e: React.MouseEvent) {
+  didMouseLeave(e: React.MouseEvent<HTMLDivElement>) {
     this.props.changeHoverState(false)
     e.stopPropagation()
   }
@@ -92,6 +113,9 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   didDragOver(e: React.DragEvent<HTMLDivElement>) {
     // Ignore this event id there's the component didn't recieve any drop handler.
     if (!this.props.onDropSubterm) { return }
+
+    // Ignore this event if the component is collapsed.
+    if (this.extraProps.isCollapsed) { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
@@ -120,6 +144,9 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Ignore this event id there's the component didn't recieve any drop handler.
     if (!this.props.onDropSubterm) { return }
 
+    // Ignore this event if the component is collapsed.
+    if (this.extraProps.isCollapsed) { return }
+
     // Ignore this event unless this block is root, and a drop placeholder is being rendered in
     // either this block or one of its children.
     if (!this.props.data || !this.props.data.dropPlaceholderPosition) { return }
@@ -135,11 +162,34 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
   }
 
   didDrop(e: React.DragEvent<HTMLDivElement>) {
-    // Ignore this event id there's the component didn't recieve any drop handler.
+    // Ignore this event if there's the component didn't recieve any drop handler.
     if (!this.props.onDropSubterm) { return }
+
+    // Ignore this event if the component is collapsed.
+    if (this.extraProps.isCollapsed) { return }
 
     this.props.updateData({ dropPlaceholderPosition: null })
     this.props.onDropSubterm()
+  }
+
+  didDoubleClick(e: React.MouseEvent<HTMLDivElement>) {
+    // Ignore this event if this term isn't collapsible.
+    if (!this.props.collapsible) { return }
+
+    // Ignore this event if this term doesn't have any subterm.
+    if (this.props.term.subterms.length == 0) { return }
+
+    // Ignore this event if it originates from a subterm.
+    let elm = e.target as Element
+    while ((elm !== e.currentTarget) && !elm.getAttribute('data-term')) {
+      elm = elm.parentElement
+    }
+    if (elm !== e.currentTarget) { return }
+
+    const extraProps = this.extraProps
+    this.props.updateData({
+      [this.props.term.id]: { ...extraProps, isCollapsed: !extraProps.isCollapsed },
+    })
   }
 
 }
