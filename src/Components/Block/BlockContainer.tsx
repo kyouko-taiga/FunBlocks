@@ -90,6 +90,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
       onClick       : this.props.onClick && this.didClick.bind(this),
       onChange      : this.props.onChange,
       updateData    : this.props.updateData,
+      editable      : this.props.editable,
       isShaking     : this.state.isShaking,
       colors        : this.colors(),
       changeHovered : this.changeHovered.bind(this),
@@ -103,7 +104,6 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
         term={ term }
         collapsible={ this.props.collapsible }
         isCollapsed={ this.state.isCollapsed }
-        editable={ this.props.editable }
         onSubtermClick={ this.props.onClick }
         changeCollapsed={ this.changeCollapsed.bind(this) }
       />
