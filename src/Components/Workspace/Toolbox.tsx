@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
+import ToolButton from './ToolButton'
 
 const styles = require('./Workspace.module')
 
@@ -20,7 +21,7 @@ class Toolbox extends React.PureComponent {
         </div>
         <div className={ styles.toolMatrix }>
           <div className={ styles.row }>
-            <ToolButton label="Term" kind="term">
+            <ToolButton label="Expression" kind="expression">
               <Block term={ this.dummyExpr } />
             </ToolButton>
             <ToolButton label="Variable" kind="variable">
@@ -41,34 +42,6 @@ class Toolbox extends React.PureComponent {
         </div>
       </div>
     )
-  }
-
-}
-
-class ToolButton extends React.PureComponent<{ label: string, kind: string, colspan?: number }> {
-
-  static defaultProps = {
-    colspan: 1,
-  }
-
-  render() {
-    const className = classNames(
-      styles.btn,
-      styles['colspan' + this.props.colspan],
-      'no-text-select')
-
-    return (
-      <div className={ className }>
-        <div className={ styles.btnIcon } draggable onDragStart={ this.didDragStart.bind(this) }>
-          { this.props.children }
-        </div>
-        <span>{ this.props.label }</span>
-      </div>
-    )
-  }
-
-  didDragStart(e: React.DragEvent<HTMLDivElement>) {
-    e.dataTransfer.setData('text/plain', `{ "kind": "${this.props.kind}" }`)
   }
 
 }

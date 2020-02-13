@@ -1,8 +1,10 @@
 import classNames from 'classnames'
 import React from 'react'
+import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Expression, Term, Variable } from 'FunBlocks/AST/Terms'
+import { RootState } from 'FunBlocks/Store'
 import { BlockContainer } from './BlockContainer'
 
 const styles = require('./Block.module')
@@ -20,6 +22,7 @@ type ExprBlockProps = {
     borderColor: string,
     color: string,
   },
+  dragData: { type: string, payload: StringDictionary },
 
   onClick?(e: React.MouseEvent): void,
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
@@ -133,6 +136,10 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Ignore this event if the component is collapsed.
     if (this.props.isCollapsed) { return }
 
+    // Ignore this event if the data attached to the drag event is not compatible.
+    const dragKind = this.props.dragData.payload?.kind
+    if ((dragKind !== 'expression') && (dragKind !== 'variable')) { return }
+
     // Allow data to be dropped onto this block.
     e.preventDefault()
 
@@ -191,14 +198,9 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Remove the drop placeholder.
     this.props.updateData({ dropPlaceholderPosition: null })
 
-    // Parse the data transferred along with the drag event.
-    const rawEventData = e.dataTransfer.getData('text/plain')
-    const eventData = JSON.parse(rawEventData)
-    e.dataTransfer.clearData()
-
     // Modify the term and notify the parent with the updated version.
     const newSubterms = [ ...this.props.term.subterms ]
-    switch (eventData?.kind) {
+    switch (this.props.dragData.payload?.kind) {
     case 'expression':
       newSubterms.splice(placeholderIndex, 0, new Expression({ label: 'abc' }))
       break
@@ -208,7 +210,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       break
 
     default:
-      console.warn('ignored unexpected drop')
+      console.warn('ignored unexpected drop payload')
       return
     }
 
@@ -240,4 +242,6 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
 }
 
-export default ExprBlock
+const mapStateToProps = (state: RootState) => ({ dragData: state.dragData })
+
+export default connect(mapStateToProps)(ExprBlock)
