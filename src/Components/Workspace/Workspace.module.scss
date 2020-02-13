@@ -2,6 +2,13 @@
   flex-grow: 1;
 }
 
+.sectionHeading {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
 // Edit Workspace
 
 .workspace.edit {
@@ -12,13 +19,6 @@
   padding: 16px 32px;
   background: #515258;
   color: white;
-
-  & > .sectionHeading {
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 0.8rem;
-    margin-bottom: 8px;
-  }
 
   & > .tool-matrix {
     & .row {
@@ -37,12 +37,6 @@
       justify-content: center;
       width: 96px;
       height: 96px;
-      // background: #2c2d30;
-
-      // &:hover {
-      //   background: darken(#2c2d30, 10);
-      //   cursor: default;
-      // }
 
       &.colspan-2 {
         width: 196px;
@@ -61,11 +55,7 @@
 }
 
 .program {
-
-  .block-editor {
-    margin: 16px;
-  }
-
+  padding: 16px 32px;
 }
 
 // Debug Workspace
