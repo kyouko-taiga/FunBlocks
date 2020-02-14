@@ -52,6 +52,8 @@ type BlockContainerProps = BlockProps & {
 }
 
 type BlockContainerState = {
+  /** Indicates whether the component is faded (for drag events). */
+  isFaded: boolean,
   /** Indicates whether the component is hovered by the mouse. */
   isHovered: boolean,
   /** Indicates whether the component is collapsed. */
@@ -76,6 +78,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
   }
 
   state = {
+    isFaded: false,
     isHovered: false,
     isCollapsed: false,
     isShaking: false,
@@ -90,9 +93,11 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
       onClick       : this.props.onClick && this.didClick.bind(this),
       onChange      : this.props.onChange,
       updateData    : this.props.updateData,
+      isFaded       : this.state.isFaded,
       editable      : this.props.editable,
       isShaking     : this.state.isShaking,
       colors        : this.colors(),
+      changeFaded   : this.changeFaded.bind(this),
       changeHovered : this.changeHovered.bind(this),
     }
 
@@ -138,6 +143,10 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     if (elm === e.currentTarget) {
       this.props.onClick(this.props.term, this.startAnimation.bind(this))
     }
+  }
+
+  changeFaded(value: boolean) {
+    this.setState({ isFaded: value })
   }
 
   changeHovered(value: boolean) {

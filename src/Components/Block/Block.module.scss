@@ -11,6 +11,10 @@ $label-min-width: $term-height / 2;
 /// `$term-height + 2 * $border-width`, i.e. `sqrt(hyp * hyp / 2)`.
 $var-side: 28.2842712475px;
 
+.expr.faded, .var.faded {
+  opacity: 0.5;
+}
+
 .expr {
   height: $term-height;
   padding: 0 ($term-height / 4);

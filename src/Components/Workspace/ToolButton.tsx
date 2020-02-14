@@ -3,17 +3,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { setData, clearData } from 'FunBlocks/Actions/DragData'
+import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
+import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
 
 const styles = require('./Workspace.module')
 
 type Props = {
   label: string,
-  kind: string,
   colspan?: number,
   children?: React.ReactNode,
-  setDragData(type: string, payload?: Dictionary): void,
-  clearDragData(): void,
+  draggedData: DraggedData | (() => DraggedData),
+  setDraggedData(type: string, payload?: Dictionary): void,
+  clearDraggedData(): void,
 }
 
 class ToolButton extends React.PureComponent<Props> {
@@ -28,15 +29,13 @@ class ToolButton extends React.PureComponent<Props> {
       styles['colspan' + this.props.colspan],
       'no-text-select')
 
-    // Note that according to the drag-n-drop specification model, `dragend` event occurs **after**
-    // the drop event. Hence it should be safe to clear the drag data on `dragend` here.
     return (
       <div className={ className }>
         <div
           draggable
           className={ styles.btnIcon }
           onDragStart={ this.didDragStart.bind(this) }
-          onDragEnd={ this.props.clearDragData }
+          onDragEnd={ this.props.clearDraggedData }
         >
           { this.props.children }
         </div>
@@ -46,14 +45,17 @@ class ToolButton extends React.PureComponent<Props> {
   }
 
   didDragStart(e: React.DragEvent<HTMLDivElement>) {
-    this.props.setDragData('toolButton', { kind: this.props.kind })
+    const data = this.props.draggedData instanceof Function
+      ? this.props.draggedData()
+      : this.props.draggedData
+    this.props.setDraggedData(data.type, data.payload)
   }
 
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  setDragData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
-  clearDragData: () => dispatch(clearData()),
+  setDraggedData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
+  clearDraggedData: () => dispatch(clearData()),
 })
 
 export default connect(null, mapDispatchToProps)(ToolButton)

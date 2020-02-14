@@ -1,21 +1,42 @@
 import classNames from 'classnames'
 import React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
-import { Variable } from 'FunBlocks/AST/Terms'
+import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
+import { Term, Variable } from 'FunBlocks/AST/Terms'
 
 const styles = require('./Block.module')
 
 type VarBlockProps = {
+  /// The variable to render.
   term: Variable,
+  /// The data associated with this variable's root term.
   data: Dictionary,
+  /// Whether the block is faded.
+  isFaded: boolean
+  /// Whether the block is editable.
+  editable: boolean,
+  /// Whether the block is shaking (i.e. animated with the `shake` animation).
   isShaking: boolean,
+  /// The colors with which the expression should be rendered.
   colors: {
     backgroundColor: string,
     borderColor: string,
     color: string,
   },
+  /// The callback to call on click events.
   onClick?(e: React.MouseEvent): void,
+  /// The callback to call when the rendered expression was modified by the user.
+  onChange?(newTerm: Term): void,
+  /// A callback to set whether the rendered block is faded.
+  changeFaded(value: boolean): void,
+  /// A callback to set whether the rendered block is hovered.
   changeHovered(value: boolean): void,
+  /// An action dispatcher that sets drag data.
+  setDraggedData(type: string, payload?: any): void,
+  /// An action creater that clears drag data.
+  clearDraggedData(): void,
 }
 
 class VarBlock extends React.PureComponent<VarBlockProps> {
@@ -26,7 +47,7 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
     const innerSideStyle = { backgroundColor: this.props.colors.backgroundColor }
 
     const className = classNames(styles.var, 'no-text-select', {
-      [styles.clickable]: !!this.props.onClick,
+      [styles.faded]: this.props.isFaded,
       [styles.shaking]: this.props.isShaking,
     })
 
@@ -34,9 +55,12 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
       <div
         data-term={ this.props.term.id }
         className={ className }
+        draggable={ this.props.editable }
         onClick={ this.props.onClick }
         onMouseOver={ this.didMouseOver.bind(this) }
         onMouseLeave={ this.didMouseLeave.bind(this) }
+        onDragStart={ this.didDragStart.bind(this) }
+        onDragEnd={ this.didDragEnd.bind(this) }
       >
         <div className={ styles.varInner }>
           <div
@@ -73,6 +97,23 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
     e.stopPropagation()
   }
 
+  didDragStart(e: React.DragEvent<HTMLDivElement>) {
+    this.props.changeFaded(true)
+    this.props.setDraggedData('Term', this.props.term)
+    e.stopPropagation()
+  }
+
+  didDragEnd(e: React.DragEvent<HTMLDivElement>) {
+    this.props.changeFaded(false)
+    this.props.clearDraggedData()
+    e.stopPropagation()
+  }
+
 }
 
-export default VarBlock
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  setDraggedData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
+  clearDraggedData: () => dispatch(clearData()),
+})
+
+export default connect(null, mapDispatchToProps)(VarBlock)

@@ -43,8 +43,13 @@
         margin-right: none;
       }
 
-      & > .btn-icon > svg {
-        margin: 0 16px;
+      & > .btn-icon {
+        display: flex;
+        align-items: center;
+
+        & > svg {
+          margin: 0 16px;
+        }
       }
 
       & > span {

@@ -21,27 +21,41 @@ class Toolbox extends React.PureComponent {
         </div>
         <div className={ styles.toolMatrix }>
           <div className={ styles.row }>
-            <ToolButton label="Expression" kind="expression">
+            <ToolButton label="Expression" draggedData={ this.createExprDraggedData.bind(this) }>
               <Block term={ this.dummyExpr } />
             </ToolButton>
-            <ToolButton label="Variable" kind="variable">
+            <ToolButton label="Variable" draggedData={ this.createVarDraggedData.bind(this) }>
               <Block term={ this.dummyVar } />
             </ToolButton>
           </div>
           <div className={ styles.row }>
-            <ToolButton label="Rule" colspan={ 2 } kind="rule">
+            <ToolButton label="Rule" colspan={ 2 } draggedData={ { type: 'Rule' } }>
               <Block term={ this.dummyExpr } />
               <FontAwesomeIcon icon="arrow-right" size="lg" />
               <Block term={ this.dummyExpr } />
             </ToolButton>
           </div>
           <div className={ styles.row }>
-            <ToolButton label="Type" kind="type" />
-            <ToolButton label="Handler" kind="handler" />
+            <ToolButton label="Type" draggedData={ { type: 'Type' } } />
+            <ToolButton label="Handler" draggedData={ { type: 'Handler' } } />
           </div>
         </div>
       </div>
     )
+  }
+
+  createExprDraggedData() {
+    return {
+      type: 'Term',
+      payload: new Expression({ label: 'abc' }),
+    }
+  }
+
+  createVarDraggedData() {
+    return {
+      type: 'Term',
+      payload: new Variable({ label: 'x' }),
+    }
   }
 
 }

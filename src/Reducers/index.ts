@@ -5,7 +5,7 @@ import { BlockData, blockData } from './BlockData'
 import { DebugContext, debugContext } from './Contexts/DebugContext'
 import { EditContext, editContext } from './Contexts/EditContext'
 import { RunContext, runContext } from './Contexts/RunContext'
-import { DragData, dragData } from './DragData'
+import { DraggedData, draggedData } from './DraggedData'
 import { Program, program } from './Program'
 
 /// An enumeration of the modes of the IDE.
@@ -18,7 +18,7 @@ type IDEState = {
   program: Program,
   context: IDEContext,
   blockData: BlockData,
-  dragData: DragData,
+  draggedData: DraggedData,
 }
 
 const contextReducers = {
@@ -32,7 +32,7 @@ const initialState: IDEState = {
   program: program(undefined, { type: null }),
   context: editContext(undefined, { type: null }),
   blockData: blockData(undefined, { type: null }),
-  dragData: dragData(undefined, { type: null }),
+  draggedData: draggedData(undefined, { type: null }),
 }
 
 const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
@@ -58,7 +58,7 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   const newRemainer = {
     program: program(newState.program, action),
     blockData: blockData(newState.blockData, action),
-    dragData: dragData(newState.dragData, action),
+    draggedData: draggedData(newState.draggedData, action),
 
     // Notice that `state.context` must be cast as `any`, because the compiler cannot statically
     // guarantee that it has the same type as the reducer denoted by `contextReducers[state.mode]`.
