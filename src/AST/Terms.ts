@@ -1,67 +1,89 @@
 import { Type } from './Types'
 
 /// A term.
-export interface Term {
+export abstract class Term {
 
   /// This term's ID.
-  readonly id: string
+  public readonly id: string
 
   /// This term's label.
-  readonly label: string
+  public readonly label: string
 
   /// This term's type, if defined.
-  readonly type?: Type
+  public readonly type?: Type
+
+  _parent: Expression = null
 
   /// This term's parent, if any.
-  parent: Term
+  public get parent(): Expression {
+    return this._parent
+  }
 
   /// This term's root.
-  root: Term
+  public get root(): Term {
+    return this._parent !== null
+      ? this._parent.root
+      : this
+  }
 
-  /// Returns a new term in which occurrences of variables bound in the given mapping are
-  /// substituted by their corresponding term.
-  reifying(mapping: Dictionary<Term>): Term
+  /// A shallow copy of this term.
+  public abstract get clone(): Term
 
-  /// Returns a new term in which occurrences of subterms with the given ID are replaced by the
-  /// given term.
-  substituting(subtermID: string, newTerm: Term): Term
+  /// A textual description of this term.
+  public abstract get description(): string
+
+  protected constructor(id: string, label: string, type?: Type) {
+    this.id = id
+    this.label = label
+    this.type = type
+  }
+
+  /// Returns a term in which occurrences of variables bound in the given mapping are substituted
+  /// for their corresponding term.
+  ///
+  /// - Parameter mapping: A mapping from variable labels to terms.
+  public abstract reified(mapping: Dictionary<Term>): Term
+
+  /// Returns a term in which occurrences of terms identified by the given IDs are substituted for
+  /// their corresponding term in the given mapping.
+  ///
+  /// - Parameter mapping:
+  ///   A mapping from term IDs to terms or null values. The latter can be used to remove subterms.
+  ///
+  /// - Note:
+  ///   As terms are supposed to be immutable, all terms that are ancestor of a substituted subterm
+  ///   must also be substituted by a new term, invalidating their former identifiers. It follows
+  ///   that these identifiers cannot be used on subsequent calls to `substituting`. Instead, all
+  ///   substitutions should be applied at once.
+  public abstract substituting(mapping: Dictionary<Term>): Term
 
 }
 
 /// An expression.
-export class Expression implements Term {
-
-  /// A unique identifier for this expression.
-  public readonly id: string
-
-  /// The label of this expression.
-  public readonly label: string
-
-  /// The type of this expression, if defined.
-  public readonly type: Type
+export class Expression extends Term {
 
   /// The subterms of this expression.
   public readonly subterms: Array<Term>
 
-  /// The parent term of this expression.
-  public parent: Term
+  public get clone(): Expression {
+    return new Expression({ label: this.label, type: this.type, subterms: this.subterms })
+  }
 
-  /// The root term of this expression.
-  public get root(): Term {
-    return this.parent !== null
-      ? this.parent.root
-      : this
+  public get description(): string {
+    let result = this.label
+    if (this.subterms.length > 0) {
+      result = result + `(${this.subterms.map((subterm) => subterm.description).join(', ')})`
+    }
+    return result
   }
 
   public constructor(args: { label: string, type?: Type, subterms?: Term[] }) {
-    this.id = `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    this.label = args.label
-    this.subterms = args.subterms || []
-    this.type = args.type || null
-    this.parent = null
+    const id = `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
+    super(id, args.label, args.type)
 
+    this.subterms = args.subterms || []
     for (const subterm of this.subterms) {
-      subterm.parent = this
+      subterm._parent = this
     }
   }
 
@@ -115,64 +137,78 @@ export class Expression implements Term {
     return null
   }
 
-  public reifying(mapping: Dictionary<Term>): Term {
-    return new Expression({
-      label: this.label,
-      type: this.type,
-      subterms: this.subterms.map((subterm) => subterm.reifying(mapping)),
-    })
+  public reified(mapping: Dictionary<Term>): Term {
+    if (this.subterms.length == 0) {
+      return this
+    }
+
+    let mutated = false
+    const reifiedSubterms = []
+    for (let i = 0; i < this.subterms.length; ++i) {
+      const reified = this.subterms[i].reified(mapping)
+      if (reified !== this.subterms[i]) {
+        mutated = true
+      }
+      reifiedSubterms.push(reified)
+    }
+
+    return mutated
+      ? new Expression({ label: this.label, type: this.type, subterms: reifiedSubterms })
+      : this
   }
 
-  public substituting(subtermID: string, newTerm: Term): Term {
-    if (this.id === subtermID) {
-      return newTerm
-    } else {
-      return new Expression({
-        label: this.label,
-        type: this.type,
-        subterms: this.subterms.map((subterm) => subterm.substituting(subtermID, newTerm)),
-      })
+  public substituting(mapping: Dictionary<Term>): Term {
+    if (this.id in mapping) {
+      return mapping[this.id]?.substituting(mapping) || null
     }
+
+    if (this.subterms.length == 0) {
+      return this
+    }
+
+    let mutated = false
+    const substitutedSubterms = []
+    for (let i = 0; i < this.subterms.length; ++i) {
+      const substituted = this.subterms[i].substituting(mapping)
+      if (substituted !== this.subterms[i]) {
+        mutated = true
+        if (substituted === null) { continue }
+      }
+      substitutedSubterms.push(substituted)
+    }
+
+    return mutated
+      ? new Expression({ label: this.label, type: this.type, subterms: substitutedSubterms })
+      : this
   }
 
 }
 
 /// A variable.
-export class Variable implements Term {
+export class Variable extends Term {
 
-  /// A unique identifier for this variable.
-  public readonly id: string
+  public get clone(): Variable {
+    return new Variable({ label: this.label, type: this.type })
+  }
 
-  /// The label of this variable.
-  public readonly label: string
-
-  /// The type of this variable, if defined.
-  public readonly type: Type
-
-  /// The parent term of this variable.
-  public parent: Term
-
-  /// The root term of this variable.
-  public get root(): Term {
-    return this.parent !== null
-      ? this.parent.root
-      : this
+  public get description(): string {
+    return `$${this.label}`
   }
 
   public constructor(args: { label: string, type?: Type }) {
-    this.id = `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    this.label = args.label
-    this.type = args.type || null
-    this.parent = null
+    const id = `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
+    super(id, args.label, args.type)
   }
 
-  public reifying(mapping: Dictionary<Term>): Term {
-    return mapping[this.label] || this
+  public reified(mapping: Dictionary<Term>): Term {
+    return this.label in mapping
+      ? mapping[this.label]
+      : this
   }
 
-  public substituting(subtermID: string, newTerm: Term): Term {
-    return this.id === subtermID
-      ? newTerm
+  public substituting(mapping: Dictionary<Term>): Term {
+    return this.id in mapping
+      ? mapping[this.id]
       : this
   }
 
