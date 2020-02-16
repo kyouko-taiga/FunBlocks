@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
+import ObjectTrash from './ObjectTrash'
 import ToolButton from './ToolButton'
 
 const styles = require('./Workspace.module')
@@ -16,9 +17,7 @@ class Toolbox extends React.PureComponent {
   render() {
     return (
       <div className={ styles.toolbox }>
-        <div className={ styles.sectionHeading }>
-          Blocks
-        </div>
+        <div className={ styles.sectionHeading }>Objects</div>
         <div className={ styles.toolMatrix }>
           <div className={ styles.row }>
             <ToolButton label="Expression" draggedData={ this.createExprDraggedData.bind(this) }>
@@ -35,11 +34,9 @@ class Toolbox extends React.PureComponent {
               <Block term={ this.dummyExpr } />
             </ToolButton>
           </div>
-          <div className={ styles.row }>
-            <ToolButton label="Type" draggedData={ { type: 'Type' } } />
-            <ToolButton label="Handler" draggedData={ { type: 'Handler' } } />
-          </div>
         </div>
+        <div className={ styles.sectionHeading }>Trash</div>
+        <ObjectTrash />
       </div>
     )
   }

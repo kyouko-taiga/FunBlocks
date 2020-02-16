@@ -8,6 +8,7 @@ import {
   faPen,
   faPlay,
   faSquare,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -18,4 +19,5 @@ library.add(
   faMousePointer,
   faPen,
   faPlay,
-  faSquare)
+  faSquare,
+  faTrash)

@@ -57,6 +57,15 @@
       }
     }
   }
+
+  & > .trash {
+    text-align: center;
+    color: #c8c8c8;
+
+    & > .trash-icon {
+      display: inline;
+    }
+  }
 }
 
 .program {
