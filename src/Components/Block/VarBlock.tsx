@@ -34,7 +34,7 @@ type VarBlockProps = {
   /// A callback to set whether the rendered block is hovered.
   changeHovered(value: boolean): void,
   /// An action dispatcher that sets drag data.
-  setDraggedData(type: string, payload?: any): void,
+  setDraggedData(type: string, payload?: any, callbacks?: Dictionary<Function>): void,
   /// An action creater that clears drag data.
   clearDraggedData(): void,
 }
@@ -99,7 +99,7 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
 
   didDragStart(e: React.DragEvent<HTMLDivElement>) {
     this.props.changeFaded(true)
-    this.props.setDraggedData('Term', this.props.term)
+    this.props.setDraggedData('Term', this.props.term, { onChange: this.props.onChange })
     e.stopPropagation()
   }
 
@@ -112,7 +112,8 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  setDraggedData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
+  setDraggedData: (type: string, payload?: Dictionary, callbacks?: Dictionary<Function>) =>
+    dispatch(setData(type, payload, callbacks)),
   clearDraggedData: () => dispatch(clearData()),
 })
 

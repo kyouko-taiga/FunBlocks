@@ -33,7 +33,7 @@ type ExprBlockProps = {
     color: string,
   },
   /// The data associated with drag events.
-  draggedData: { type: string, payload: any },
+  draggedData: { type: string, payload?: any, callback?: Dictionary<Function> },
   /// The callback to call on click events.
   onClick?(e: React.MouseEvent): void,
   /// The click callback to pass on to children.
@@ -49,7 +49,7 @@ type ExprBlockProps = {
   /// A callback to update the data associated with this expression's root term.
   updateData(data: Dictionary): void,
   /// An action dispatcher that sets drag data.
-  setDraggedData(type: string, payload?: any): void,
+  setDraggedData(type: string, payload?: any, callbacks?: Dictionary<Function>): void,
   /// An action creater that clears drag data.
   clearDraggedData(): void,
 }
@@ -138,7 +138,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
   didDragStart(e: React.DragEvent<HTMLDivElement>) {
     this.props.changeFaded(true)
-    this.props.setDraggedData('Term', this.props.term)
+    this.props.setDraggedData('Term', this.props.term, {  onChange: this.props.onChange })
     e.stopPropagation()
   }
 
@@ -279,7 +279,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 const mapStateToProps = (state: RootState) => ({ draggedData: state.draggedData })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  setDraggedData: (type: string, payload?: Dictionary) => dispatch(setData(type, payload)),
+  setDraggedData: (type: string, payload?: Dictionary, callbacks?: Dictionary<Function>) =>
+    dispatch(setData(type, payload, callbacks)),
   clearDraggedData: () => dispatch(clearData()),
 })
 
