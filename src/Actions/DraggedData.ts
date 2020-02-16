@@ -31,7 +31,11 @@ export const ACTION_TYPES = {
 export const clearData = (): Action => ({ type: ACTION_TYPES.CLEAR_DATA })
 
 /// Writes new data to the drag data store.
-export const setData = (type: string, payload?: any): PayloadAction<DraggedData> => ({
+export const setData = (
+  type: string,
+  payload?: any,
+  callbacks?: Dictionary<Function>
+): PayloadAction<DraggedData> => ({
   type: ACTION_TYPES.SET_DATA,
-  payload: { type, payload },
+  payload: { type, payload, callbacks },
 })

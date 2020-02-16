@@ -5,9 +5,10 @@ import { ACTION_TYPES } from 'FunBlocks/Actions/DraggedData'
 export type DraggedData = {
   type: string,
   payload?: any,
+  callbacks?: Dictionary<Function>,
 }
 
-const initialState: DraggedData = { type: null, payload: null }
+const initialState: DraggedData = { type: null }
 export const draggedData = (state: DraggedData = initialState, action: AnyAction): DraggedData => {
   switch (action.type) {
   case ACTION_TYPES.CLEAR_DATA:
