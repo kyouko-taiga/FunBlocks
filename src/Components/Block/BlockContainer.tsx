@@ -90,13 +90,14 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
     // Compute component-independent properties.
     const childProps = {
       data          : this.props.data,
-      onClick       : this.props.onClick && this.didClick.bind(this),
+      onClick       : this.didClick.bind(this),
       onChange      : this.props.onChange,
       updateData    : this.props.updateData,
       isFaded       : this.state.isFaded,
       editable      : this.props.editable,
       isShaking     : this.state.isShaking,
       colors        : this.colors(),
+      onChangeLabel : this.didChangeLabel.bind(this),
       changeFaded   : this.changeFaded.bind(this),
       changeHovered : this.changeHovered.bind(this),
     }
@@ -141,8 +142,20 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
       elm = elm.parentElement
     }
     if (elm === e.currentTarget) {
-      this.props.onClick(this.props.term, this.startAnimation.bind(this))
+      this.props.onClick?.(this.props.term, this.startAnimation.bind(this))
     }
+  }
+
+  didChangeLabel(e: React.KeyboardEvent<HTMLInputElement>) {
+    // Ignore this event if this block isn't editable.
+    if (!this.props.editable) { return }
+
+    // Modifiy the term's label.
+    const newLabel = (e.target as HTMLInputElement).value
+    const newRoot = this.props.term.root.substituting({
+      [this.props.term.id]: this.props.term.renamed(newLabel)
+    })
+    this.props.onChange?.(newRoot)
   }
 
   changeFaded(value: boolean) {

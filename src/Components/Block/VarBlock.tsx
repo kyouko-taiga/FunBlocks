@@ -29,6 +29,8 @@ type VarBlockProps = {
   onClick?(e: React.MouseEvent): void,
   /// The callback to call when the rendered expression was modified by the user.
   onChange?(newTerm: Term): void,
+  /// A callback to change the block's label.
+  onChangeLabel(e: React.ChangeEvent<HTMLInputElement>): void,
   /// A callback to set whether the rendered block is faded.
   changeFaded(value: boolean): void,
   /// A callback to set whether the rendered block is hovered.
@@ -80,11 +82,25 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
             className={ styles.varLabel }
             style={ { borderColor: this.props.colors.borderColor, color: this.props.colors.color } }
           >
-            { this.props.term.label }
+            { this.renderLabel() }
           </div>
         </div>
       </div>
     )
+  }
+
+  renderLabel() {
+    if (this.props.editable) {
+      return (
+        <input
+          value={ this.props.term.label }
+          style={ { width: `${Math.max(this.props.term.label.length, 1)}ch` } }
+          onChange={ this.props.onChangeLabel }
+        />
+      )
+    } else {
+      return this.props.term.label
+    }
   }
 
   didMouseOver(e: React.MouseEvent) {

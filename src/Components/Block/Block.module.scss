@@ -39,6 +39,16 @@ $var-side: 28.2842712475px;
   line-height: $term-height + ($border-width * 2);
 }
 
+.expr-label, .var-label {
+  & > input {
+    font-size: inherit;
+    text-align: center;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+}
+
 .ellipsis {
   height: $term-height + ($border-width * 2);
   line-height: $term-height + ($border-width * 2);

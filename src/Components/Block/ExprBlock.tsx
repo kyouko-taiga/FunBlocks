@@ -40,6 +40,8 @@ type ExprBlockProps = {
   onSubtermClick(term: Term, startAnimation?: (animation: string) => void): void,
   /// The callback to call when the rendered expression was modified by the user.
   onChange?(newTerm: Term): void,
+  /// A callback to change the block's label.
+  onChangeLabel(e: React.ChangeEvent<HTMLInputElement>): void,
   /// A callback to set whether the rendered block is faded.
   changeFaded(value: boolean): void,
   /// A callback to set whether the rendered block is hovered.
@@ -79,11 +81,26 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         onDoubleClick={ this.didDoubleClick.bind(this) }
       >
         <div className={ styles.exprLabel }>
-          { this.props.term.label }
+          { this.renderLabel() }
         </div>
         { this.renderSubterms() }
       </div>
     )
+  }
+
+  renderLabel() {
+    if (this.props.editable) {
+      return (
+        <input
+          value={ this.props.term.label }
+          size={ Math.max(this.props.term.label.length, 1) }
+          // style={ { width: `${Math.max(this.props.term.label.length, 1)}ch` } }
+          onChange={ this.props.onChangeLabel }
+        />
+      )
+    } else {
+      return this.props.term.label
+    }
   }
 
   renderSubterms() {
@@ -100,7 +117,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     const subterms = term.subterms
       .map((subterm, i) => (
         <BlockContainer
-          key={ subterm.id }
+          key={ i }
           term={ subterm }
           editable={ this.props.editable }
           data={ this.props.data }
