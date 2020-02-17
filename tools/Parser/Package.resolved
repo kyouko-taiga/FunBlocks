@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Diesel",
+        "repositoryURL": "https://github.com/kyouko-taiga/Diesel.git",
+        "state": {
+          "branch": null,
+          "revision": "2d9f37383e1f9c280ab62e0f8f63989193da168a",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
