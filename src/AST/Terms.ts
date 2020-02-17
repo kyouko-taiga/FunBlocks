@@ -38,6 +38,9 @@ export abstract class Term {
     this.type = type
   }
 
+  /// Returns this term renamed with the given label.
+  public abstract renamed(newLabel: string): Term
+
   /// Returns a term in which occurrences of variables bound in the given mapping are substituted
   /// for their corresponding term.
   ///
@@ -137,6 +140,10 @@ export class Expression extends Term {
     return null
   }
 
+  public renamed(newLabel: string): Term {
+    return new Expression({ label: newLabel, type: this.type, subterms: this.subterms })
+  }
+
   public reified(mapping: Dictionary<Term>): Term {
     if (this.subterms.length == 0) {
       return this
@@ -198,6 +205,10 @@ export class Variable extends Term {
   public constructor(args: { label: string, type?: Type }) {
     const id = `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
     super(id, args.label, args.type)
+  }
+
+  public renamed(newLabel: string): Term {
+    return new Variable({ label: newLabel, type: this.type })
   }
 
   public reified(mapping: Dictionary<Term>): Term {
