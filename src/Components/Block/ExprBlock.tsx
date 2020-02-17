@@ -94,7 +94,6 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         <input
           value={ this.props.term.label }
           size={ Math.max(this.props.term.label.length, 1) }
-          // style={ { width: `${Math.max(this.props.term.label.length, 1)}ch` } }
           onChange={ this.props.onChangeLabel }
         />
       )

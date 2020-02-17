@@ -1,5 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faArrowDown,
   faArrowRight,
   faBug,
   faEllipsisH,
@@ -12,6 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
+  faArrowDown,
   faArrowRight,
   faBug,
   faEllipsisH,
