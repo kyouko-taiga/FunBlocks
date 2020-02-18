@@ -95,6 +95,7 @@ class VarBlock extends React.PureComponent<VarBlockProps> {
         <input
           value={ this.props.term.label }
           style={ { width: `${Math.max(this.props.term.label.length, 1)}ch` } }
+          onClick={ (e) => (e.target as HTMLInputElement).select() }
           onChange={ this.props.onChangeLabel }
         />
       )

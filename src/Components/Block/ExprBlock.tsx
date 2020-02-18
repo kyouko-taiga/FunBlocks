@@ -94,6 +94,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
         <input
           value={ this.props.term.label }
           size={ Math.max(this.props.term.label.length, 1) }
+          onClick={ (e) => (e.target as HTMLInputElement).select() }
           onChange={ this.props.onChangeLabel }
         />
       )
