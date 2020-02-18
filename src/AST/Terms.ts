@@ -27,6 +27,9 @@ export abstract class Term {
   /// A shallow copy of this term.
   public abstract get clone(): Term
 
+  /// Returns a tree-like representation of this term, suitable to be json-serialized.
+  public abstract get treeized(): Dictionary
+
   /// A textual description of this term.
   public abstract get description(): string
 
@@ -68,6 +71,17 @@ export class Expression extends Term {
 
   public get clone(): Expression {
     return new Expression({ label: this.label, type: this.type, subterms: this.subterms })
+  }
+
+  public get treeized(): Dictionary {
+    return {
+      _objectType: 'Expression',
+      id: this.id,
+      label: this.label,
+      type: this.type,
+      subterms: this.subterms.map((subterm) => subterm.treeized),
+      parent: this.parent?.id || null,
+    }
   }
 
   public get description(): string {
@@ -194,6 +208,16 @@ export class Variable extends Term {
 
   public get clone(): Variable {
     return new Variable({ label: this.label, type: this.type })
+  }
+
+  public get treeized(): Dictionary {
+    return {
+      _objectType: 'Variable',
+      id: this.id,
+      label: this.label,
+      type: this.type,
+      parent: this.parent?.id || null,
+    }
   }
 
   public get description(): string {
