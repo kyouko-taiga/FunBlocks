@@ -56,7 +56,7 @@ class RulesEditor extends React.PureComponent<Props> {
   }
 
   didDrop(e: React.DragEvent<HTMLDivElement>) {
-    // Make sure the dragged object is a term.
+    // Make sure the dragged object is a rule.
     const draggedData = this.props.draggedData
     if (draggedData.type !== 'Rule') {
       console.warn(`ignored dragged payload of type '${this.props.draggedData.type}'`)

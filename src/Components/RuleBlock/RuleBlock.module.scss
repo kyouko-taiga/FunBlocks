@@ -34,7 +34,19 @@
   & > .left {
     margin-right: 8px;
   }
+
   & > .right {
     margin-left: 8px;
+  }
+
+  & .placeholder {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 16px;
+    border: 4px dashed #c8c8c8;
+    border-radius: 16px;
+    font-size: 1.2rem;
+    color: #c8c8c8;
   }
 }

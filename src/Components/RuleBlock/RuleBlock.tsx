@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Rule, Term } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
+import BlockPlaceholder from './BlockPlaceholder'
 
 const styles = require('./RuleBlock.module')
 
@@ -43,22 +44,8 @@ class RuleBlock extends React.Component<RuleBlockProps> {
       [styles.selected]: this.props.selected,
     })
 
-    const left = this.props.rule.left && (
-      <Block
-        term={ this.props.rule.left }
-        editable={ this.props.editable }
-        onChange={ this.didChangeLeft.bind(this) }
-      />
-    ) || <div className={ styles.placeholder } />
-
-    const right = this.props.rule.right && (
-      <Block
-        term={ this.props.rule.right }
-        editable={ this.props.editable }
-        onChange={ this.didChangeRight.bind(this) }
-      />
-    ) || <div className={ styles.placeholder } />
-
+    const left = this.block(this.props.rule.left, this.didChangeLeft.bind(this), false)
+    const right = this.block(this.props.rule.right, this.didChangeRight.bind(this), true)
     return (
       <div className={ className } onClick={ () => this.props.onClick(this.props.rule) }>
         <div className={ styles.left }>
@@ -70,6 +57,14 @@ class RuleBlock extends React.Component<RuleBlockProps> {
         </div>
       </div>
     )
+  }
+
+  block(term: Term, onChange: (newTerm: Term) => void, allowsVariables: boolean): React.ReactNode {
+    return term && (
+      <Block term={ term } editable={ this.props.editable } onChange={ onChange } />
+    ) || this.props.editable && (
+      <BlockPlaceholder onDrop={ onChange } allowsVariables={ allowsVariables } />
+    ) || <FontAwesomeIcon icon="ban" size="lg" />
   }
 
   didChangeLeft(newTerm: Term) {
