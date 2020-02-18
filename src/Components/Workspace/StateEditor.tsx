@@ -49,8 +49,7 @@ class StateEditor extends React.PureComponent<Props> {
     // Ignore this event if the program's initial state is defined.
     if (!!this.props.initialState) { return }
 
-    // Ignore this event if the data attached to the drag event is not compatible (i.e. not an
-    // expression).
+    // Ignore this event if the data attached to the drag event is not an expression.
     if (this.props.draggedData.type !== 'Term') { return }
     if (!(this.props.draggedData.payload instanceof Expression)) { return }
 
@@ -59,6 +58,9 @@ class StateEditor extends React.PureComponent<Props> {
   }
 
   didDrop(e: React.DragEvent<HTMLDivElement>) {
+    // Ignore this event if the program's initial state is defined.
+    if (!!this.props.initialState) { return }
+
     // Make sure the dragged object is a term.
     const draggedData = this.props.draggedData
     if (draggedData.type !== 'Term' || !(draggedData.payload instanceof Expression)) {
@@ -67,6 +69,7 @@ class StateEditor extends React.PureComponent<Props> {
     }
 
     // Set the program's initial state.
+    console.assert(this.props.draggedData.payload instanceof Term)
     this.props.updateInitialState(this.props.draggedData.payload)
   }
 
