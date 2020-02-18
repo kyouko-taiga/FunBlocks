@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
 import { Expression, Term, Variable } from 'FunBlocks/AST/Terms'
+import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
 import { RootState } from 'FunBlocks/Store'
 import { BlockContainer } from './BlockContainer'
 
@@ -33,7 +34,7 @@ type ExprBlockProps = {
     color: string,
   },
   /// The data associated with drag events.
-  draggedData: { type: string, payload?: any, callback?: Dictionary<Function> },
+  draggedData: DraggedData,
   /// The callback to call on click events.
   onClick?(e: React.MouseEvent): void,
   /// The click callback to pass on to children.
@@ -173,8 +174,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Ignore this event if this block is collapsed.
     if (this.props.isCollapsed) { return }
 
-    // Ignore this event if the data attached to the drag event is not compatible (i.e. not an
-    // expression nor a variable).
+    // Ignore this event if the data attached to the drag event is not a term.
     if (this.props.draggedData.type !== 'Term') { return }
 
     // Ignore this event if this block renders the term being dragged or one of its descendants.
