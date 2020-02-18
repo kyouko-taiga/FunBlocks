@@ -6,6 +6,7 @@ export const ACTION_TYPES = {
   SET_MODE              : 'IDE.setMode',
 
   INSERT_RULE           : 'IDE.editMode.insertRule',
+  UPDATE_RULE           : 'IDE.editMode.updateRule',
   UPDATE_INITIAL_STATE  : 'IDE.editMode.updateInitialState',
 
   PUSH_STATE            : 'IDE.debugMode.pushState',
@@ -25,6 +26,11 @@ export const pushState = (state: Term): PayloadAction<Term> => ({
 export const insertRule = (rule: Rule): PayloadAction<Rule> => ({
   type: ACTION_TYPES.INSERT_RULE,
   payload: rule,
+})
+
+export const updateRule = (ruleID: string, patch: { left?: Term, right?: Term }) => ({
+  type: ACTION_TYPES.UPDATE_RULE,
+  payload: { ruleID, patch },
 })
 
 export const updateInitialState = (state: Term): PayloadAction<Term> => ({
