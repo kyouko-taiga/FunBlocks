@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { RootState, Program } from 'FunBlocks/Store'
+import { RootState } from 'FunBlocks/Store'
 import ProgramEditor from './ProgramEditor'
 import Toolbox from './Toolbox'
 

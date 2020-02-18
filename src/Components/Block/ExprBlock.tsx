@@ -5,7 +5,7 @@ import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
-import { Expression, Term, Variable } from 'FunBlocks/AST/Terms'
+import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
 import { RootState } from 'FunBlocks/Store'
 import { BlockContainer } from './BlockContainer'

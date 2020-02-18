@@ -4,7 +4,7 @@ import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { updateInitialState } from 'FunBlocks/Actions/IDE'
-import { Expression, Term } from 'FunBlocks/AST/Terms'
+import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/Store'
 import Block from 'FunBlocks/Components/Block'
 
@@ -69,7 +69,8 @@ class StateEditor extends React.PureComponent<Props> {
     }
 
     // Set the program's initial state.
-    console.assert(this.props.draggedData.payload instanceof Term)
+    const state = this.props.draggedData.payload
+    console.assert((state instanceof Expression) || (state instanceof Variable))
     this.props.updateInitialState(this.props.draggedData.payload)
   }
 

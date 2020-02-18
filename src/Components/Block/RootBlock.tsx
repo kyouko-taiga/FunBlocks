@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { clearBlockData, updateBlockData } from 'FunBlocks/Actions/BlockData'
-import { Term } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/Store'
 import { BlockContainer, BlockProps } from './BlockContainer'
 

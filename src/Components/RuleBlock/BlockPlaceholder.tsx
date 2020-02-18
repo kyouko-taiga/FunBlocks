@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Term, Variable } from 'FunBlocks/AST/Terms'
+import { Variable } from 'FunBlocks/AST/Terms'
 import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
 import { RootState } from 'FunBlocks/Store'
 

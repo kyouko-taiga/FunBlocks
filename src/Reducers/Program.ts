@@ -1,7 +1,7 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
-import { Term, Rule } from 'FunBlocks/AST/Terms'
+import { Rule } from 'FunBlocks/AST/Terms'
 
 const initialState = (state: Term = null, action: AnyAction): Term => {
   switch (action.type) {
@@ -43,5 +43,3 @@ const rules = (state: Array<Rule> = [], action: AnyAction): Array<Rule> => {
 }
 
 export const program = combineReducers({ initialState, rules })
-
-export type Program = ReturnType<typeof program>

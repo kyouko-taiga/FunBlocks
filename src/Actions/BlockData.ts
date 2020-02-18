@@ -1,5 +1,3 @@
-import { PayloadAction } from 'FunBlocks/Actions/Types'
-
 export const ACTION_TYPES = {
   CLEAR_BLOCKDATA       : 'BlockData.clear',
   UPDATE_BLOCKDATA      : 'BlockData.update',

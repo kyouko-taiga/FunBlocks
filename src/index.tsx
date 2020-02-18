@@ -12,7 +12,7 @@ import './Icons'
 // import 'react-resizable/css/styles.css'
 // import GridLayout from 'react-grid-layout'
 
-import { Expression, Variable, Rule, Term } from './AST/Terms'
+import { Expression, Variable, Rule } from './AST/Terms'
 import { EnumType } from './AST/Types'
 import IDE from './Components/IDE'
 import Color from './Utils/Color'

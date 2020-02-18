@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
-import { Term, Variable } from 'FunBlocks/AST/Terms'
+import { Variable } from 'FunBlocks/AST/Terms'
 
 const styles = require('./Block.module')
 

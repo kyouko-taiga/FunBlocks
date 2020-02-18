@@ -13,8 +13,6 @@
 ///       * ondragleave - occurs when the dragged element leaves the drop target
 ///       * ondrop - occurs when the dragged element is dropped on the drop target
 
-import { Action, PayloadAction } from 'FunBlocks/Actions/Types'
-
 import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
 
 export const ACTION_TYPES = {

@@ -6,7 +6,7 @@ import { DebugContext, debugContext } from './Contexts/DebugContext'
 import { EditContext, editContext } from './Contexts/EditContext'
 import { RunContext, runContext } from './Contexts/RunContext'
 import { DraggedData, draggedData } from './DraggedData'
-import { Program, program } from './Program'
+import { program } from './Program'
 
 /// An enumeration of the modes of the IDE.
 export enum IDEMode { Edit, Debug, Run }

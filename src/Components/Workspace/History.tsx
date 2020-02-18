@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { setHistoryIndex } from 'FunBlocks/Actions/IDE'
-import { Term } from 'FunBlocks/AST/Terms'
 import { DebugContext } from 'FunBlocks/Reducers/Contexts/DebugContext'
 import { RootState } from 'FunBlocks/Store'
 

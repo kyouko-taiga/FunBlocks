@@ -1,5 +1,3 @@
-import { Type } from './Types'
-
 /// A term.
 export abstract class Term {
 
@@ -10,7 +8,7 @@ export abstract class Term {
   public readonly label: string
 
   /// This term's type, if defined.
-  public readonly type?: Type
+  public readonly type: Type
 
   _parent: Expression = null
 

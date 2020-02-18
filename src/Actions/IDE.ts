@@ -1,5 +1,4 @@
-import { PayloadAction } from 'FunBlocks/Actions/Types'
-import { Term, Rule } from 'FunBlocks/AST/Terms'
+import { Rule } from 'FunBlocks/AST/Terms'
 import { IDEMode } from 'FunBlocks/Reducers'
 
 export const ACTION_TYPES = {

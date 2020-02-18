@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Rule, Term } from 'FunBlocks/AST/Terms'
+import { Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
 import BlockPlaceholder from './BlockPlaceholder'
 

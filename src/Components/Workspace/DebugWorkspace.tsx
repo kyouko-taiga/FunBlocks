@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { pushState, selectRule } from 'FunBlocks/Actions/IDE'
-import { Expression, Term, Rule } from 'FunBlocks/AST/Terms'
+import { Expression, Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
 import RuleBlock from 'FunBlocks/Components/RuleBlock'
 import { DebugContext } from 'FunBlocks/Reducers/Contexts/DebugContext'

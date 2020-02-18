@@ -1,7 +1,6 @@
 import { AnyAction } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
-import { Term } from 'FunBlocks/AST/Terms'
 
 export type DebugContext = {
   history: Array<Term>,

@@ -4,7 +4,7 @@ import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { insertRule, updateRule } from 'FunBlocks/Actions/IDE'
-import { Rule, Term } from 'FunBlocks/AST/Terms'
+import { Rule } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/Store'
 import Block from 'FunBlocks/Components/Block'
 import RuleBlock from 'FunBlocks/Components/RuleBlock'

@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { Term, Expression, Variable } from 'FunBlocks/AST/Terms'
+import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/Store'
 import Color from 'FunBlocks/Utils/Color'
 import ExprBlock from './ExprBlock'
