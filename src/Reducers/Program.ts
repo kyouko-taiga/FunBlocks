@@ -43,6 +43,17 @@ const rules = (state: Array<Rule> = [], action: AnyAction): Array<Rule> => {
     return state.slice(0, index).concat([newRule], state.slice(index + 1))
   }
 
+  case ACTION_TYPES.REMOVE_RULE: {
+    // Find the rule to remove.
+    const index = state.findIndex((r) => r.id === action.payload)
+    if (index < 0) {
+      return state
+    }
+
+    // Remove the rule.
+    return state.slice(0, index).concat(state.slice(index + 1))
+  }
+
   default:
     return state
   }
