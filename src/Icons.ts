@@ -12,6 +12,7 @@ import {
   faPlay,
   faSquare,
   faTrash,
+  faUpload,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -26,4 +27,5 @@ library.add(
   faPen,
   faPlay,
   faSquare,
-  faTrash)
+  faTrash,
+  faUpload)

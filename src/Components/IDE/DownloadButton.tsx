@@ -17,7 +17,7 @@ class DownloadButton extends React.PureComponent<Props> {
 
   render() {
     return (
-      <div>
+      <div className={ styles.menuBarItemWrapper }>
         <a ref={ this.anchorRef } style={ { display: 'none' } } />
         <MenuBarItem
           icon="download"

@@ -7,6 +7,7 @@ import { IDEMode } from 'FunBlocks/Reducers'
 import { RootState } from 'FunBlocks/Store'
 import DownloadButton from './DownloadButton'
 import MenuBarItem from './MenuBarItem'
+import UploadButton from './UploadButton'
 
 const styles = require('./IDE.module')
 
@@ -43,6 +44,7 @@ class MenuBar extends React.PureComponent<Props> {
         </div>
         <div className={ styles.menuGroup }>
           <DownloadButton />
+          <UploadButton />
         </div>
       </div>
     )
