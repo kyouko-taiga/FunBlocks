@@ -42,9 +42,22 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   case ACTION_TYPES.SET_MODE: {
     // Compute the context of the mode to which the IDE is about to transition.
     const newMode = action.payload as IDEMode
-    const initialContext: IDEContext = newMode === IDEMode.Debug
-      ? { history: [ state.program.initialState ], historyIndex: 0, selectedRuleID: null }
-      : {}
+    let initialContext: Dictionary = {}
+    switch (newMode) {
+    case IDEMode.Debug:
+      initialContext = { selectedRuleID: null }
+      if (state.program.initialState !== null) {
+        initialContext.history = [state.program.initialState]
+        initialContext.historyIndex = 0
+      } else {
+        initialContext.history = []
+        initialContext.historyIndex = -1
+      }
+      break
+
+    default:
+      break
+    }
 
     // Update the IDE's mode.
     newState = { ...state, mode: newMode, context: initialContext }
