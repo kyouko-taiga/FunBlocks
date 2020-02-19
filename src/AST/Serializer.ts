@@ -12,6 +12,5 @@ export function serialize(program: Program): string {
     }))
   }
 
-  console.log(tree)
   return JSON.stringify(tree)
 }
