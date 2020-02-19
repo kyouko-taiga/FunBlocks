@@ -92,8 +92,8 @@ export class Expression extends Term {
     return result
   }
 
-  public constructor(args: { label: string, type?: Type, subterms?: Term[] }) {
-    const id = `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
+  public constructor(args: { id?: string, label: string, type?: Type, subterms?: Term[] }) {
+    const id = args.id || `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
     super(id, args.label, args.type)
 
     this.subterms = args.subterms || []
@@ -224,8 +224,8 @@ export class Variable extends Term {
     return `$${this.label}`
   }
 
-  public constructor(args: { label: string, type?: Type }) {
-    const id = `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
+  public constructor(args: { id?: string, label: string, type?: Type }) {
+    const id = args.id || `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
     super(id, args.label, args.type)
   }
 
@@ -259,8 +259,8 @@ export class Rule {
   /// The right part of this rule (i.e. the expression that is rewritten).
   public readonly right: Term
 
-  constructor(args: { left: Term, right: Term }) {
-    this.id = `rule/${Math.random().toString(36).substr(2, 9)}`
+  constructor(args: { id?: string, left: Term, right: Term }) {
+    this.id = args.id || `rule/${Math.random().toString(36).substr(2, 9)}`
     this.left = args.left
     this.right = args.right
   }
