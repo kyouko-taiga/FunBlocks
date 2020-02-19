@@ -3,6 +3,7 @@ import { IDEMode } from 'FunBlocks/Reducers'
 
 export const ACTION_TYPES = {
   SET_MODE              : 'IDE.setMode',
+  UPDATE_PROGRAM        : 'IDE.updateProgram',
 
   INSERT_RULE           : 'IDE.editMode.insertRule',
   UPDATE_RULE           : 'IDE.editMode.updateRule',
@@ -18,6 +19,11 @@ export const ACTION_TYPES = {
 export const pushState = (state: Term): PayloadAction<Term> => ({
   type: ACTION_TYPES.PUSH_STATE,
   payload: state,
+})
+
+export const updateProgram = (program: Program): PayloadAction<Program> => ({
+  type: ACTION_TYPES.UPDATE_PROGRAM,
+  payload: program,
 })
 
 // ----- Edit mode actions -----------------------------------------------------------------------

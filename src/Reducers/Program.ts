@@ -5,6 +5,9 @@ import { Rule } from 'FunBlocks/AST/Terms'
 
 const initialState = (state: Term = null, action: AnyAction): Term => {
   switch (action.type) {
+  case ACTION_TYPES.UPDATE_PROGRAM:
+    return action.payload.initialState
+
   case ACTION_TYPES.UPDATE_INITIAL_STATE:
     return action.payload
 
@@ -15,6 +18,9 @@ const initialState = (state: Term = null, action: AnyAction): Term => {
 
 const rules = (state: Array<Rule> = [], action: AnyAction): Array<Rule> => {
   switch (action.type) {
+  case ACTION_TYPES.UPDATE_PROGRAM:
+    return action.payload.rules
+
   case ACTION_TYPES.INSERT_RULE:
     return state.concat([ action.payload ])
 
