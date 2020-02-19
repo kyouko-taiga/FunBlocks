@@ -1,6 +1,8 @@
+import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { pushState, selectRule } from 'FunBlocks/Actions/IDE'
 import { Expression, Rule } from 'FunBlocks/AST/Terms'
@@ -25,28 +27,38 @@ class DebugWorkspace extends React.PureComponent<Props> {
     const state = (this.props.historyIndex >= 0) && (
       <Block
         term={ this.props.history[this.props.historyIndex] }
-        onClick={ this.didClickOnExpr.bind(this) }
+        onClick={ this.didStateClick.bind(this) }
       />
     )
 
     // Create the representation of the program's rewriting rules.
-    const rules = this.props.rules.map((rule) => (
-      <RuleBlock
-        key={ rule.id }
-        rule={ rule }
-        selected={ rule.id == this.props.selectedRuleID }
-        onClick={ this.didClickOnRule.bind(this) }
-      />
-    ))
+    const rules = this.props.rules.map((rule) => {
+      const className = classNames(styles.ruleContainer, {
+        [styles.selected]: this.props.selectedRuleID === rule.id,
+      })
+
+      return (
+        <div key={ rule.id } className={ className } onClick={ () => this.didRuleClick(rule) }>
+          <span className={ styles.selectIcon }>
+            <FontAwesomeIcon icon="play" />
+          </span>
+          <RuleBlock rule={ rule } />
+        </div>
+      )
+    })
 
     return (
       <div className={ styles.workspace }>
         <History />
-        <div className={ styles.stateViewer }>
-          { state }
-        </div>
-        <div className={ styles.rulesViewer }>
-          { rules }
+        <div className={ styles.programDebugger }>
+          <div className={ styles.sectionHeading }>Program State</div>
+          <div className={ styles.stateViewer }>
+            { state }
+          </div>
+          <div className={ styles.sectionHeading }>Rules</div>
+          <div className={ styles.rulesViewer }>
+            { rules }
+          </div>
         </div>
       </div>
     )
@@ -67,7 +79,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     }
   }
 
-  private didClickOnExpr(expr: Expression, startAnimation: (animation: string) => void) {
+  private didStateClick(expr: Expression, startAnimation: (animation: string) => void) {
     // If a rule has been selected, we shall try to apply it on the clicked term to rewrite it.
     const selectedRuleID = this.props.selectedRuleID
     if (selectedRuleID !== null) {
@@ -90,7 +102,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     }
   }
 
-  private didClickOnRule(rule: Rule) {
+  private didRuleClick(rule: Rule) {
     if (this.props.selectedRuleID !== rule.id) {
       this.props.selectRule(rule.id)
     } else {

@@ -74,16 +74,19 @@
 
   .state-editor {
     display: flex;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    overflow-x: scroll;
   }
 
   .rules-editor {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 24px;
 
     & > div {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      overflow-x: scroll;
     }
   }
 
@@ -105,22 +108,51 @@
 
 // Debug Workspace
 
-.state-viewer {
-  padding: 24px 0;
-  margin: 0 12px 12px 12px;
-  text-align: center;
-  border-bottom: 4px solid #f0f0f0;
-  overflow-x: scroll;
+.program-debugger {
+  padding: 16px 32px;
+}
 
-  & > *:not(:first-child) {
-    margin-top: 24px;
-  }
+.state-viewer {
+  display: flex;
+  overflow-x: scroll;
+  margin-bottom: 24px;
 }
 
 .rules-viewer {
-  padding: 24px 12px;
-  text-align: center;
-  overflow-x: scroll;
+  margin-bottom: 24px;
+
+  & > div:not(:last-child) {
+    margin-bottom: 8px;
+    overflow-x: scroll;
+  }
+
+  .rule-container {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: background-color 200ms linear;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #d8ebff;
+    }
+
+    &.selected {
+      background-color: darken(#d8ebff, 10);
+
+      & > .select-icon {
+        color: darken(#d8ebff, 20);
+      }
+    }
+
+    & > .select-icon {
+      margin: 0 8px;
+      color: #f0f0f0;
+      transition: color 200ms linear;
+    }
+  }
 }
 
 .rule-item {
@@ -131,6 +163,7 @@
 
 .history {
   display: flex;
+  padding: 0 8px;
   height: 34px;
   background: #f0f0f0;
 
