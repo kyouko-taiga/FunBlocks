@@ -19,7 +19,7 @@ class History extends React.PureComponent<HistoryProps> {
   render() {
     const buttons = this.props.states.map((term, i) => (
       <button
-        key={ term.id }
+        key={ i }
         className={ this.props.historyIndex == i ? styles.selected : '' }
         onClick={ () => this.props.setHistoryIndex(i) }
       />

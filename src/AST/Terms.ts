@@ -178,7 +178,11 @@ export class Expression extends Term {
 
   public substituting(mapping: Dictionary<Term>): Term {
     if (this.id in mapping) {
-      return mapping[this.id]?.substituting(mapping) || null
+      if (mapping[this.id] === this) {
+        return this
+      } else {
+        return mapping[this.id]?.substituting(mapping) || null
+      }
     }
 
     if (this.subterms.length == 0) {
