@@ -156,7 +156,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
   didDragStart(e: React.DragEvent<HTMLDivElement>) {
     this.props.changeFaded(true)
-    this.props.setDraggedData('Term', this.props.term, {  onChange: this.props.onChange })
+    this.props.setDraggedData('Term', this.props.term, { onChange: this.props.onChange })
     e.stopPropagation()
   }
 
