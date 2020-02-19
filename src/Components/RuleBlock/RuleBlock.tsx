@@ -1,7 +1,10 @@
 import classNames from 'classnames'
 import React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
 import { Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/Components/Block'
 import BlockPlaceholder from './BlockPlaceholder'
@@ -29,6 +32,15 @@ export interface RuleBlockProps {
   /// A callback that is called when the rule has been updated (i.e. its terms changed).
   onUpdate?(patch: { left?: Term, right?: Term }): void,
 
+  /// A callback that is called when the rule has been removed.
+  onRemove?(): void,
+
+  /// An action dispatcher that sets drag data.
+  setDraggedData(type: string, payload?: any, callbacks?: Dictionary<Function>): void
+
+  /// An action creater that clears drag data.
+  clearDraggedData(): void
+
 }
 
 class RuleBlock extends React.Component<RuleBlockProps> {
@@ -47,7 +59,12 @@ class RuleBlock extends React.Component<RuleBlockProps> {
     const left = this.block(this.props.rule.left, this.didChangeLeft.bind(this), false)
     const right = this.block(this.props.rule.right, this.didChangeRight.bind(this), true)
     return (
-      <div className={ className } onClick={ () => this.props.onClick(this.props.rule) }>
+      <div
+        className={ className }
+        draggable={ this.props.editable }
+        onClick={ () => this.props.onClick(this.props.rule) }
+        onDragStart={ this.didDragStart.bind(this) }
+      >
         <div className={ styles.left }>
           { left }
         </div>
@@ -75,6 +92,22 @@ class RuleBlock extends React.Component<RuleBlockProps> {
     this.props.onUpdate?.({ right: newTerm })
   }
 
+  didDragStart(e: React.DragEvent<HTMLDivElement>) {
+    this.props.setDraggedData('Rule', this.props.rule, { onRemove: this.props.onRemove })
+    e.stopPropagation()
+  }
+
+  didDragEnd(e: React.DragEvent<HTMLDivElement>) {
+    this.props.clearDraggedData()
+    e.stopPropagation()
+  }
+
 }
 
-export default RuleBlock
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  setDraggedData: (type: string, payload?: Dictionary, callbacks?: Dictionary<Function>) =>
+    dispatch(setData(type, payload, callbacks)),
+  clearDraggedData: () => dispatch(clearData()),
+})
+
+export default connect(null, mapDispatchToProps)(RuleBlock)

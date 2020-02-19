@@ -28,24 +28,33 @@ class ObjectTrash extends React.PureComponent<ObjectTrashProps> {
 
   didDragOver(e: React.DragEvent<HTMLDivElement>) {
     // Ignore this event if the data attached to the drag event is not compatible (i.e. not an
-    // expression nor a variable).
-    if (this.props.draggedData.type !== 'Term') { return }
+    // expression, a variable nor a rule).
+    const draggedType = this.props.draggedData.type
+    if ((draggedType !== 'Term') && (draggedType !== 'Rule')) { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
   }
 
   didDrop(e: React.DragEvent<HTMLDivElement>) {
-    // Make sure the dragged object is a term.
-    if (this.props.draggedData.type !== 'Term') {
-      console.warn(`ignored dragged payload of type '${this.props.draggedData.type}'`)
-      return
+    const draggedType = this.props.draggedData.type
+    switch (this.props.draggedData.type) {
+    case 'Term': {
+      // Modify the dragged term by removing it from its hierarchy.
+      const draggedTerm = this.props.draggedData.payload
+      const newRoot = draggedTerm.root.substituting({ [draggedTerm.id]: null })
+      this.props.draggedData.callbacks?.onChange?.(newRoot)
+      break
     }
 
-    // Modify the dragged term by removing it from its hierarchy.
-    const draggedTerm = this.props.draggedData.payload
-    const newRoot = draggedTerm.root.substituting({ [draggedTerm.id]: null })
-    this.props.draggedData.callbacks?.onChange?.(newRoot)
+    case 'Rule':
+      this.props.draggedData.callbacks?.onRemove?.()
+      break
+
+    default:
+      console.warn(`ignored dragged payload of type '${this.props.draggedData.type}'`)
+      break
+    }
   }
 
 }

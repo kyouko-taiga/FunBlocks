@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { insertRule, updateRule } from 'FunBlocks/Actions/IDE'
+import { insertRule, removeRule, updateRule } from 'FunBlocks/Actions/IDE'
 import { Rule } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/Store'
 import Block from 'FunBlocks/Components/Block'
@@ -16,6 +16,7 @@ type Props = {
   draggedData: { type: string, payload?: any, callbacks?: Dictionary<Function> },
   insertRule(newRule: Rule): void,
   updateRule(ruleID: string, updates: { left?: Term, right?: Term }): void,
+  removeRule(ruleID: string): void,
 }
 
 type RulePatch = { left?: Term, right?: Term }
@@ -29,6 +30,7 @@ class RulesEditor extends React.PureComponent<Props> {
         rule={ rule }
         editable
         onUpdate={ (patch: RulePatch) => this.props.updateRule(rule.id, patch) }
+        onRemove={ () => this.props.removeRule(rule.id) }
       />
     ))
 
@@ -78,6 +80,7 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   insertRule: (newRule: Rule) => dispatch(insertRule(newRule)),
   updateRule: (ruleID: string, patch: RulePatch) => dispatch(updateRule(ruleID, patch)),
+  removeRule: (ruleID: string) => dispatch(removeRule(ruleID)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesEditor)
