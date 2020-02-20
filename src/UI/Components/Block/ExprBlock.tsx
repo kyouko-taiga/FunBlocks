@@ -4,10 +4,10 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
+import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
 import { Expression, Variable } from 'FunBlocks/AST/Terms'
-import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
-import { RootState } from 'FunBlocks/Store'
+import { DraggedData } from 'FunBlocks/UI/Reducers/DraggedData'
+import { RootState } from 'FunBlocks/UI/Store'
 import { BlockContainer } from './BlockContainer'
 
 const styles = require('./Block.module')

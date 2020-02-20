@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux'
 
-import { ACTION_TYPES } from 'FunBlocks/Actions/BlockData'
+import { ACTION_TYPES } from 'FunBlocks/UI/Actions/BlockData'
 
 export type BlockData = Dictionary<Dictionary>
 

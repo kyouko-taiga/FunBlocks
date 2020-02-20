@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Workspace from 'FunBlocks/Components/Workspace'
+import Workspace from 'FunBlocks/UI/Components/Workspace'
 import MenuBar from './MenuBar'
 
 const styles = require('./IDE.module')

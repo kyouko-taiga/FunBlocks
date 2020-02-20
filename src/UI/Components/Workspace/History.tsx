@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { setHistoryIndex } from 'FunBlocks/Actions/IDE'
-import { DebugContext } from 'FunBlocks/Reducers/Contexts/DebugContext'
-import { RootState } from 'FunBlocks/Store'
+import { setHistoryIndex } from 'FunBlocks/UI/Actions/IDE'
+import { DebugContext } from 'FunBlocks/UI/Reducers/Contexts/DebugContext'
+import { RootState } from 'FunBlocks/UI/Store'
 
 const styles = require('./Workspace.module')
 

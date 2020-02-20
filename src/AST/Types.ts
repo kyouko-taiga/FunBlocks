@@ -1,4 +1,4 @@
-import Color from 'FunBlocks/Utils/Color'
+import Color from 'FunBlocks/UI/Utils/Color'
 import { Expression, Variable } from './Terms'
 
 /// An enumeration type.

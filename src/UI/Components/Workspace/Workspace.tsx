@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { IDEMode } from 'FunBlocks/Reducers'
-import { RootState } from 'FunBlocks/Store'
+import { IDEMode } from 'FunBlocks/UI/Reducers'
+import { RootState } from 'FunBlocks/UI/Store'
 import DebugWorkspace from './DebugWorkspace'
 import EditWorkspace from './EditWorkspace'
 

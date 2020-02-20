@@ -13,7 +13,7 @@
 ///       * ondragleave - occurs when the dragged element leaves the drop target
 ///       * ondrop - occurs when the dragged element is dropped on the drop target
 
-import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
+import { DraggedData } from 'FunBlocks/UI/Reducers/DraggedData'
 
 export const ACTION_TYPES = {
   CLEAR_DATA: 'DraggedData.clear',

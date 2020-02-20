@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
+import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
 import { Rule } from 'FunBlocks/AST/Terms'
-import Block from 'FunBlocks/Components/Block'
+import Block from 'FunBlocks/UI/Components/Block'
 import BlockPlaceholder from './BlockPlaceholder'
 
 const styles = require('./RuleBlock.module')

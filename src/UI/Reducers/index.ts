@@ -1,6 +1,6 @@
 import { AnyAction, combineReducers } from 'redux'
 
-import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
+import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 import { BlockData, blockData } from './BlockData'
 import { DebugContext, debugContext } from './Contexts/DebugContext'
 import { EditContext, editContext } from './Contexts/EditContext'

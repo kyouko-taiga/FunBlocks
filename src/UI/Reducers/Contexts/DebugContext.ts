@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux'
 
-import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
+import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 
 export type DebugContext = {
   history: Array<Term>,

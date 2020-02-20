@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
+import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
 import { Variable } from 'FunBlocks/AST/Terms'
 
 const styles = require('./Block.module')

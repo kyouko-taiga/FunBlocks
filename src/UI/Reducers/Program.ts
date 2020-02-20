@@ -1,6 +1,6 @@
 import { AnyAction, combineReducers } from 'redux'
 
-import { ACTION_TYPES } from 'FunBlocks/Actions/IDE'
+import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 import { Rule } from 'FunBlocks/AST/Terms'
 
 const initialState = (state: Term = null, action: AnyAction): Term => {

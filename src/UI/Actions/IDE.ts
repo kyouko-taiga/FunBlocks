@@ -1,5 +1,5 @@
 import { Rule } from 'FunBlocks/AST/Terms'
-import { IDEMode } from 'FunBlocks/Reducers'
+import { IDEMode } from 'FunBlocks/UI/Reducers'
 
 export const ACTION_TYPES = {
   SET_MODE              : 'IDE.setMode',

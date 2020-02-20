@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { clearBlockData, updateBlockData } from 'FunBlocks/Actions/BlockData'
-import { RootState } from 'FunBlocks/Store'
+import { clearBlockData, updateBlockData } from 'FunBlocks/UI/Actions/BlockData'
+import { RootState } from 'FunBlocks/UI/Store'
 import { BlockContainer, BlockProps } from './BlockContainer'
 
 const mapStateToProps = (state: RootState, ownProps: BlockProps) => ({

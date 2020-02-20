@@ -3,8 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { setData, clearData } from 'FunBlocks/Actions/DraggedData'
-import { DraggedData } from 'FunBlocks/Reducers/DraggedData'
+import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
+import { DraggedData } from 'FunBlocks/UI/Reducers/DraggedData'
 
 const styles = require('./Workspace.module')
 

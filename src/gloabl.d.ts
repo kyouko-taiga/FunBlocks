@@ -11,7 +11,7 @@ type PayloadAction<Payload, Meta=void> = Action<Meta> & { readonly payload: Payl
 interface Type {
 
   /// The color associated with the type.
-  readonly baseColor: import("FunBlocks/Utils/Color")
+  readonly baseColor: import("FunBlocks/UI/Utils/Color")
 
 }
 

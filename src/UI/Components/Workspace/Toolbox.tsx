@@ -3,7 +3,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Expression, Variable, Rule } from 'FunBlocks/AST/Terms'
-import Block from 'FunBlocks/Components/Block'
+import Block from 'FunBlocks/UI/Components/Block'
 import ObjectTrash from './ObjectTrash'
 import ToolButton from './ToolButton'
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { serialize } from 'FunBlocks/AST/Serializer'
-import { RootState } from 'FunBlocks/Store'
+import { RootState } from 'FunBlocks/UI/Store'
 import MenuBarItem from './MenuBarItem'
 
 const styles = require('./IDE.module')

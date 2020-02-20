@@ -2,13 +2,13 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
-import './Styles/Foundation.css'
+import './UI/Styles/Foundation.css'
 
 // This import configures fontawesome.
-import './Icons'
+import './UI/Icons'
 
-import IDE from './Components/IDE'
-import { store } from './Store'
+import IDE from './UI/Components/IDE'
+import { store } from './UI/Store'
 
 class View extends React.PureComponent {
 

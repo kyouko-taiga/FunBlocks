@@ -4,12 +4,12 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { pushState, selectRule } from 'FunBlocks/Actions/IDE'
+import { pushState, selectRule } from 'FunBlocks/UI/Actions/IDE'
 import { Expression, Rule } from 'FunBlocks/AST/Terms'
-import Block from 'FunBlocks/Components/Block'
-import RuleBlock from 'FunBlocks/Components/RuleBlock'
-import { DebugContext } from 'FunBlocks/Reducers/Contexts/DebugContext'
-import { RootState } from 'FunBlocks/Store'
+import Block from 'FunBlocks/UI/Components/Block'
+import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
+import { DebugContext } from 'FunBlocks/UI/Reducers/Contexts/DebugContext'
+import { RootState } from 'FunBlocks/UI/Store'
 import History from './History'
 
 const styles = require('./Workspace.module')

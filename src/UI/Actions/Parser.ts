@@ -1,4 +1,4 @@
-import { string, whitespace, regexp, newline, eof, anyChar, 
+import { string, whitespace, regexp, newline, eof, anyChar,
   fail } from "parjs";
 import {
   between,
@@ -27,7 +27,7 @@ import {
   TypeSign, ArrowTypeSign,
   RuleDef,
   RuleDecl
-} from "../AST/SyntacticElements";
+} from "FunBlocks/AST/SyntacticElements";
 
 let alphanumeric = regexp(new RegExp("[a-zA-Z0-9_]"));
 
@@ -179,7 +179,7 @@ typeDeclRef.init(
     thenq(whitespace()),
     map(arr => new TypeDeclRef({ name: arr[0], arguments: arr[1] }))
   )
-  
+
 );
 
 
@@ -204,13 +204,13 @@ let left = typeRef.pipe(or(parenthTypeSign), map(e => e as TypeSign) );
 typeSign.init(
   arrowTypeSign.pipe(
     recover(
-      failure => { 
+      failure => {
         if(failure.kind === "Hard" && failure.reason === 'custom soft failure'){
-          return {kind: "Soft", reason: "custom soft failure 2"} 
+          return {kind: "Soft", reason: "custom soft failure 2"}
         }
       }
     )
-    , or(typeRef) 
+    , or(typeRef)
   , map(e=> e as TypeSign))
 );
 
@@ -288,5 +288,3 @@ rule if(false, $x, $y) => $y ;
 `;
 
 console.log(" program 1)", program.parse(programInput));
-
-

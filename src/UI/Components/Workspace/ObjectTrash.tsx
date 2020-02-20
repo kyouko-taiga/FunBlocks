@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { RootState } from 'FunBlocks/Store'
+import { RootState } from 'FunBlocks/UI/Store'
 
 const styles = require('./Workspace.module')
 

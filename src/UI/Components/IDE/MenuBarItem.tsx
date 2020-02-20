@@ -1,7 +1,7 @@
 import React from 'react'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
-import { Button, UITheme } from 'FunBlocks/Components/UILibrary'
+import { Button, UITheme } from 'FunBlocks/UI/Components/UILibrary'
 
 const styles = require('./IDE.module')
 

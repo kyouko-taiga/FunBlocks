@@ -3,10 +3,10 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { updateInitialState } from 'FunBlocks/Actions/IDE'
+import { updateInitialState } from 'FunBlocks/UI/Actions/IDE'
 import { Expression, Variable } from 'FunBlocks/AST/Terms'
-import { RootState } from 'FunBlocks/Store'
-import Block from 'FunBlocks/Components/Block'
+import { RootState } from 'FunBlocks/UI/Store'
+import Block from 'FunBlocks/UI/Components/Block'
 
 const styles = require('./Workspace.module')
 
