@@ -1,7 +1,11 @@
-/// A term.
+/// The abstract base class for all terms.
 export abstract class Term {
 
   /// This term's ID.
+  ///
+  /// This property uniquely identifies a term instance, and is therefore suitable to be used as a
+  // key in a dictionary or a serialized AST representation. Note that two equivalent terms (e.g.
+  // two terms with the same label and no subterms) still have different identifiers.
   public readonly id: string
 
   /// This term's label.
