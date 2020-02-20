@@ -11,12 +11,12 @@ type PayloadAction<Payload, Meta=void> = Action<Meta> & { readonly payload: Payl
 interface Type {
 
   /// The color associated with the type.
-  readonly baseColor: import("FunBlocks/Utils/Color")
+  readonly baseColor: import("FunBlocks/UI/Utils/Color")
 
 }
 
 /// A term (e.g. an expression or a variable).
-type Term = import("FunBlocks/AST/Terms").Term
+type Term = import("FunBlocks/AST").Term
 
 /// A FunBlocks' program.
 interface Program {
@@ -25,6 +25,6 @@ interface Program {
   readonly initialState: Term
 
   /// The program's rewriting rules.
-  readonly rules: Array<import("FunBlocks/AST/Terms").Rule>
+  readonly rules: Array<import("FunBlocks/AST").RuleCaseDecl>
 
 }
