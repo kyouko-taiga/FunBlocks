@@ -3,14 +3,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
+import * as AST from 'FunBlocks/AST'
 import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
-import { Variable } from 'FunBlocks/AST/Terms'
 
 const styles = require('./Block.module')
 
-type VarBlockProps = {
+type VarRefBlockProps = {
   /// The variable to render.
-  term: Variable,
+  term: AST.VarRef,
   /// The data associated with this variable's root term.
   data: Dictionary,
   /// Whether the block is faded.
@@ -41,7 +41,7 @@ type VarBlockProps = {
   clearDraggedData(): void,
 }
 
-class VarBlock extends React.PureComponent<VarBlockProps> {
+class VarRefBlock extends React.PureComponent<VarRefBlockProps> {
 
   render() {
     const term = this.props.term
@@ -134,4 +134,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   clearDraggedData: () => dispatch(clearData()),
 })
 
-export default connect(null, mapDispatchToProps)(VarBlock)
+export default connect(null, mapDispatchToProps)(VarRefBlock)

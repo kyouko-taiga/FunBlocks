@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import * as AST from 'FunBlocks/AST'
 import { updateInitialState } from 'FunBlocks/UI/Actions/IDE'
-import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import { RootState } from 'FunBlocks/UI/Store'
 import Block from 'FunBlocks/UI/Components/Block'
 
@@ -51,7 +51,7 @@ class StateEditor extends React.PureComponent<Props> {
 
     // Ignore this event if the data attached to the drag event is not an expression.
     if (this.props.draggedData.type !== 'Term') { return }
-    if (!(this.props.draggedData.payload instanceof Expression)) { return }
+    if (!(this.props.draggedData.payload instanceof AST.Expr)) { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
@@ -63,14 +63,14 @@ class StateEditor extends React.PureComponent<Props> {
 
     // Make sure the dragged object is a term.
     const draggedData = this.props.draggedData
-    if (draggedData.type !== 'Term' || !(draggedData.payload instanceof Expression)) {
+    if (draggedData.type !== 'Term' || !(draggedData.payload instanceof AST.Expr)) {
       console.warn(`ignored dragged payload of type '${this.props.draggedData.type}'`)
       return
     }
 
     // Set the program's initial state.
     const state = this.props.draggedData.payload
-    console.assert((state instanceof Expression) || (state instanceof Variable))
+    console.assert((state instanceof AST.Expr) || (state instanceof AST.VarRef))
     this.props.updateInitialState(this.props.draggedData.payload)
   }
 

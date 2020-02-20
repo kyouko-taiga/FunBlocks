@@ -10,10 +10,10 @@ export abstract class Term {
   /// This term's type, if defined.
   public readonly type: Type
 
-  _parent: Expression = null
+  _parent: Expr = null
 
   /// This term's parent, if any.
-  public get parent(): Expression {
+  public get parent(): Expr {
     return this._parent
   }
 
@@ -52,30 +52,31 @@ export abstract class Term {
   /// their corresponding term in the given mapping.
   ///
   /// - Parameter mapping:
-  ///   A mapping from term IDs to terms or null values. The latter can be used to remove subterms.
+  ///   A mapping from term IDs to terms instances or `null`. The latter can be used to remove
+  ///   subterms.
   ///
   /// - Note:
   ///   As terms are supposed to be immutable, all terms that are ancestor of a substituted subterm
   ///   must also be substituted by a new term, invalidating their former identifiers. It follows
   ///   that these identifiers cannot be used on subsequent calls to `substituting`. Instead, all
-  ///   substitutions should be applied at once.
+  ///    substitutions should be applied at once.
   public abstract substituting(mapping: Dictionary<Term>): Term
 
 }
 
 /// An expression.
-export class Expression extends Term {
+export class Expr extends Term {
 
   /// The subterms of this expression.
   public readonly subterms: Array<Term>
 
-  public get clone(): Expression {
-    return new Expression({ label: this.label, type: this.type, subterms: this.subterms })
+  public get clone(): Expr {
+    return new Expr({ label: this.label, type: this.type, subterms: this.subterms })
   }
 
   public get treeized(): Dictionary {
     return {
-      _objectType: 'Expression',
+      _objectType: 'Expr',
       id: this.id,
       label: this.label,
       type: this.type,
@@ -102,7 +103,7 @@ export class Expression extends Term {
     }
   }
 
-  /// Computes a binding mapping variables to terms for which this term matches the given pattern.
+  /// Computes a variable mapping for which this term matches the given pattern.
   public match(pattern: Term, context: Dictionary<Term> = {}): Dictionary<Term> {
     // Check for trivial cases.
     if (this === pattern) {
@@ -114,7 +115,7 @@ export class Expression extends Term {
       return null
     }
 
-    if (pattern instanceof Variable) {
+    if (pattern instanceof VarRef) {
       // Recall that patterns do not need to be linear. Hence if the pattern is a variable, we've
       // to check if it's already bound in the current context.
       if (pattern.label in context) {
@@ -128,7 +129,7 @@ export class Expression extends Term {
 
     // Expressions match if their labels are the same, if they have the same arity and if there
     // exists a binding for which their subterms match.
-    if (pattern instanceof Expression) {
+    if (pattern instanceof Expr) {
       if (this.label != pattern.label || this.subterms.length != pattern.subterms.length) {
         return null
       }
@@ -137,10 +138,10 @@ export class Expression extends Term {
       for (let i = 0; i < this.subterms.length; ++i) {
         // The receiver of `match()` is supposed to be a state and therefore it should not contain
         // any variable in its subterms.
-        console.assert(this.subterms[i] instanceof Expression)
+        console.assert(this.subterms[i] instanceof Expr)
 
         // Check if the subterms match, given the current context.
-        mapping = (this.subterms[i] as Expression).match(pattern.subterms[i], mapping)
+        mapping = (this.subterms[i] as Expr).match(pattern.subterms[i], mapping)
         if (mapping === null) {
           return null
         }
@@ -153,7 +154,7 @@ export class Expression extends Term {
   }
 
   public renamed(newLabel: string): Term {
-    return new Expression({ label: newLabel, type: this.type, subterms: this.subterms })
+    return new Expr({ label: newLabel, type: this.type, subterms: this.subterms })
   }
 
   public reified(mapping: Dictionary<Term>): Term {
@@ -172,7 +173,7 @@ export class Expression extends Term {
     }
 
     return mutated
-      ? new Expression({ label: this.label, type: this.type, subterms: reifiedSubterms })
+      ? new Expr({ label: this.label, type: this.type, subterms: reifiedSubterms })
       : this
   }
 
@@ -199,22 +200,22 @@ export class Expression extends Term {
     }
 
     return mutated
-      ? new Expression({ label: this.label, type: this.type, subterms: substitutedSubterms })
+      ? new Expr({ label: this.label, type: this.type, subterms: substitutedSubterms })
       : this
   }
 
 }
 
 /// A variable.
-export class Variable extends Term {
+export class VarRef extends Term {
 
-  public get clone(): Variable {
-    return new Variable({ label: this.label, type: this.type })
+  public get clone(): VarRef {
+    return new VarRef({ label: this.label, type: this.type })
   }
 
   public get treeized(): Dictionary {
     return {
-      _objectType: 'Variable',
+      _objectType: 'VarRef',
       id: this.id,
       label: this.label,
       type: this.type,
@@ -232,7 +233,7 @@ export class Variable extends Term {
   }
 
   public renamed(newLabel: string): Term {
-    return new Variable({ label: newLabel, type: this.type })
+    return new VarRef({ label: newLabel, type: this.type })
   }
 
   public reified(mapping: Dictionary<Term>): Term {
@@ -245,26 +246,6 @@ export class Variable extends Term {
     return this.id in mapping
       ? mapping[this.id]
       : this
-  }
-
-}
-
-/// A rule.
-export class Rule {
-
-  /// A unique identifier for this rule.
-  public readonly id: string
-
-  /// The left part of this rule (i.e. the expression that should be matched).
-  public readonly left: Term
-
-  /// The right part of this rule (i.e. the expression that is rewritten).
-  public readonly right: Term
-
-  constructor(args: { id?: string, left: Term, right: Term }) {
-    this.id = args.id || `rule/${Math.random().toString(36).substr(2, 9)}`
-    this.left = args.left
-    this.right = args.right
   }
 
 }

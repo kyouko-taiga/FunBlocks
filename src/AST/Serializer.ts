@@ -1,10 +1,11 @@
-import { Expression, Rule, Variable } from './Terms'
+import { RuleCaseDecl } from './DeclNodes'
+import { Expr, VarRef } from './TermNodes'
 
 /// Serializes a program to a string.
 export function serialize(program: Program): string {
   const tree = {
     initialState: program.initialState.treeized,
-    rules: program.rules.map((rule: Rule) => ({
+    rules: program.rules.map((rule: RuleCaseDecl) => ({
       _objectType: 'Rule',
       id: rule.id,
       left: rule.left.treeized,
@@ -26,7 +27,7 @@ export function deserialize(input: string): Program {
 
   // Build the rules.
   const rulesData = tree.rules || []
-  const rules = rulesData.map((subtree: Dictionary) => new Rule({
+  const rules = rulesData.map((subtree: Dictionary) => new RuleCaseDecl({
     id: subtree.id,
     left: subtree.left && makeTerm(subtree.left),
     right: subtree.right && makeTerm(subtree.right),
@@ -53,16 +54,16 @@ type VarArgs = {
 }
 
 function makeTerm(args: TermArgs): Term {
-  if (args._objectType === 'Expression') {
+  if (args._objectType === 'Expr') {
     const exprArgs = args as ExprArgs
-    return new Expression({
+    return new Expr({
       id: exprArgs.id,
       label: exprArgs.label,
       subterms: exprArgs.subterms.map(makeTerm),
     })
-  } else if (args._objectType === 'Variable') {
+  } else if (args._objectType === 'VarRef') {
     const varArgs = args as VarArgs
-    return new Variable({
+    return new VarRef({
       id: varArgs.id,
       label: varArgs.label,
     })

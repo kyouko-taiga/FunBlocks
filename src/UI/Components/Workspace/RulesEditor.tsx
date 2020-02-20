@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { insertRule, removeRule, updateRule } from 'FunBlocks/UI/Actions/IDE'
-import { Rule } from 'FunBlocks/AST/Terms'
+import * as AST from 'FunBlocks/AST'
+import { insertRuleCase, removeRuleCase, updateRuleCase } from 'FunBlocks/UI/Actions/IDE'
 import { RootState } from 'FunBlocks/UI/Store'
 import Block from 'FunBlocks/UI/Components/Block'
 import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
@@ -12,14 +12,14 @@ import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
 const styles = require('./Workspace.module')
 
 type Props = {
-  rules: Array<Rule>,
+  rules: Array<AST.RuleCaseDecl>,
   draggedData: { type: string, payload?: any, callbacks?: Dictionary<Function> },
-  insertRule(newRule: Rule): void,
-  updateRule(ruleID: string, updates: { left?: Term, right?: Term }): void,
-  removeRule(ruleID: string): void,
+  insertRuleCase(newRule: AST.RuleCaseDecl): void,
+  updateRuleCase(ruleID: string, updates: { left?: Term, right?: Term }): void,
+  removeRuleCase(ruleID: string): void,
 }
 
-type RulePatch = { left?: Term, right?: Term }
+type RuleCasePatch = { left?: Term, right?: Term }
 
 class RulesEditor extends React.PureComponent<Props> {
 
@@ -29,8 +29,8 @@ class RulesEditor extends React.PureComponent<Props> {
         key={ i }
         rule={ rule }
         editable
-        onUpdate={ (patch: RulePatch) => this.props.updateRule(rule.id, patch) }
-        onRemove={ () => this.props.removeRule(rule.id) }
+        onUpdate={ (patch: RuleCasePatch) => this.props.updateRuleCase(rule.id, patch) }
+        onRemove={ () => this.props.removeRuleCase(rule.id) }
       />
     ))
 
@@ -51,7 +51,7 @@ class RulesEditor extends React.PureComponent<Props> {
 
   didDragOver(e: React.DragEvent<HTMLDivElement>) {
     // Ignore this event if the data attached to the drag event is not a rule.
-    if (this.props.draggedData.type !== 'Rule') { return }
+    if (this.props.draggedData.type !== 'RuleCaseDecl') { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
@@ -60,14 +60,14 @@ class RulesEditor extends React.PureComponent<Props> {
   didDrop(e: React.DragEvent<HTMLDivElement>) {
     // Make sure the dragged object is a rule.
     const draggedData = this.props.draggedData
-    if (draggedData.type !== 'Rule') {
+    if (draggedData.type !== 'RuleCaseDecl') {
       console.warn(`ignored dragged payload of type '${this.props.draggedData.type}'`)
       return
     }
 
     // Insert the new rule.
-    console.assert(this.props.draggedData.payload instanceof Rule)
-    this.props.insertRule(this.props.draggedData.payload)
+    console.assert(this.props.draggedData.payload instanceof AST.RuleCaseDecl)
+    this.props.insertRuleCase(this.props.draggedData.payload)
   }
 
 }
@@ -78,9 +78,10 @@ const mapStateToProps = (state: RootState) => ({
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  insertRule: (newRule: Rule) => dispatch(insertRule(newRule)),
-  updateRule: (ruleID: string, patch: RulePatch) => dispatch(updateRule(ruleID, patch)),
-  removeRule: (ruleID: string) => dispatch(removeRule(ruleID)),
+  insertRuleCase: (newRule: AST.RuleCaseDecl) => dispatch(insertRuleCase(newRule)),
+  updateRuleCase: (ruleID: string, patch: RuleCasePatch) =>
+    dispatch(updateRuleCase(ruleID, patch)),
+  removeRuleCase: (ruleID: string) => dispatch(removeRuleCase(ruleID)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesEditor)

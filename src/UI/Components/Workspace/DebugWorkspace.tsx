@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import * as AST from 'FunBlocks/AST'
 import { pushState, selectRule } from 'FunBlocks/UI/Actions/IDE'
-import { Expression, Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/UI/Components/Block'
 import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
 import { DebugContext } from 'FunBlocks/UI/Reducers/Contexts/DebugContext'
@@ -15,7 +15,7 @@ import History from './History'
 const styles = require('./Workspace.module')
 
 type Props = DebugContext & {
-  rules: Array<Rule>,
+  rules: Array<AST.RuleCaseDecl>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
 }
@@ -79,7 +79,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     }
   }
 
-  private didStateClick(expr: Expression, startAnimation: (animation: string) => void) {
+  private didStateClick(expr: AST.Expr, startAnimation: (animation: string) => void) {
     // If a rule has been selected, we shall try to apply it on the clicked term to rewrite it.
     const selectedRuleID = this.props.selectedRuleID
     if (selectedRuleID !== null) {
@@ -102,7 +102,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     }
   }
 
-  private didRuleClick(rule: Rule) {
+  private didRuleClick(rule: AST.RuleCaseDecl) {
     if (this.props.selectedRuleID !== rule.id) {
       this.props.selectRule(rule.id)
     } else {

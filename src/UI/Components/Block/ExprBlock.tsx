@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import * as AST from 'FunBlocks/AST'
 import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
-import { Expression, Variable } from 'FunBlocks/AST/Terms'
 import { DraggedData } from 'FunBlocks/UI/Reducers/DraggedData'
 import { RootState } from 'FunBlocks/UI/Store'
 import { BlockContainer } from './BlockContainer'
@@ -14,7 +14,7 @@ const styles = require('./Block.module')
 
 type ExprBlockProps = {
   /// The expression to render.
-  term: Expression,
+  term: AST.Expr,
   /// The data associated with this expression's root term.
   data: Dictionary,
   /// Whether the block is faded.
@@ -262,7 +262,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
     const substitutions: Dictionary<Term> = {
       [draggedTerm.id]: null,
-      [this.props.term.id]: new Expression({
+      [this.props.term.id]: new AST.Expr({
         label: this.props.term.label,
         type: this.props.term.type,
         subterms: newSubterms

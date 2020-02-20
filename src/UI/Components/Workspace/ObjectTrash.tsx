@@ -30,7 +30,7 @@ class ObjectTrash extends React.PureComponent<ObjectTrashProps> {
     // Ignore this event if the data attached to the drag event is not compatible (i.e. not an
     // expression, a variable nor a rule).
     const draggedType = this.props.draggedData.type
-    if ((draggedType !== 'Term') && (draggedType !== 'Rule')) { return }
+    if ((draggedType !== 'Term') && (draggedType !== 'RuleCaseDecl')) { return }
 
     // Allow data to be dropped onto this block.
     e.preventDefault()
@@ -47,7 +47,7 @@ class ObjectTrash extends React.PureComponent<ObjectTrashProps> {
       break
     }
 
-    case 'Rule':
+    case 'RuleCaseDecl':
       this.props.draggedData.callbacks?.onRemove?.()
       break
 

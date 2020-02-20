@@ -1,11 +1,11 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { Expression, Variable } from 'FunBlocks/AST/Terms'
+import * as AST from 'FunBlocks/AST'
 import { RootState } from 'FunBlocks/UI/Store'
 import Color from 'FunBlocks/UI/Utils/Color'
 import ExprBlock from './ExprBlock'
-import VarBlock from './VarBlock'
+import VarRefBlock from './VarRefBlock'
 
 const styles = require('./Block.module')
 
@@ -66,9 +66,9 @@ type BlockContainerState = {
  * Component representing the graphical representation of a single term.
  * @extends React.Component
  *
- * This component acts as a wrapper for either {ExprBlock} or {VarBlock}, depending on whether the
- * term given as props is an expression or a variable, respectively. It factorizes the logic of a
- * few UI handlers, manages animations and generates color schemes.
+ * This component acts as a wrapper for either {ExprBlock} or {VarRefBlock}, depending on whether
+ * the term given as props is an expression or a variable, respectively. It factorizes the logic of
+ * a few UI handlers, manages animations and generates color schemes.
  */
 export class BlockContainer extends React.Component<BlockContainerProps, BlockContainerState> {
 
@@ -104,7 +104,7 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
 
     // Select and render the appropriate component.
     const term = this.props.term
-    if (term instanceof Expression) {
+    if (term instanceof AST.Expr) {
       return <ExprBlock
         { ...childProps }
         term={ term }
@@ -113,8 +113,8 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
         onSubtermClick={ this.props.onClick }
         changeCollapsed={ this.changeCollapsed.bind(this) }
       />
-    } else if (term instanceof Variable) {
-      return <VarBlock { ...childProps } term={ term } />
+    } else if (term instanceof AST.VarRef) {
+      return <VarRefBlock { ...childProps } term={ term } />
     } else {
       return null
     }

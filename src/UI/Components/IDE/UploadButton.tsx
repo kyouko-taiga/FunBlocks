@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 
-import { updateProgram } from 'FunBlocks/UI/Actions/IDE'
 import { deserialize } from 'FunBlocks/AST/Serializer'
+import { updateProgram } from 'FunBlocks/UI/Actions/IDE'
 import { RootState } from 'FunBlocks/UI/Store'
 import MenuBarItem from './MenuBarItem'
 

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Expression, Variable, Rule } from 'FunBlocks/AST/Terms'
+import * as AST from 'FunBlocks/AST'
 import Block from 'FunBlocks/UI/Components/Block'
 import ObjectTrash from './ObjectTrash'
 import ToolButton from './ToolButton'
@@ -11,8 +11,8 @@ const styles = require('./Workspace.module')
 
 class Toolbox extends React.PureComponent {
 
-  private readonly dummyExpr = new Expression({ label: 'abc' })
-  private readonly dummyVar = new Variable({ label: 'x' })
+  private readonly dummyExpr = new AST.Expr({ label: 'abc' })
+  private readonly dummyVar = new AST.VarRef({ label: 'x' })
 
   render() {
     return (
@@ -57,8 +57,8 @@ class Toolbox extends React.PureComponent {
 
   createRuleData() {
     return {
-      type: 'Rule',
-      payload: new Rule({ left: this.dummyExpr.clone, right: this.dummyExpr.clone }),
+      type: 'RuleCaseDecl',
+      payload: new AST.RuleCaseDecl({ left: this.dummyExpr.clone, right: this.dummyExpr.clone }),
     }
   }
 

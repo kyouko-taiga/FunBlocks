@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import * as AST from 'FunBlocks/AST'
 import { setData, clearData } from 'FunBlocks/UI/Actions/DraggedData'
-import { Rule } from 'FunBlocks/AST/Terms'
 import Block from 'FunBlocks/UI/Components/Block'
 import BlockPlaceholder from './BlockPlaceholder'
 
@@ -13,24 +13,24 @@ const styles = require('./RuleBlock.module')
 
 export interface RuleBlockProps {
 
-  /// The rule to represent graphically.
-  rule: Rule
+  /// The rule case to represent graphically.
+  rule: AST.RuleCaseDecl
 
   /// Indicates whether the blocks of this rules are editable (default: `false`).
   ///
   /// Setting this flag will make this block react to the user interactions that can trigger its
   /// modification. This include drag and drop events originating from the program editor's toolbox
   /// (for additions) and drag events originating from a subterm (for deletions).
-  editable?: boolean,
+  editable?: boolean
 
   /// A callback that is called when the rule block is clicked.
   onClick?(e: React.MouseEvent | React.TouchEvent): void
 
   /// A callback that is called when the rule has been updated (i.e. its terms changed).
-  onUpdate?(patch: { left?: Term, right?: Term }): void,
+  onUpdate?(patch: { left?: Term, right?: Term }): void
 
   /// A callback that is called when the rule has been removed.
-  onRemove?(): void,
+  onRemove?(): void
 
   /// An action dispatcher that sets drag data.
   setDraggedData(type: string, payload?: any, callbacks?: Dictionary<Function>): void
@@ -84,7 +84,7 @@ class RuleBlock extends React.Component<RuleBlockProps> {
   }
 
   didDragStart(e: React.DragEvent<HTMLDivElement>) {
-    this.props.setDraggedData('Rule', this.props.rule, { onRemove: this.props.onRemove })
+    this.props.setDraggedData('RuleCaseDecl', this.props.rule, { onRemove: this.props.onRemove })
     e.stopPropagation()
   }
 

@@ -1,13 +1,13 @@
-import { Rule } from 'FunBlocks/AST/Terms'
+import * as AST from 'FunBlocks/AST'
 import { IDEMode } from 'FunBlocks/UI/Reducers'
 
 export const ACTION_TYPES = {
   SET_MODE              : 'IDE.setMode',
   UPDATE_PROGRAM        : 'IDE.updateProgram',
 
-  INSERT_RULE           : 'IDE.editMode.insertRule',
-  UPDATE_RULE           : 'IDE.editMode.updateRule',
-  REMOVE_RULE           : 'IDE.editMode.removeRule',
+  INSERT_RULE_CASE      : 'IDE.editMode.insertRuleCase',
+  UPDATE_RULE_CASE      : 'IDE.editMode.updateRuleCase',
+  REMOVE_RULE_CASE      : 'IDE.editMode.removeRuleCase',
   UPDATE_INITIAL_STATE  : 'IDE.editMode.updateInitialState',
 
   PUSH_STATE            : 'IDE.debugMode.pushState',
@@ -29,21 +29,21 @@ export const updateProgram = (program: Program): PayloadAction<Program> => ({
 
 // ----- Edit mode actions -----------------------------------------------------------------------
 
-export const insertRule = (rule: Rule): PayloadAction<Rule> => ({
-  type: ACTION_TYPES.INSERT_RULE,
+export const insertRuleCase = (rule: AST.RuleCaseDecl): PayloadAction<AST.RuleCaseDecl> => ({
+  type: ACTION_TYPES.INSERT_RULE_CASE,
   payload: rule,
 })
 
-export const updateRule = (
+export const updateRuleCase = (
   ruleID: string,
   patch: { left?: Term, right?: Term
 }): PayloadAction<{ ruleID: string, patch: { left?: Term, right?: Term } }> => ({
-  type: ACTION_TYPES.UPDATE_RULE,
+  type: ACTION_TYPES.UPDATE_RULE_CASE,
   payload: { ruleID, patch },
 })
 
-export const removeRule = (ruleID: string): PayloadAction<string> => ({
-  type: ACTION_TYPES.REMOVE_RULE,
+export const removeRuleCase = (ruleID: string): PayloadAction<string> => ({
+  type: ACTION_TYPES.REMOVE_RULE_CASE,
   payload: ruleID,
 })
 

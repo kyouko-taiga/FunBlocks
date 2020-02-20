@@ -1,7 +1,7 @@
 import { AnyAction, combineReducers } from 'redux'
 
+import * as AST from 'FunBlocks/AST'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
-import { Rule } from 'FunBlocks/AST/Terms'
 
 const initialState = (state: Term = null, action: AnyAction): Term => {
   switch (action.type) {
@@ -16,16 +16,16 @@ const initialState = (state: Term = null, action: AnyAction): Term => {
   }
 }
 
-const rules = (state: Array<Rule> = [], action: AnyAction): Array<Rule> => {
+const rules = (state: Array<AST.RuleCaseDecl> = [], action: AnyAction): Array<AST.RuleCaseDecl> => {
   switch (action.type) {
   case ACTION_TYPES.UPDATE_PROGRAM:
     return action.payload.rules
 
-  case ACTION_TYPES.INSERT_RULE:
+  case ACTION_TYPES.INSERT_RULE_CASE:
     return state.concat([ action.payload ])
 
-  case ACTION_TYPES.UPDATE_RULE: {
-    // Find the rule to update.
+  case ACTION_TYPES.UPDATE_RULE_CASE: {
+    // Find the rule case to update.
     const index = state.findIndex((r) => r.id === action.payload.ruleID)
     if (index < 0) {
       return state
@@ -39,12 +39,12 @@ const rules = (state: Array<Rule> = [], action: AnyAction): Array<Rule> => {
       ? action.payload.patch.right
       : state[index].right
 
-    const newRule = new Rule({ left: left, right: right })
+    const newRule = new AST.RuleCaseDecl({ left: left, right: right })
     return state.slice(0, index).concat([newRule], state.slice(index + 1))
   }
 
-  case ACTION_TYPES.REMOVE_RULE: {
-    // Find the rule to remove.
+  case ACTION_TYPES.REMOVE_RULE_CASE: {
+    // Find the rule case to remove.
     const index = state.findIndex((r) => r.id === action.payload)
     if (index < 0) {
       return state

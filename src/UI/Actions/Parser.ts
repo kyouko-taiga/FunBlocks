@@ -1,5 +1,4 @@
-import { string, whitespace, regexp, newline, eof, anyChar,
-  fail } from "parjs";
+import { string, whitespace, regexp, newline, eof, anyChar, fail } from "parjs"
 import {
   between,
   manySepBy,
@@ -14,20 +13,9 @@ import {
   maybe,
   manyTill,
   recover
-} from "parjs/combinators";
+} from "parjs/combinators"
 
-import {
-  TypeDeclRef, TypeDecl,
-  TypeVarRef,
-  Expression,
-  VarRef,
-  Term,
-  InitStateDecl,
-  TypeRef, TypeCons,
-  TypeSign, ArrowTypeSign,
-  RuleDef,
-  RuleDecl
-} from "FunBlocks/AST/SyntacticElements";
+import * as AST from 'FunBlocks/AST'
 
 let alphanumeric = regexp(new RegExp("[a-zA-Z0-9_]"));
 
@@ -48,22 +36,22 @@ let identifier = alphaSequence;
 
 let variable = string("$").pipe(
   qthen(identifier),
-  map(str => new VarRef({ name: str }))
+  map(str => new AST.VarRef({ label: str }))
 );
 
 let typeVarRef = variable.pipe(
-  map(e => new TypeVarRef({ name: e.name }))
+  map(e => new AST.TypeVarRef({ label: e.label }))
 );
 
 let typeParamList = typeVarRef.pipe(manySepBy(whitespace()));
 
-let typeDeclRef = later<TypeDeclRef>();
-let typeArg = later<TypeRef>();
-let typeArgList = later<TypeRef[]>();
+let typeDeclRef = later<AST.TypeDeclRef>();
+let typeArg = later<AST.TypeRef>();
+let typeArgList = later<AST.TypeRef[]>();
 
 let typeRef = typeDeclRef.pipe(
   or(typeVarRef)
-  , map(e => e as TypeRef )
+  , map(e => e as AST.TypeRef )
 );
 
 typeArg.init(
@@ -92,7 +80,7 @@ let typeCons =  identifier.pipe(
     ),
     thenq(whitespace()),
     // create a typeArg[]
-    map(arr => new TypeCons({ label: arr[0], arguments: arr[1] }))
+    map(arr => new AST.TypeConsDecl({ label: arr[0], arguments: arr[1] }))
   );
 
 let term = later<Term>();
@@ -111,7 +99,7 @@ let expression = identifier.pipe(
     )
   ),
   thenq(whitespace()),
-  map(arr => new Expression({ label: arr[0], subterms: arr[1] }))
+  map(arr => new AST.Expr({ label: arr[0], subterms: arr[1] }))
 );
 
 term.init(
@@ -124,7 +112,7 @@ term.init(
 let initStateDecl = string("init").pipe(
   qthen(expression.pipe(between(whitespace()))),
   thenq(terminator),
-  map(expr => new InitStateDecl({ state: expr }))
+  map(expr => new AST.InitStateDecl({ state: expr }))
 );
 
 let parenthExpression = expression.pipe(
@@ -137,7 +125,7 @@ let parenthTerm = term.pipe(
   , between("(",")")
 );
 
-let ruleDef = string("rule").pipe(
+let ruleCaseDecl = string("rule").pipe(
   qthen(expression.pipe(or(parenthExpression), between(whitespace())))
   , then(
     string("=>").pipe(
@@ -147,7 +135,7 @@ let ruleDef = string("rule").pipe(
   )
   , thenq(whitespace())
   , thenq(terminator)
-  , map(arr => new RuleDef({ left: arr[0], right: arr[1] }))
+  , map(arr => new AST.RuleCaseDecl({ left: arr[0], right: arr[1] }))
 );
 
 
@@ -177,15 +165,15 @@ typeDeclRef.init(
       )
     ),
     thenq(whitespace()),
-    map(arr => new TypeDeclRef({ name: arr[0], arguments: arr[1] }))
+    map(arr => new AST.TypeDeclRef({ name: arr[0], arguments: arr[1] }))
   )
 
 );
 
 
-let right = typeSign.pipe(or(parenthTypeSign), map(e => e as TypeSign));
+let right = typeSign.pipe(or(parenthTypeSign), map(e => e as AST.TypeSign))
 
-let left = typeRef.pipe(or(parenthTypeSign), map(e => e as TypeSign) );
+let left = typeRef.pipe(or(parenthTypeSign), map(e => e as AST.TypeSign))
 
  let arrowTypeSign = left.pipe(
   then(string("->").pipe(
@@ -197,7 +185,7 @@ let left = typeRef.pipe(or(parenthTypeSign), map(e => e as TypeSign) );
     , thenq(whitespace())
   ))
   , map(
-    arr => new ArrowTypeSign({ left: arr[0], right: arr[1] })
+    arr => new AST.ArrowTypeSign({ left: arr[0], right: arr[1] })
   )
 );
 
@@ -211,7 +199,7 @@ typeSign.init(
       }
     )
     , or(typeRef)
-  , map(e=> e as TypeSign))
+  , map(e=> e as AST.TypeSign))
 );
 
 
@@ -223,7 +211,7 @@ let ruleDeclBody = typeSign.pipe(
   )
   , then(typeSign)
   , map(
-    arr => arr as TypeSign[] )
+    arr => arr as AST.TypeSign[] )
 );
 
 let ruleDecl = string("decl").pipe(
@@ -234,7 +222,7 @@ let ruleDecl = string("decl").pipe(
   , thenq(terminator)
   , map(
     arr =>
-      new RuleDecl({
+      new AST.RuleDecl({
         name: arr[0][0],
         arguments: arr[0][1],
         left: arr[1][0],
@@ -250,14 +238,14 @@ let typeDecl = string("type").pipe(
   then(enumTypeBody.pipe(between(whitespace()))),
   thenq(terminator),
   map(
-    arr => new TypeDecl({ name: arr[0][0], parameters: arr[0][1], cases : arr[1] })
+    arr => new AST.TypeDecl({ name: arr[0][0], parameters: arr[0][1], cases : arr[1] })
   )
 );
 
 let topLevelStmt = typeDecl.pipe(
   or(initStateDecl),
   or(ruleDecl),
-  or(ruleDef),
+  or(ruleCaseDecl),
   between(whitespace())
 );
 

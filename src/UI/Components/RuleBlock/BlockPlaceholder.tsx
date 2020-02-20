@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { Variable } from 'FunBlocks/AST/Terms'
+import * as AST from 'FunBlocks/AST'
 import { DraggedData } from 'FunBlocks/UI/Reducers/DraggedData'
 import { RootState } from 'FunBlocks/UI/Store'
 
@@ -41,7 +41,7 @@ class BlockPlaceholder extends React.PureComponent<Props> {
 
     // Ignore this event if the data attached to the drag event is a variable, unless the
     // `allowsVariables` flag is set.
-    if ((this.props.draggedData.payload instanceof Variable) && !this.props.allowsVariables) {
+    if ((this.props.draggedData.payload instanceof AST.VarRef) && !this.props.allowsVariables) {
       return
     }
 
@@ -59,7 +59,7 @@ class BlockPlaceholder extends React.PureComponent<Props> {
 
     // Ignore this event if the data attached to the drag event is a variable, unless the
     // `allowsVariables` flag is set.
-    if ((this.props.draggedData.payload instanceof Variable) && !this.props.allowsVariables) {
+    if ((this.props.draggedData.payload instanceof AST.VarRef) && !this.props.allowsVariables) {
       return
     }
 
