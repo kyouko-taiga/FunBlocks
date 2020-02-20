@@ -8,13 +8,13 @@ import { RunContext, runContext } from './Contexts/RunContext'
 import { DraggedData, draggedData } from './DraggedData'
 import { program } from './Program'
 
-/// An enumeration of the modes of the IDE.
-export enum IDEMode { Edit, Debug, Run }
+/// An enumeration of the workspaces of the IDE.
+export enum IDEWorkspace { Edit, Debug, Run }
 
 export type IDEContext = EditContext | DebugContext | RunContext
 
 type IDEState = {
-  mode: IDEMode,
+  activeWorkspace: IDEWorkspace,
   program: Program,
   context: IDEContext,
   blockData: BlockData,
@@ -22,13 +22,13 @@ type IDEState = {
 }
 
 const contextReducers = {
-  [IDEMode.Edit]  : editContext,
-  [IDEMode.Debug] : debugContext,
-  [IDEMode.Run]   : runContext,
+  [IDEWorkspace.Edit]: editContext,
+  [IDEWorkspace.Debug]: debugContext,
+  [IDEWorkspace.Run]: runContext,
 }
 
 const initialState: IDEState = {
-  mode: IDEMode.Edit,
+  activeWorkspace: IDEWorkspace.Edit,
   program: program(undefined, { type: null }),
   context: editContext(undefined, { type: null }),
   blockData: blockData(undefined, { type: null }),
@@ -39,12 +39,12 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   let newState = state
 
   switch (action.type) {
-  case ACTION_TYPES.SET_MODE: {
-    // Compute the context of the mode to which the IDE is about to transition.
-    const newMode = action.payload as IDEMode
+  case ACTION_TYPES.SET_ACTIVE_WORKSPACE: {
+    // Compute the context of the workspace to which the IDE is about to transition.
+    const newWorkspace = action.payload as IDEWorkspace
     let initialContext: Dictionary = {}
-    switch (newMode) {
-    case IDEMode.Debug:
+    switch (newWorkspace) {
+    case IDEWorkspace.Debug:
       initialContext = { selectedRuleID: null }
       if (state.program.initialState !== null) {
         initialContext.history = [state.program.initialState]
@@ -59,8 +59,8 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
       break
     }
 
-    // Update the IDE's mode.
-    newState = { ...state, mode: newMode, context: initialContext }
+    // Update the IDE's workspace.
+    newState = { ...state, activeWorkspace: newWorkspace, context: initialContext }
   }
 
   default:
@@ -73,11 +73,11 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
     blockData: blockData(newState.blockData, action),
     draggedData: draggedData(newState.draggedData, action),
 
-    // Notice that `state.context` must be cast as `any`, because the compiler cannot statically
-    // guarantee that it has the same type as the reducer denoted by `contextReducers[state.mode]`.
-    // A safer version would be to compute the context in a switch case for all possible modes, so
-    // that the compiler may guarantee that it has the appropriate type.
-    context: contextReducers[newState.mode](newState.context as any, action),
+    // Notice that `state.context` must be cast as `any`, as the compiler can't guarantee that it
+    // has the same type as the reducer corresponding to the active workspace. A safer version
+    // would be to compute the context in a switch case for all possible workspaces, so that the
+    // compiler may guarantee that it has the appropriate type.
+    context: contextReducers[newState.activeWorkspace](newState.context as any, action),
   }
 
   // Create a new state only if one of the sub-reducers produced a different object.

@@ -1,14 +1,14 @@
 import * as AST from 'FunBlocks/AST'
-import { IDEMode } from 'FunBlocks/UI/Reducers'
+import { IDEWorkspace } from 'FunBlocks/UI/Reducers'
 
 export const ACTION_TYPES = {
-  SET_MODE              : 'IDE.setMode',
+  SET_ACTIVE_WORKSPACE  : 'IDE.setActiveWorkspace',
   UPDATE_PROGRAM        : 'IDE.updateProgram',
 
-  INSERT_RULE_CASE      : 'IDE.editMode.insertRuleCase',
-  UPDATE_RULE_CASE      : 'IDE.editMode.updateRuleCase',
-  REMOVE_RULE_CASE      : 'IDE.editMode.removeRuleCase',
-  UPDATE_INITIAL_STATE  : 'IDE.editMode.updateInitialState',
+  INSERT_RULE_CASE      : 'IDE.insertRuleCase',
+  UPDATE_RULE_CASE      : 'IDE.updateRuleCase',
+  REMOVE_RULE_CASE      : 'IDE.removeRuleCase',
+  UPDATE_INITIAL_STATE  : 'IDE.updateInitialState',
 
   PUSH_STATE            : 'IDE.debugMode.pushState',
   SELECT_RULE           : 'IDE.debugMode.selectRule',
@@ -17,17 +17,15 @@ export const ACTION_TYPES = {
 
 // ----- General actions --------------------------------------------------------------------------
 
-export const pushState = (state: Term): PayloadAction<Term> => ({
-  type: ACTION_TYPES.PUSH_STATE,
-  payload: state,
+export const setActiveWorkspace = (mode: IDEWorkspace): PayloadAction<IDEWorkspace> => ({
+  type: ACTION_TYPES.SET_ACTIVE_WORKSPACE,
+  payload: mode,
 })
 
 export const updateProgram = (program: Program): PayloadAction<Program> => ({
   type: ACTION_TYPES.UPDATE_PROGRAM,
   payload: program,
 })
-
-// ----- Edit mode actions -----------------------------------------------------------------------
 
 export const insertRuleCase = (rule: AST.RuleCaseDecl): PayloadAction<AST.RuleCaseDecl> => ({
   type: ACTION_TYPES.INSERT_RULE_CASE,
@@ -52,7 +50,7 @@ export const updateInitialState = (state: Term): PayloadAction<Term> => ({
   payload: state,
 })
 
-// ----- Debug mode actions -----------------------------------------------------------------------
+// ----- Actions specific to the debug worspace ---------------------------------------------------
 
 export const selectRule = (ruleID: string): PayloadAction<string> => ({
   type: ACTION_TYPES.SELECT_RULE,
@@ -64,7 +62,7 @@ export const setHistoryIndex = (index: number): PayloadAction<number> => ({
   payload: index,
 })
 
-export const setMode = (mode: IDEMode): PayloadAction<IDEMode> => ({
-  type: ACTION_TYPES.SET_MODE,
-  payload: mode,
+export const pushState = (state: Term): PayloadAction<Term> => ({
+  type: ACTION_TYPES.PUSH_STATE,
+  payload: state,
 })
