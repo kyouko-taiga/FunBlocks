@@ -10,7 +10,9 @@ import {
   faMousePointer,
   faPen,
   faPlay,
+  faShapes,
   faSquare,
+  faTerminal,
   faTrash,
   faUpload,
 } from '@fortawesome/free-solid-svg-icons'
@@ -26,6 +28,8 @@ library.add(
   faMousePointer,
   faPen,
   faPlay,
+  faShapes,
   faSquare,
+  faTerminal,
   faTrash,
   faUpload)

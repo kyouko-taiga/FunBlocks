@@ -39,7 +39,8 @@
   }
 
   &.pressed {
-
+    background-color: #737373;
+    color: #f3f3f3;
   }
 
   &.dark {
@@ -71,7 +72,7 @@
 }
 
 .btn-group {
-  display: flex;
+  display: inline-flex;
 
   & > .btn {
     &:not(:first-child) {

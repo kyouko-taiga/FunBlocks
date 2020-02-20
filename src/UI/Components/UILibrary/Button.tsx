@@ -8,6 +8,7 @@ import UITheme from './UITheme'
 const styles = require('./UILibrary.module')
 
 type ButtonProps = {
+  classes?: string,
   pressed?: boolean,
   theme?: UITheme,
   icon?: IconProp,
@@ -35,7 +36,7 @@ class Button extends React.PureComponent<ButtonProps> {
       </span>
     )
 
-    const className = classNames(styles.btn, {
+    const className = classNames(styles.btn, this.props.classes, {
       [styles.pressed]: this.props.pressed,
       [styles.dark]: this.props.theme == UITheme.Dark,
     })

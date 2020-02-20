@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import * as AST from 'FunBlocks/AST'
 import Block from 'FunBlocks/UI/Components/Block'
+import Button from 'FunBlocks/UI/Components/UILibrary/Button'
+import ButtonGroup from 'FunBlocks/UI/Components/UILibrary/ButtonGroup'
 import ObjectTrash from './ObjectTrash'
 import ToolButton from './ToolButton'
 
@@ -17,6 +19,17 @@ class Toolbox extends React.PureComponent {
   render() {
     return (
       <div className={ styles.toolbox }>
+        <div className={ styles.sectionHeading }>Input Mode</div>
+        <div className={ styles.inputMode }>
+          <ButtonGroup>
+            <Button classes={ styles.btn } pressed>
+              <FontAwesomeIcon icon="shapes" /> Blocks
+            </Button>
+            <Button classes={ styles.btn }>
+              <FontAwesomeIcon icon="terminal" /> Text
+            </Button>
+          </ButtonGroup>
+        </div>
         <div className={ styles.sectionHeading }>Objects</div>
         <div className={ styles.toolMatrix }>
           <div className={ styles.row }>
