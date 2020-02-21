@@ -66,10 +66,12 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
 
     // Update the IDE's workspace.
     newState = { ...state, activeWorkspace: newWorkspace, context: initialContext }
+    break
   }
 
   case ACTION_TYPES.CHANGE_INPUT_MODE:
-    return { ...state, inputMode: action.payload }
+    newState = { ...state, inputMode: action.payload }
+    break
 
   default:
     break
