@@ -2,24 +2,25 @@ import * as AST from 'FunBlocks/AST'
 import { IDEWorkspace } from 'FunBlocks/UI/Reducers'
 
 export const ACTION_TYPES = {
-  SET_ACTIVE_WORKSPACE  : 'IDE.setActiveWorkspace',
-  UPDATE_PROGRAM        : 'IDE.updateProgram',
+  CHANGE_ACTIVE_WORKSPACE: 'IDE.changeActiveWorkspace',
+  CHANGE_INPUT_MODE: 'IDE.changeInputMode',
+  UPDATE_PROGRAM: 'IDE.updateProgram',
 
-  INSERT_RULE_CASE      : 'IDE.insertRuleCase',
-  UPDATE_RULE_CASE      : 'IDE.updateRuleCase',
-  REMOVE_RULE_CASE      : 'IDE.removeRuleCase',
-  UPDATE_INITIAL_STATE  : 'IDE.updateInitialState',
+  INSERT_RULE_CASE: 'IDE.insertRuleCase',
+  UPDATE_RULE_CASE: 'IDE.updateRuleCase',
+  REMOVE_RULE_CASE: 'IDE.removeRuleCase',
+  UPDATE_INITIAL_STATE: 'IDE.updateInitialState',
 
-  PUSH_STATE            : 'IDE.debugMode.pushState',
-  SELECT_RULE           : 'IDE.debugMode.selectRule',
-  SET_HISTORY_INDEX     : 'IDE.debugMode.setHistoryIndex',
+  PUSH_STATE: 'IDE.debugMode.pushState',
+  SELECT_RULE: 'IDE.debugMode.selectRule',
+  SET_HISTORY_INDEX: 'IDE.debugMode.setHistoryIndex',
 }
 
 // ----- General actions --------------------------------------------------------------------------
 
-export const setActiveWorkspace = (mode: IDEWorkspace): PayloadAction<IDEWorkspace> => ({
-  type: ACTION_TYPES.SET_ACTIVE_WORKSPACE,
-  payload: mode,
+export const changeActiveWorkspace = (workspace: IDEWorkspace): PayloadAction<IDEWorkspace> => ({
+  type: ACTION_TYPES.CHANGE_ACTIVE_WORKSPACE,
+  payload: workspace,
 })
 
 export const updateProgram = (program: Program): PayloadAction<Program> => ({

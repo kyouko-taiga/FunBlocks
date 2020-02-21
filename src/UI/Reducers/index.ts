@@ -39,7 +39,7 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
   let newState = state
 
   switch (action.type) {
-  case ACTION_TYPES.SET_ACTIVE_WORKSPACE: {
+  case ACTION_TYPES.CHANGE_ACTIVE_WORKSPACE: {
     // Compute the context of the workspace to which the IDE is about to transition.
     const newWorkspace = action.payload as IDEWorkspace
     let initialContext: Dictionary = {}
