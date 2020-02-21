@@ -1,19 +1,32 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import * as AST from 'FunBlocks/AST'
+import { unparse } from 'FunBlocks/Parser/Unparser'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
+import { InputMode } from './.'
 
-const defaultProgram: Program = {
+type ReducerType = Program & { source: string }
+const defaultProgram: ReducerType = {
   initialState: null,
   ruleCases: [],
   source: '',
 }
 
-const reducer = (program: Program = defaultProgram, action: AnyAction): Program => {
+const reducer = (program: ReducerType = defaultProgram, action: AnyAction): ReducerType => {
   switch (action.type) {
+  case ACTION_TYPES.CHANGE_INPUT_MODE:
+    if (action.payload == InputMode.Textual) {
+      // If we are moving from the visual to the textual mode, then we must (re)build the textual
+      // form of the program from its current AST.
+      return { ...program, source: unparse(program) }
+    }
+
   case ACTION_TYPES.UPDATE_PROGRAM:
     // The payload should be an object that implements `Program`.
     return { ...program, ...action.payload }
+
+  case ACTION_TYPES.UPDATE_PROGRAM_SOURCE:
+    return { ...program, source: action.payload }
 
   case ACTION_TYPES.UPDATE_INITIAL_STATE:
     return { ...program, initialState: action.payload }

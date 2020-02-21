@@ -2,10 +2,12 @@ import classNames from 'classnames'
 import React from 'react'
 import AceEditor from "react-ace"
 import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 import "ace-builds/webpack-resolver"
 import "ace-builds/src-noconflict/theme-github"
 
+import { updateProgramSource } from 'FunBlocks/UI/Actions/IDE'
 import { InputMode } from 'FunBlocks/UI/Reducers'
 import { RootState } from 'FunBlocks/UI/Store'
 import RulesEditor from './RulesEditor'
@@ -15,6 +17,8 @@ const styles = require('./Workspace.module')
 
 type Props = {
   inputMode: InputMode,
+  source: string,
+  updateProgramSource(source: string): void,
 }
 
 class ProgramEditor extends React.PureComponent<Props> {
@@ -51,6 +55,8 @@ class ProgramEditor extends React.PureComponent<Props> {
           width="100%"
           height="100%"
           fontSize={ 16 }
+          value={ this.props.source }
+          onChange={ this.props.updateProgramSource }
         />
       </div>
     )
@@ -60,6 +66,11 @@ class ProgramEditor extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => ({
   inputMode: state.inputMode,
+  source: state.program.source,
 })
 
-export default connect(mapStateToProps)(ProgramEditor)
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  updateProgramSource: (source: string) => dispatch(updateProgramSource(source)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProgramEditor)

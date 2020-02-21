@@ -5,7 +5,7 @@ export const ACTION_TYPES = {
   CHANGE_ACTIVE_WORKSPACE: 'IDE.changeActiveWorkspace',
   CHANGE_INPUT_MODE: 'IDE.changeInputMode',
   UPDATE_PROGRAM: 'IDE.updateProgram',
-
+  UPDATE_PROGRAM_SOURCE: 'IDE.updateProgramSource',
   INSERT_RULE_CASE: 'IDE.insertRuleCase',
   UPDATE_RULE_CASE: 'IDE.updateRuleCase',
   REMOVE_RULE_CASE: 'IDE.removeRuleCase',
@@ -31,6 +31,11 @@ export const changeInputMode = (mode: InputMode): PayloadAction<InputMode> => ({
 export const updateProgram = (program: Program): PayloadAction<Program> => ({
   type: ACTION_TYPES.UPDATE_PROGRAM,
   payload: program,
+})
+
+export const updateProgramSource = (source: string): PayloadAction<string> => ({
+  type: ACTION_TYPES.UPDATE_PROGRAM_SOURCE,
+  payload: source,
 })
 
 export const insertRuleCase = (rule: AST.RuleCaseDecl): PayloadAction<AST.RuleCaseDecl> => ({

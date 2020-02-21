@@ -1,11 +1,11 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
-import { BlockData, blockData } from './BlockData'
-import { DebugContext, debugContext } from './Contexts/DebugContext'
-import { EditContext, editContext } from './Contexts/EditContext'
-import { RunContext, runContext } from './Contexts/RunContext'
-import { DraggedData, draggedData } from './DraggedData'
+import { blockData } from './BlockData'
+import { debugContext } from './Contexts/DebugContext'
+import { editContext } from './Contexts/EditContext'
+import { runContext } from './Contexts/RunContext'
+import { draggedData } from './DraggedData'
 import { program } from './Program'
 
 /// An enumeration of the workspaces of the IDE.
@@ -14,15 +14,17 @@ export enum IDEWorkspace { Edit, Debug, Run }
 /// An enumeration of the IDE's input mode.
 export enum InputMode { Visual, Textual }
 
-export type IDEContext = EditContext | DebugContext | RunContext
+export type IDEContext = ReturnType<typeof editContext>
+                       | ReturnType<typeof debugContext>
+                       | ReturnType<typeof runContext>
 
 type IDEState = {
   activeWorkspace: IDEWorkspace,
   context: IDEContext,
   inputMode: InputMode,
-  blockData: BlockData,
-  draggedData: DraggedData,
-  program: Program,
+  blockData: ReturnType<typeof blockData>,
+  draggedData: ReturnType<typeof draggedData>,
+  program: ReturnType<typeof program>,
 }
 
 const contextReducers = {
