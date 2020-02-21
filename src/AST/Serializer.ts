@@ -33,7 +33,7 @@ export function deserialize(input: string): Program {
     right: subtree.right && makeTerm(subtree.right),
   }))
 
-  return { initialState, ruleCases }
+  return { initialState, ruleCases, source: '' }
 }
 
 // MARK: Parsing helper functions.

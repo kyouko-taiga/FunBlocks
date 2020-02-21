@@ -12,7 +12,7 @@ export const ACTION_TYPES = {
   UPDATE_INITIAL_STATE: 'IDE.updateInitialState',
 
   PUSH_STATE: 'IDE.debugMode.pushState',
-  SELECT_RULE: 'IDE.debugMode.selectRule',
+  SELECT_RULE: 'IDE.debugMode.selectRuleCase',
   SET_HISTORY_INDEX: 'IDE.debugMode.setHistoryIndex',
 }
 
@@ -39,16 +39,16 @@ export const insertRuleCase = (rule: AST.RuleCaseDecl): PayloadAction<AST.RuleCa
 })
 
 export const updateRuleCase = (
-  ruleID: string,
+  ruleCaseID: string,
   patch: { left?: Term, right?: Term
-}): PayloadAction<{ ruleID: string, patch: { left?: Term, right?: Term } }> => ({
+}): PayloadAction<{ ruleCaseID: string, patch: { left?: Term, right?: Term } }> => ({
   type: ACTION_TYPES.UPDATE_RULE_CASE,
-  payload: { ruleID, patch },
+  payload: { ruleCaseID, patch },
 })
 
-export const removeRuleCase = (ruleID: string): PayloadAction<string> => ({
+export const removeRuleCase = (ruleCaseID: string): PayloadAction<string> => ({
   type: ACTION_TYPES.REMOVE_RULE_CASE,
-  payload: ruleID,
+  payload: ruleCaseID,
 })
 
 export const updateInitialState = (state: Term): PayloadAction<Term> => ({
@@ -58,9 +58,9 @@ export const updateInitialState = (state: Term): PayloadAction<Term> => ({
 
 // ----- Actions specific to the debug worspace ---------------------------------------------------
 
-export const selectRule = (ruleID: string): PayloadAction<string> => ({
+export const selectRuleCase = (ruleCaseID: string): PayloadAction<string> => ({
   type: ACTION_TYPES.SELECT_RULE,
-  payload: ruleID,
+  payload: ruleCaseID,
 })
 
 export const setHistoryIndex = (index: number): PayloadAction<number> => ({

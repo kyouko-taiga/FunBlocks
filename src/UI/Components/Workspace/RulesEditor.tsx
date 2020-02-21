@@ -15,8 +15,8 @@ type Props = {
   ruleCases: Array<AST.RuleCaseDecl>,
   draggedData: { type: string, payload?: any, callbacks?: Dictionary<Function> },
   insertRuleCase(newRule: AST.RuleCaseDecl): void,
-  updateRuleCase(ruleID: string, updates: { left?: Term, right?: Term }): void,
-  removeRuleCase(ruleID: string): void,
+  updateRuleCase(ruleCaseID: string, updates: { left?: Term, right?: Term }): void,
+  removeRuleCase(ruleCaseID: string): void,
 }
 
 type RuleCasePatch = { left?: Term, right?: Term }
@@ -79,9 +79,9 @@ const mapStateToProps = (state: RootState) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   insertRuleCase: (newRule: AST.RuleCaseDecl) => dispatch(insertRuleCase(newRule)),
-  updateRuleCase: (ruleID: string, patch: RuleCasePatch) =>
-    dispatch(updateRuleCase(ruleID, patch)),
-  removeRuleCase: (ruleID: string) => dispatch(removeRuleCase(ruleID)),
+  updateRuleCase: (ruleCaseID: string, patch: RuleCasePatch) =>
+    dispatch(updateRuleCase(ruleCaseID, patch)),
+  removeRuleCase: (ruleCaseID: string) => dispatch(removeRuleCase(ruleCaseID)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(RulesEditor)

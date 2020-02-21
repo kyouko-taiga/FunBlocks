@@ -5,7 +5,7 @@ import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import * as AST from 'FunBlocks/AST'
-import { pushState, selectRule } from 'FunBlocks/UI/Actions/IDE'
+import { pushState, selectRuleCase } from 'FunBlocks/UI/Actions/IDE'
 import Block from 'FunBlocks/UI/Components/Block'
 import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
 import { DebugContext } from 'FunBlocks/UI/Reducers/Contexts/DebugContext'
@@ -17,7 +17,7 @@ const styles = require('./Workspace.module')
 type Props = DebugContext & {
   ruleCases: Array<AST.RuleCaseDecl>,
   pushState(state: Term): void,
-  selectRule(ruleID: string): void,
+  selectRuleCase(ruleCaseID: string): void,
 }
 
 class DebugWorkspace extends React.PureComponent<Props> {
@@ -75,7 +75,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
 
   private readonly didKeydown = (e: KeyboardEvent) => {
     if (e.keyCode == 27 /* ESC */) {
-      this.props.selectRule(null)
+      this.props.selectRuleCase(null)
     }
   }
 
@@ -104,9 +104,9 @@ class DebugWorkspace extends React.PureComponent<Props> {
 
   private didRuleClick(rule: AST.RuleCaseDecl) {
     if (this.props.selectedRuleID !== rule.id) {
-      this.props.selectRule(rule.id)
+      this.props.selectRuleCase(rule.id)
     } else {
-      this.props.selectRule(null)
+      this.props.selectRuleCase(null)
     }
   }
 
@@ -119,7 +119,7 @@ const mapStateToProps = (state: RootState) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   pushState: (state: Term) => dispatch(pushState(state)),
-  selectRule: (ruleID: string) => dispatch(selectRule(ruleID)),
+  selectRuleCase: (ruleCaseID: string) => dispatch(selectRuleCase(ruleCaseID)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DebugWorkspace)
