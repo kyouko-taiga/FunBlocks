@@ -1,17 +1,27 @@
 import classNames from 'classnames'
 import React from 'react'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import * as AST from 'FunBlocks/AST'
+import { changeInputMode } from 'FunBlocks/UI/Actions/IDE'
 import Block from 'FunBlocks/UI/Components/Block'
 import Button from 'FunBlocks/UI/Components/UILibrary/Button'
 import ButtonGroup from 'FunBlocks/UI/Components/UILibrary/ButtonGroup'
+import { InputMode } from 'FunBlocks/UI/Reducers'
+import { RootState } from 'FunBlocks/UI/Store'
 import ObjectTrash from './ObjectTrash'
 import ToolButton from './ToolButton'
 
 const styles = require('./Workspace.module')
 
-class Toolbox extends React.PureComponent {
+type Props = {
+  inputMode: InputMode,
+  changeInputMode(mode: InputMode): void,
+}
+
+class Toolbox extends React.PureComponent<Props> {
 
   private readonly dummyExpr = new AST.Expr({ label: 'abc' })
   private readonly dummyVar = new AST.VarRef({ label: 'x' })
@@ -22,10 +32,18 @@ class Toolbox extends React.PureComponent {
         <div className={ styles.sectionHeading }>Input Mode</div>
         <div className={ styles.inputMode }>
           <ButtonGroup>
-            <Button classes={ styles.btn } pressed>
+            <Button
+              classes={ styles.btn }
+              pressed={ this.props.inputMode == InputMode.Visual }
+              onClick={ () => this.props.changeInputMode(InputMode.Visual) }
+            >
               <FontAwesomeIcon icon="shapes" /> Blocks
             </Button>
-            <Button classes={ styles.btn }>
+            <Button
+              classes={ styles.btn }
+              pressed={ this.props.inputMode == InputMode.Textual }
+              onClick={ () => this.props.changeInputMode(InputMode.Textual) }
+            >
               <FontAwesomeIcon icon="terminal" /> Text
             </Button>
           </ButtonGroup>
@@ -77,4 +95,12 @@ class Toolbox extends React.PureComponent {
 
 }
 
-export default Toolbox
+const mapStateToProps = (state: RootState) => ({
+  inputMode: state.inputMode,
+})
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  changeInputMode: (mode: InputMode) => dispatch(changeInputMode(mode))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Toolbox)
