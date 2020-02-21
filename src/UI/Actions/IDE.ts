@@ -1,5 +1,5 @@
 import * as AST from 'FunBlocks/AST'
-import { IDEWorkspace } from 'FunBlocks/UI/Reducers'
+import { IDEWorkspace, InputMode } from 'FunBlocks/UI/Reducers'
 
 export const ACTION_TYPES = {
   CHANGE_ACTIVE_WORKSPACE: 'IDE.changeActiveWorkspace',
@@ -21,6 +21,11 @@ export const ACTION_TYPES = {
 export const changeActiveWorkspace = (workspace: IDEWorkspace): PayloadAction<IDEWorkspace> => ({
   type: ACTION_TYPES.CHANGE_ACTIVE_WORKSPACE,
   payload: workspace,
+})
+
+export const changeInputMode = (mode: InputMode): PayloadAction<InputMode> => ({
+  type: ACTION_TYPES.CHANGE_INPUT_MODE,
+  payload: mode,
 })
 
 export const updateProgram = (program: Program): PayloadAction<Program> => ({

@@ -11,14 +11,18 @@ import { program } from './Program'
 /// An enumeration of the workspaces of the IDE.
 export enum IDEWorkspace { Edit, Debug, Run }
 
+/// An enumeration of the IDE's input mode.
+export enum InputMode { Visual, Textual }
+
 export type IDEContext = EditContext | DebugContext | RunContext
 
 type IDEState = {
   activeWorkspace: IDEWorkspace,
-  program: Program,
   context: IDEContext,
+  inputMode: InputMode,
   blockData: BlockData,
   draggedData: DraggedData,
+  program: Program,
 }
 
 const contextReducers = {
@@ -29,10 +33,11 @@ const contextReducers = {
 
 const initialState: IDEState = {
   activeWorkspace: IDEWorkspace.Edit,
-  program: program(undefined, { type: null }),
   context: editContext(undefined, { type: null }),
+  inputMode: InputMode.Visual,
   blockData: blockData(undefined, { type: null }),
   draggedData: draggedData(undefined, { type: null }),
+  program: program(undefined, { type: null }),
 }
 
 const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
@@ -62,6 +67,9 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
     // Update the IDE's workspace.
     newState = { ...state, activeWorkspace: newWorkspace, context: initialContext }
   }
+
+  case ACTION_TYPES.CHANGE_INPUT_MODE:
+    return { ...state, inputMode: action.payload }
 
   default:
     break
