@@ -80,8 +80,11 @@
 }
 
 .program-editor {
-  padding: 16px 32px;
   flex-grow: 1;
+
+  &.visual {
+    padding: 16px 32px;
+  }
 
   .state-editor {
     display: flex;
