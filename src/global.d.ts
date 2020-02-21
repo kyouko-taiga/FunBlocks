@@ -27,7 +27,4 @@ interface Program {
   /// The program's rewriting rules.
   readonly ruleCases: Array<import("FunBlocks/AST").RuleCaseDecl>
 
-  /// The textual representation of the program.
-  readonly source: string
-
 }
