@@ -16,8 +16,8 @@ const reducer = (program: ReducerType = defaultProgram, action: AnyAction): Redu
   switch (action.type) {
   case ACTION_TYPES.CHANGE_INPUT_MODE:
     if (action.payload == InputMode.Textual) {
-      // If we are moving from the visual to the textual mode, then we must (re)build the textual
-      // form of the program from its current AST.
+      // If we are moving from the visual to the textual mode, we have to build its textual from
+      // its current AST.
       return { ...program, source: unparse(program) }
     }
 

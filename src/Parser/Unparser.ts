@@ -4,7 +4,10 @@ export function unparse(program: Program): string {
   // Unparse the program's initial state.
   if (!!program.initialState) {
     source += `init ${program.initialState.description}`
-    source += '\n\n'
+    source += '\n'
+    if (program.ruleCases.length > 0) {
+      source += '\n'
+    }
   }
 
   // Unparse the program's rule case declarations.
