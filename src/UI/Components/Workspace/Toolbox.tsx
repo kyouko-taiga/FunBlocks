@@ -35,14 +35,14 @@ class Toolbox extends React.PureComponent<Props> {
             <Button
               classes={ styles.btn }
               pressed={ this.props.inputMode == InputMode.Visual }
-              onClick={ () => this.props.changeInputMode(InputMode.Visual) }
+              onClick={ () => this.didChangeInputMode(InputMode.Visual) }
             >
               <FontAwesomeIcon icon="shapes" /> Blocks
             </Button>
             <Button
               classes={ styles.btn }
               pressed={ this.props.inputMode == InputMode.Textual }
-              onClick={ () => this.props.changeInputMode(InputMode.Textual) }
+              onClick={ () => this.didChangeInputMode(InputMode.Textual) }
             >
               <FontAwesomeIcon icon="terminal" /> Text
             </Button>
@@ -90,6 +90,12 @@ class Toolbox extends React.PureComponent<Props> {
     return {
       type: 'RuleCaseDecl',
       payload: new AST.RuleCaseDecl({ left: this.dummyExpr.clone, right: this.dummyExpr.clone }),
+    }
+  }
+
+  didChangeInputMode(newInputMode: InputMode) {
+    if (this.props.inputMode != newInputMode) {
+      this.props.changeInputMode(newInputMode)
     }
   }
 
