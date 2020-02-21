@@ -15,7 +15,7 @@ import History from './History'
 const styles = require('./Workspace.module')
 
 type Props = DebugContext & {
-  rules: Array<AST.RuleCaseDecl>,
+  ruleCases: Array<AST.RuleCaseDecl>,
   pushState(state: Term): void,
   selectRule(ruleID: string): void,
 }
@@ -32,7 +32,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     )
 
     // Create the representation of the program's rewriting rules.
-    const rules = this.props.rules.map((rule) => {
+    const rules = this.props.ruleCases.map((rule) => {
       const className = classNames(styles.ruleContainer, {
         [styles.selected]: this.props.selectedRuleID === rule.id,
       })
@@ -84,7 +84,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
     const selectedRuleID = this.props.selectedRuleID
     if (selectedRuleID !== null) {
       // Load the rule to apply.
-      const rule = this.props.rules.find((r) => r.id == selectedRuleID)
+      const rule = this.props.ruleCases.find((r) => r.id == selectedRuleID)
       console.assert(rule !== undefined, `rule not found '${selectedRuleID}'`)
 
       // Check if the left part of the rule matches the selected term.
@@ -114,7 +114,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => ({
   ...(state.context as DebugContext),
-  rules: state.program.rules,
+  ruleCases: state.program.ruleCases,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

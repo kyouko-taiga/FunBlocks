@@ -25,6 +25,6 @@ interface Program {
   readonly initialState: Term
 
   /// The program's rewriting rules.
-  readonly rules: Array<import("FunBlocks/AST").RuleCaseDecl>
+  readonly ruleCases: Array<import("FunBlocks/AST").RuleCaseDecl>
 
 }

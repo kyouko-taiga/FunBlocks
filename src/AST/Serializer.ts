@@ -5,7 +5,7 @@ import { Expr, VarRef } from './TermNodes'
 export function serialize(program: Program): string {
   const tree = {
     initialState: program.initialState.treeized,
-    rules: program.rules.map((rule: RuleCaseDecl) => ({
+    ruleCases: program.ruleCases.map((rule: RuleCaseDecl) => ({
       _objectType: 'Rule',
       id: rule.id,
       left: rule.left.treeized,
@@ -25,15 +25,15 @@ export function deserialize(input: string): Program {
   // Build the initial state.
   const initialState = tree.initialState && makeTerm(tree.initialState)
 
-  // Build the rules.
-  const rulesData = tree.rules || []
-  const rules = rulesData.map((subtree: Dictionary) => new RuleCaseDecl({
+  // Build the rule cases.
+  const rulesData = tree.ruleCases || []
+  const ruleCases = rulesData.map((subtree: Dictionary) => new RuleCaseDecl({
     id: subtree.id,
     left: subtree.left && makeTerm(subtree.left),
     right: subtree.right && makeTerm(subtree.right),
   }))
 
-  return { initialState, rules }
+  return { initialState, ruleCases }
 }
 
 // MARK: Parsing helper functions.

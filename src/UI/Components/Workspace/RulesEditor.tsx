@@ -12,7 +12,7 @@ import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
 const styles = require('./Workspace.module')
 
 type Props = {
-  rules: Array<AST.RuleCaseDecl>,
+  ruleCases: Array<AST.RuleCaseDecl>,
   draggedData: { type: string, payload?: any, callbacks?: Dictionary<Function> },
   insertRuleCase(newRule: AST.RuleCaseDecl): void,
   updateRuleCase(ruleID: string, updates: { left?: Term, right?: Term }): void,
@@ -24,7 +24,7 @@ type RuleCasePatch = { left?: Term, right?: Term }
 class RulesEditor extends React.PureComponent<Props> {
 
   render() {
-    const rules = this.props.rules.map((rule, i) => (
+    const rules = this.props.ruleCases.map((rule, i) => (
       <RuleBlock
         key={ i }
         rule={ rule }
@@ -73,7 +73,7 @@ class RulesEditor extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  rules: state.program.rules,
+  ruleCases: state.program.ruleCases,
   draggedData: state.draggedData,
 })
 

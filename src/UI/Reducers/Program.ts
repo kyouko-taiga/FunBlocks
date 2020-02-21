@@ -16,7 +16,10 @@ const initialState = (state: Term = null, action: AnyAction): Term => {
   }
 }
 
-const rules = (state: Array<AST.RuleCaseDecl> = [], action: AnyAction): Array<AST.RuleCaseDecl> => {
+const ruleCases = (
+  state: Array<AST.RuleCaseDecl> = [],
+  action: AnyAction
+): Array<AST.RuleCaseDecl> => {
   switch (action.type) {
   case ACTION_TYPES.UPDATE_PROGRAM:
     return action.payload.rules
@@ -59,4 +62,4 @@ const rules = (state: Array<AST.RuleCaseDecl> = [], action: AnyAction): Array<AS
   }
 }
 
-export const program = combineReducers({ initialState, rules })
+export const program = combineReducers({ initialState, ruleCases })
