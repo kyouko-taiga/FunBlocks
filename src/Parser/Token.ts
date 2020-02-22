@@ -15,23 +15,34 @@ export interface Token {
 
 /// A category of lexical token.
 export enum TokenKind {
-
+  /// "type"
   TypeKeyword,
+  /// "init"
   InitKeyword,
+  /// "decl"
   DeclKeyword,
+  /// "case"
   CaseKeyword,
+  /// "$" <ident-char> { <ident-char> }
   VarRef,
+  /// <ident-char> { <ident-char> }
   Ident,
-
+  /// "|"
   Or,
+  /// "->"
   Arrow,
+  /// "=>"
   ThickArrow,
+  /// "::"
   DoubleColon,
+  /// ","
   Comma,
+  /// ";"
   Semicolon,
+  /// "\n"
   Newline,
+  /// <eof>
   EOF,
-
+  /// Any unrecognized token.
   Unrecognized,
-
 }

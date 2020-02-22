@@ -2,7 +2,6 @@ import { SourceLocation } from 'FunBlocks/AST/SourceLocation'
 import { SourceRange } from 'FunBlocks/AST/SourceRange'
 import { Token, TokenKind } from 'FunBlocks/Parser/Token'
 
-
 /// Returns whether the given character is any whitespace character, excluding newlines.
 const isSkip = (ch: string): boolean =>
   (ch === ' ') || (ch === '\t') || (ch === '\f') || (ch === '\v') || (ch === '\r')
