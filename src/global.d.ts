@@ -1,5 +1,9 @@
 /// A mapping from string to values of type `T`.
-type Dictionary<T=any> = { [key: string]: T }
+interface Dictionary<T=any> {
+
+  [key: string]: T
+
+}
 
 /// A redux action without any payload.
 type Action<Meta=void> = import("redux").Action<string> & { meta?: Meta }
