@@ -1,3 +1,6 @@
+/// An optional value (i.e. a value of type `T` or `null`).
+type Optional<T> = T | null
+
 /// A mapping from string to values of type `T`.
 interface Dictionary<T=any> {
 

@@ -1,6 +1,6 @@
 import { SourceLocation } from 'FunBlocks/AST/SourceLocation'
 import { SourceRange } from 'FunBlocks/AST/SourceRange'
-import { Token, TokenKind } from 'FunBlocks/Parser/Token'
+import { Token, TokenKind } from './Token'
 
 /// Returns whether the given character is any whitespace character, excluding newlines.
 const isSkip = (ch: string): boolean =>
@@ -20,29 +20,48 @@ const operatorRE = RegExp(/(->)|(=>)|[;,:|]/)
 /// A regular expression that matches keywords, variable references and identifiers.
 const identRE = RegExp(/^\$?\w+/)
 
-/// Create a lexer over the given character string.
+/// A collection of tokens.
+export interface TokenCollection {
+
+  /// Returns an iterator over this collection.
+  [Symbol.iterator](): Iterator<Token>
+
+}
+
+/// Returns a collection containing the tokens that constitute the given character string.
+export function tokenize(input: string): TokenCollection {
+
+  return {
+    [Symbol.iterator]: () => createLexer(input),
+  }
+
+}
+
+/// Creates a lexer over the given character string.
 ///
 /// The returned lexer is given as an iterator that uses the input string as a stream to produce
 /// tokens every time its `next` method is called.
-export function createLexer(input: string): { next: () => { value: Token, done: boolean } } {
+export function createLexer(input: string): Iterator<Token> {
 
   /// Stores the lexer's current source location.
   let currentLoc: SourceLocation = { line: 1, column: 1, offset: 0 }
+
   /// Stores whether the lexer has scanned all the input.
   let done = false
 
-  /// Returns the character at the given offset relative to the lexer's index, without consuming
-  /// the input stream.
-  const peek = (offset: number = 0): string => (currentLoc.offset + offset) < input.length
-    ? input[currentLoc.offset + offset]
-    : undefined
+  /// Returns the character at the given offset relative to the lexer's curret index, without
+  /// consuming the input stream.
+  const peek = (offset: number = 0): Optional<string> =>
+    (currentLoc.offset + offset) < input.length
+      ? input[currentLoc.offset + offset]
+      : null
 
   /// Consumes a single character from the lexer's stream.
-  const consume = (): string => {
+  const consume = (): Optional<string> => {
     // Make sure the stream isn't depleted.
     const ch = peek()
-    if (ch === undefined) {
-      return undefined
+    if (ch === null) {
+      return null
     }
 
     // Compute the next source location.
@@ -63,7 +82,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
   const consumeUpTo = (count: number): string => {
     const startIndex = currentLoc.offset
     for (let i = 0; i < count; ++i) {
-      if (peek() === undefined) {
+      if (peek() === null) {
         break
       }
       consume()
@@ -74,7 +93,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
   /// Consumes characters from the lexer's stream as long as they satisfy the given predicate.
   const consumeWhile = (predicate: ((char: string) => boolean)): string => {
     const startIndex = currentLoc.offset
-    while ((peek() !== undefined) && predicate(peek())) {
+    while ((peek() !== null) && predicate(peek())) {
       consume()
     }
     return input.substring(startIndex, currentLoc.offset)
@@ -87,13 +106,12 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
   })
 
   /// A small helper that creates a result.
-  const result = (
-    kind: TokenKind,
-    range: SourceRange
-  ): { value: Token, done: boolean } => ({ value: { kind, range }, done: false })
+  const result = (kind: TokenKind, range: SourceRange): IteratorResult<Token> => ({
+    value: { kind, range }
+  })
 
   return {
-    next: () => {
+    next: (): IteratorResult<Token> => {
       // Make sure the lexer's stream isn't depleted.
       if (done) {
         return { value: undefined, done }
@@ -107,7 +125,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
         const ch = peek()
 
         // Handle the end of stream.
-        if (ch === undefined) {
+        if (ch === null) {
           done = true
           return result(TokenKind.EOF, rangeFrom(currentLoc))
         }
@@ -124,7 +142,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
       // From this point, all characters that had to be skipped have been consumed. It follows that
       // the next character will necessarily part of a token.
       const ch = peek()
-      let kind: TokenKind = undefined
+      let kind: Optional<TokenKind> = null
 
       // Save the current location to build source ranges.
       const startLoc = { ...currentLoc }
@@ -151,7 +169,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
       default: break
       }
 
-      if (kind !== undefined) {
+      if (kind !== null) {
         consumeUpTo(2)
         return result(kind, rangeFrom(startLoc))
       }
@@ -163,7 +181,7 @@ export function createLexer(input: string): { next: () => { value: Token, done: 
       default: break
       }
 
-      if (kind !== undefined) {
+      if (kind !== null) {
         consume()
         return result(kind, rangeFrom(startLoc))
       }
