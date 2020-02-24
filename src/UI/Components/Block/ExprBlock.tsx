@@ -255,21 +255,47 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       return
     }
 
-    // Modify the rendered term by inserting the subterm extracted from the dragged data payload.
+    // Remove the dragged term from its current parent to insert it as a new child in this term.
     const draggedTerm = this.props.draggedData.payload
-    const newSubterms = [ ...this.props.term.subterms ]
-    newSubterms.splice(placeholderIndex, 0, draggedTerm.clone)
+    const newSubterms: Array<Term> = [ ...this.props.term.subterms ]
 
-    const substitutions: Dictionary<Term> = {
-      [draggedTerm.id]: null,
+    if (draggedTerm.parent?.id === this.props.term.id) {
+      // If the dragged term is a direct child of this term, then we have to check its position
+      // relative to the placeholder index and possibly offset it. If it should be moved to the
+      // right (i.e. its current index in the array of subterms precedes the placeholder index),
+      // then the placeholder index should be decremented to account for the subterm's removal.
+      const i = this.props.term.subterms.findIndex((subterm) => subterm.id === draggedTerm.id)
+      newSubterms.splice(i, 1)
+      if (placeholderIndex <= i) {
+        newSubterms.splice(placeholderIndex, 0, draggedTerm)
+      } else {
+        newSubterms.splice(placeholderIndex - 1, 0, draggedTerm)
+      }
+    } else if (this.props.term.isAncestor(draggedTerm)) {
+      // If the dragged term is a descendant of one of this term's subterms, then we should remove
+      // it from the later before we insert it as a direct child.
+      for (let i = 0; i < newSubterms.length; ++i) {
+        if (newSubterms[i].isAncestor(draggedTerm)) {
+          newSubterms[i] = newSubterms[i].substituting({ [draggedTerm.id]: null })
+          break
+        }
+      }
+      newSubterms.splice(placeholderIndex, 0, draggedTerm)
+    } else {
+      // If the dragged term is a sibling of this term or not related at all, then we should remove
+      // it from its current parent using the `onChange` callback.
+      const draggedParent = draggedTerm.root.substituting({ [draggedTerm.id]: null })
+      this.props.draggedData.callbacks?.onChange?.(draggedParent)
+      newSubterms.splice(placeholderIndex, 0, draggedTerm)
+    }
+
+    const newRoot = this.props.term.root.substituting({
       [this.props.term.id]: new AST.Expr({
         label: this.props.term.label,
         type: this.props.term.type,
-        subterms: newSubterms
-      }),
-    }
-
-    const newRoot = this.props.term.root.substituting(substitutions)
+        subterms: newSubterms,
+      })
+    })
     this.props.onChange?.(newRoot)
   }
 
