@@ -2,6 +2,7 @@ import { AnyAction, combineReducers } from 'redux'
 
 import * as AST from 'FunBlocks/AST'
 import { parse } from 'FunBlocks/Parser/Parser'
+import { sanitize } from 'FunBlocks/Parser/Sanitizer'
 import { unparse } from 'FunBlocks/Parser/Unparser'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 import { InputMode } from './.'
@@ -20,18 +21,21 @@ const defaultProgram: ReducerType = {
 
 /// Parse a program from the given input string.
 const parseProgram = (source: string): ReducerType => {
-  // Parse the sources
-  const { decls, diagnostics } = parse(source)
+  // Parse the sources.
+  const unit = parse(source)
+
+  // Sanitize the translation unit.
+  sanitize(unit)
 
   // Create a new program instance from the parsed top-level declarations.
   const program: Dictionary = {
     initialState: null,
     ruleCases: [] as Array<AST.RuleCaseDecl>,
     source: source,
-    diagnostics: diagnostics,
+    diagnostics: unit.diagnostics,
   }
 
-  for (const decl of decls) {
+  for (const decl of unit.decls) {
     if ((decl instanceof AST.InitStateDecl) && (program.initialState === null)) {
       program.initialState = decl.state
     } else if (decl instanceof AST.RuleCaseDecl) {
