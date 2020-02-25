@@ -1,13 +1,5 @@
 import Color from 'FunBlocks/Utils/Color'
-import { Expression, Term, Variable } from './Terms'
-
-/// The type of a term.
-export interface Type {
-
-  /// The color associated with the type.
-  readonly baseColor: Color
-
-}
+import { Expression, Variable } from './Terms'
 
 /// An enumeration type.
 ///

@@ -11,36 +11,66 @@ $label-min-width: $term-height / 2;
 /// `$term-height + 2 * $border-width`, i.e. `sqrt(hyp * hyp / 2)`.
 $var-side: 28.2842712475px;
 
+.expr.faded, .var.faded {
+  opacity: 0.5;
+}
+
 .expr {
   height: $term-height;
   padding: 0 ($term-height / 4);
   border: $border-width solid;
   border-radius: $term-height;
   font-size: ($term-height / 2);
-  display: inline-flex;
   align-items: center;
-  cursor: pointer;
+  cursor: default;
 
-  & > .expr {
+  // FIXME: `inline-flex` might be a better choice here. Unfortunately it seems to break dragging
+  // for children in Safari 13.0.5.
+  display: flex;
+
+  & > .expr, & > .var, & > .ellipsis, & > .dropPlaceholder {
     margin-left: 8px;
   }
 }
 
-.exprLabel {
+.expr-label {
   min-width: $label-min-width;
+  height: $term-height + ($border-width * 2);
+  line-height: $term-height + ($border-width * 2);
 }
 
-.var {
+.expr-label, .var-label {
+  & > input {
+    font-size: inherit;
+    text-align: center;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+}
+
+.ellipsis {
+  height: $term-height + ($border-width * 2);
+  line-height: $term-height + ($border-width * 2);
+}
+
+.dropPlaceholder {
+  width: ($term-height * 1.5);
+  height: $term-height + ($border-width * 2);
+  background: transparent;
+}
+
+.var-inner {
   position: relative;
   height: $term-height;
   font-size: ($term-height / 2);
   display: inline-flex;
   align-items: center;
-  margin: $border-width ($var-side / 2 + $border-width + 4) $border-width ($var-side / 2 + $border-width + 10);
-  cursor: pointer;
+  margin: $border-width ($var-side / 2 + $border-width) $border-width ($var-side / 2 + $border-width);
+  cursor: default;
 }
 
-.varSide {
+.var-side {
   position: absolute;
   width: $var-side;
   height: $var-side;
@@ -71,14 +101,14 @@ $var-side: 28.2842712475px;
   }
 }
 
-.varBack {
+.var-back {
   position: absolute;
   width: 100%;
   height: $term-height;
   z-index: 0;
 }
 
-.varLabel {
+.var-label {
   margin: 0 2px;
   min-width: $label-min-width;
   height: $term-height;

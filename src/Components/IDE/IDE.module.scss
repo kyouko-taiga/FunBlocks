@@ -1,0 +1,42 @@
+.ide {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-bar {
+  padding: 8px 16px;
+  background: #2c2d30;
+  color: white;
+}
+
+.menu-group {
+  display: inline-block;
+}
+
+.menu-group + .menu-group {
+  margin-left: 64px;
+}
+
+.menu-bar-item-wrapper {
+  display: inline;
+}
+
+.menu-bar-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 8px;
+
+  & > * {
+    min-width: 48px;
+  }
+
+  & > span {
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #c8c8c8;
+    text-align: center;
+  }
+}

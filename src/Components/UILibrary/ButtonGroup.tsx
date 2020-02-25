@@ -6,7 +6,7 @@ class ButtonGroup extends React.PureComponent {
 
   render() {
     return (
-      <div className={ styles.buttonGroup }>
+      <div className={ styles.btnGroup }>
         { this.props.children }
       </div>
     )
