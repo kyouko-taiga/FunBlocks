@@ -29,7 +29,7 @@ export interface TokenCollection {
 }
 
 /// Returns a collection containing the tokens that constitute the given character string.
-export function tokenize(input: string): TokenCollection {
+export const tokenize = (input: string): TokenCollection => {
 
   return {
     [Symbol.iterator]: () => createLexer(input),
@@ -41,7 +41,7 @@ export function tokenize(input: string): TokenCollection {
 ///
 /// The returned lexer is given as an iterator that uses the input string as a stream to produce
 /// tokens every time its `next` method is called.
-export function createLexer(input: string): Iterator<Token> {
+export const createLexer = (input: string): Iterator<Token> => {
 
   /// Stores the lexer's current source location.
   let currentLoc: SourceLocation = { line: 1, column: 1, offset: 0 }
