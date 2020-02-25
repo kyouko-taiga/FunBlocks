@@ -1,34 +1,34 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import * as AST from 'FunBlocks/AST'
-import { parse, ParseIssue } from 'FunBlocks/Parser/Parser'
+import { parse } from 'FunBlocks/Parser/Parser'
 import { unparse } from 'FunBlocks/Parser/Unparser'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 import { InputMode } from './.'
 
 type ReducerType = Program & {
   source: string,
-  parseIssues: Array<ParseIssue>,
+  diagnostics: Array<AST.Diagnostic>,
 }
 
 const defaultProgram: ReducerType = {
   initialState: null,
   ruleCases: [],
   source: '',
-  parseIssues: [],
+  diagnostics: [],
 }
 
 /// Parse a program from the given input string.
 const parseProgram = (source: string): ReducerType => {
   // Parse the sources
-  const { decls, issues } = parse(source)
+  const { decls, diagnostics } = parse(source)
 
   // Create a new program instance from the parsed top-level declarations.
   const program: Dictionary = {
     initialState: null,
     ruleCases: [] as Array<AST.RuleCaseDecl>,
     source: source,
-    parseIssues: issues,
+    diagnostics: diagnostics,
   }
 
   for (const decl of decls) {
@@ -55,7 +55,7 @@ const reducer = (program: ReducerType = defaultProgram, action: AnyAction): Redu
 
     if (action.payload == InputMode.Textual) {
       // (re)build the program's textual form from its current AST.
-      return { ...program, source: unparse(program), parseIssues: [] }
+      return { ...program, source: unparse(program), diagnostics: [] }
     } else {
       // (re)build the program's visual form from its current source.
       return parseProgram(program.source)

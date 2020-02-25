@@ -2,17 +2,6 @@ import * as AST from 'FunBlocks/AST'
 import { tokenize } from './Lexer'
 import { Token, TokenKind } from './Token'
 
-/// An issue encountered while parsing a construction.
-export interface ParseIssue {
-
-  /// The issue's message.
-  readonly message: string
-
-  /// The issue's source range.
-  readonly range: AST.SourceRange
-
-}
-
 /// Returns whether the given token kind corresponds to a keyword.
 const isKeywordKind = (kind: TokenKind): boolean =>
   (kind >= TokenKind.TypeKeyword) && (kind <= TokenKind.CaseKeyword)
@@ -22,7 +11,7 @@ const isStatementDelimiterKind = (kind: TokenKind): boolean =>
   (kind === TokenKind.Newline) || (kind === TokenKind.Semicolon) || (kind === TokenKind.EOF)
 
 /// Parses the given input to produce a set of top-level declarations.
-export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<AST.TopDecl> } => {
+export const parse = (input: string): AST.TranslationUnitDecl => {
 
   // Tokenize the input.
   const tokens: Array<Token> = Array.from(tokenize(input))
@@ -73,16 +62,16 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     }
   }
 
-  /// Helper that builds parse issues of the form 'expected <construction>'
-  const expectedIssue = (expected: string): ParseIssue => {
+  /// Helper that builds diagnostics of the form 'expected <construction>'
+  const expectedIssue = (expected: string): AST.Diagnostic => {
     return {
       message: `expected ${expected}`,
       range: peek()?.range,
     }
   }
 
-  /// Helper that builds a parse issue for ambiguous consecutive statements.
-  const ambiguousConsecutiveStatementIssue = (): ParseIssue => {
+  /// Helper that builds a diagnostics for ambiguous consecutive statements.
+  const ambiguousConsecutiveStatementIssue = (): AST.Diagnostic => {
     return {
       message: 'consecutive statements should be separated by \';\'',
       range: peek()?.range
@@ -92,59 +81,59 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   // MARK: Top-level declaration parsers.
 
   /// Parses a single top-level declaration.
-  const parseTopDecl = (newIssues: Array<ParseIssue>): Optional<AST.TopDecl> => {
+  const parseTopDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.TopDecl> => {
     switch (peek()?.kind) {
     case TokenKind.TypeKeyword:
-      return parseTypeDecl(newIssues)
+      return parseTypeDecl(newDiags)
 
     case TokenKind.InitKeyword:
-      return parseInitStateDecl(newIssues)
+      return parseInitStateDecl(newDiags)
 
     case TokenKind.RuleKeyword:
-      return parseRuleDecl(newIssues)
+      return parseRuleDecl(newDiags)
 
     case TokenKind.CaseKeyword:
-      return parseRuleCaseDecl(newIssues)
+      return parseRuleCaseDecl(newDiags)
 
     default:
-      newIssues.push(expectedIssue('declaration'))
+      newDiags.push(expectedIssue('declaration'))
       return null
     }
   }
 
   /// Parses a type declaration.
-  const parseTypeDecl = (newIssues: Array<ParseIssue>): Optional<AST.TypeDecl> => {
+  const parseTypeDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeDecl> => {
     // Parse the statement keyword `type`.
     const startTk = consumeKind(TokenKind.TypeKeyword)
     if (startTk === null) {
-      newIssues.push(expectedIssue('type'))
+      newDiags.push(expectedIssue('type'))
       return null
     }
 
     // Parse the name of the declared type.
     const nameTk = consumeKind(TokenKind.Ident)
     if (nameTk === null) {
-      newIssues.push(expectedIssue('identifier'))
+      newDiags.push(expectedIssue('identifier'))
     }
 
     // Parse a possibly empty list of type arguments.
-    const parameters = parseTypeParamList(newIssues)
+    const parameters = parseTypeParamList(newDiags)
 
     // Parse `::`.
     let savePoint = currentTokenIndex
     consumeManyNewlines()
     if (consumeKind(TokenKind.DoubleColon) === null) {
       currentTokenIndex = savePoint
-      newIssues.push(expectedIssue('\'::\''))
+      newDiags.push(expectedIssue('\'::\''))
     }
 
     // Parse a list of type constructors separated by "|".
-    const cases = parseList(newIssues, TokenKind.Or, parseTypeDeclCase)
+    const cases = parseList(newDiags, TokenKind.Or, parseTypeDeclCase)
 
     /// Parse a statement delimiter.
     const endTk = consumeKind(TokenKind.Newline, TokenKind.Semicolon, TokenKind.EOF)
     if (endTk === null) {
-      newIssues.push(ambiguousConsecutiveStatementIssue())
+      newDiags.push(ambiguousConsecutiveStatementIssue())
     }
 
     return new AST.TypeDecl({
@@ -167,13 +156,13 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   /// Although type parameter lists are not supposed to contain anything but type variables, this
   /// parser accepts any type argument and filters out non-variable in a second step, in order to
   /// produce richer error messages.
-  const parseTypeParamList = (newIssues: Array<ParseIssue>): Array<AST.TypeVarRef> => {
-    const parameters = parseSpaceSeparatedList(newIssues, parseTypeArg)
+  const parseTypeParamList = (newDiags: Array<AST.Diagnostic>): Array<AST.TypeVarRef> => {
+    const parameters = parseSpaceSeparatedList(newDiags, parseTypeArg)
 
     // Filter out all non-vaiable type references.
     for (let i = 0; i < parameters.length; ++i) {
       if (!(parameters[i] instanceof AST.TypeVarRef)) {
-        newIssues.push(expectedIssue('type variable identifier'))
+        newDiags.push(expectedIssue('type variable identifier'))
         parameters.splice(i, 1)
       } else {
         i = i + 1
@@ -184,25 +173,25 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a type declaration case.
-  const parseTypeDeclCase = (newIssues: Array<ParseIssue>): Optional<AST.TypeCons> =>
-    parseParenthesized(newIssues, parseTypeCons)
+  const parseTypeDeclCase = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeCons> =>
+    parseParenthesized(newDiags, parseTypeCons)
 
   /// Parses an initial state declaration.
-  const parseInitStateDecl = (newIssues: Array<ParseIssue>): Optional<AST.InitStateDecl> => {
+  const parseInitStateDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.InitStateDecl> => {
     // Parse the statement keyword `init`.
     const startTk = consumeKind(TokenKind.InitKeyword)
     if (startTk === null) {
-      newIssues.push(expectedIssue('init'))
+      newDiags.push(expectedIssue('init'))
       return null
     }
 
     // Parse an expression.
-    const state = parseTerm(newIssues) || new AST.Expr({ label: '__error', range: peek()?.range })
+    const state = parseTerm(newDiags) || new AST.Expr({ label: '__error', range: peek()?.range })
 
     /// Parse a statement delimiter.
     const endTk = consumeKind(TokenKind.Newline, TokenKind.Semicolon, TokenKind.EOF)
     if (endTk === null) {
-      newIssues.push(ambiguousConsecutiveStatementIssue())
+      newDiags.push(ambiguousConsecutiveStatementIssue())
     }
 
     return new AST.InitStateDecl({
@@ -217,35 +206,35 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a rule declaration.
-  const parseRuleDecl = (newIssues: Array<ParseIssue>): Optional<AST.RuleDecl> => {
+  const parseRuleDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.RuleDecl> => {
     // Parse the statement keyword `rule`.
     const startTk = consumeKind(TokenKind.RuleKeyword)
     if (startTk === null) {
-      newIssues.push(expectedIssue('rule'))
+      newDiags.push(expectedIssue('rule'))
       return null
     }
 
     // Parse the name of the declared type.
     const nameTk = consumeKind(TokenKind.Ident)
     if (nameTk === null) {
-      newIssues.push(expectedIssue('identifier'))
+      newDiags.push(expectedIssue('identifier'))
     }
 
     // Parse a possibly empty list of type arguments.
-    const parameters = parseTypeParamList(newIssues)
+    const parameters = parseTypeParamList(newDiags)
 
     // Parse `::`.
     let savePoint = currentTokenIndex
     consumeManyNewlines()
     if (consumeKind(TokenKind.DoubleColon) === null) {
       currentTokenIndex = savePoint
-      newIssues.push(expectedIssue('\'::\''))
+      newDiags.push(expectedIssue('\'::\''))
     }
 
     // Parse a type signature.
     savePoint = currentTokenIndex
     consumeManyNewlines()
-    let typeSign = parseTypeSign(newIssues)
+    let typeSign = parseTypeSign(newDiags)
     if (typeSign === null) {
       currentTokenIndex = savePoint
       typeSign = new AST.TypeDeclRef({ name: '__error', arguments: [], range: peek()?.range })
@@ -254,7 +243,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     /// Parse a statement delimiter.
     const endTk = consumeKind(TokenKind.Newline, TokenKind.Semicolon, TokenKind.EOF)
     if (endTk === null) {
-      newIssues.push(ambiguousConsecutiveStatementIssue())
+      newDiags.push(ambiguousConsecutiveStatementIssue())
     }
 
     return new AST.RuleDecl({
@@ -273,16 +262,16 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a rule case declaration.
-  const parseRuleCaseDecl = (newIssues: Array<ParseIssue>): Optional<AST.RuleCaseDecl> => {
+  const parseRuleCaseDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.RuleCaseDecl> => {
     // Parse the statement keyword `case`.
     const startTk = consumeKind(TokenKind.CaseKeyword)
     if (startTk === null) {
-      newIssues.push(expectedIssue('case'))
+      newDiags.push(expectedIssue('case'))
       return null
     }
 
     // Parse the left term of the case.
-    const left = parseTerm(newIssues) || new AST.Expr({ label: '__error', range: peek()?.range })
+    const left = parseTerm(newDiags) || new AST.Expr({ label: '__error', range: peek()?.range })
 
     // Parse `=>`.
     let savePoint = currentTokenIndex
@@ -290,20 +279,20 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     if (consumeKind(TokenKind.ThickArrow) === null) {
       if (consumeKind(TokenKind.Arrow) !== null) {
         // A common mistake is to misuse the regular arrow symbol in case declarations.
-        newIssues.push({
+        newDiags.push({
           message: 'rewriting rules should be written with \'=>\' rather than \'->\'',
           range: peek(-1).range,
         })
       } else {
         currentTokenIndex = savePoint
-        newIssues.push(expectedIssue('\'=>\''))
+        newDiags.push(expectedIssue('\'=>\''))
       }
     }
 
     // Parse the right term of the case.
     savePoint = currentTokenIndex
     consumeManyNewlines()
-    let right = parseTerm(newIssues)
+    let right = parseTerm(newDiags)
     if (right === null) {
       currentTokenIndex = savePoint
       right = new AST.Expr({ label: '__error', range: peek()?.range })
@@ -312,7 +301,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     /// Parse a statement delimiter.
     const endTk = consumeKind(TokenKind.Newline, TokenKind.Semicolon, TokenKind.EOF)
     if (endTk === null) {
-      newIssues.push(ambiguousConsecutiveStatementIssue())
+      newDiags.push(ambiguousConsecutiveStatementIssue())
     }
 
     return new AST.RuleCaseDecl({
@@ -330,7 +319,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   // MARK: Type definition parsers.
 
   /// Parses a type constructor.
-  const parseTypeCons = (newIssues: Array<ParseIssue>): Optional<AST.TypeCons> => {
+  const parseTypeCons = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeCons> => {
     // Parse the constructor's label.
     const labelTk = peek()
     if (labelTk?.kind === TokenKind.Ident) {
@@ -340,18 +329,18 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
       // If the parsed token is a variable identifier or a keyword, we emit an issue but commit
       // nonetheless.
       consume()
-      newIssues.push({
+      newDiags.push({
         message: `${value(labelTk)} is not a valid type constructor identifier`,
         range: peek().range,
       })
     } else {
       // Otherwise, we completely give up.
-      newIssues.push(expectedIssue('type constructor identifier'))
+      newDiags.push(expectedIssue('type constructor identifier'))
       return null
     }
 
     // Parse a possibly empty list of type arguments.
-    const typeArgList = parseSpaceSeparatedList(newIssues, parseTypeArg)
+    const typeArgList = parseSpaceSeparatedList(newDiags, parseTypeArg)
 
     return new AST.TypeCons({
       label: value(labelTk),
@@ -366,18 +355,18 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a type argument.
-  const parseTypeArg = (newIssues: Array<ParseIssue>): Optional<AST.TypeRef> =>
-    parseParenthesized(newIssues, parseTypeRef)
+  const parseTypeArg = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeRef> =>
+    parseParenthesized(newDiags, parseTypeRef)
 
   /// Parses a type reference.
-  const parseTypeRef = (newIssues: Array<ParseIssue>): Optional<AST.TypeRef> => {
+  const parseTypeRef = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeRef> => {
     return peek()?.kind === TokenKind.VarRef
-      ? parseTypeVarRef(newIssues)
-      : parseTypeDeclRef(newIssues)
+      ? parseTypeVarRef(newDiags)
+      : parseTypeDeclRef(newDiags)
   }
 
   /// Parses a type declaration reference.
-  const parseTypeDeclRef = (newIssues: Array<ParseIssue>): Optional<AST.TypeDeclRef> => {
+  const parseTypeDeclRef = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeDeclRef> => {
     // Parse the declaration's name.
     const nameTk = peek()
     if (nameTk?.kind === TokenKind.Ident) {
@@ -386,18 +375,18 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     } else if (isKeywordKind(nameTk?.kind)) {
       // If the parsed token is a keyword, we emit an issue but commit nonetheless.
       consume()
-      newIssues.push({
+      newDiags.push({
         message: `${value(nameTk)} is not a valid type identifier`,
         range: peek().range,
       })
     } else {
       // Otherwise, we completely give up.
-      newIssues.push(expectedIssue('type identifier'))
+      newDiags.push(expectedIssue('type identifier'))
       return null
     }
 
     // Parse a possibly empty list of type arguments.
-    const typeArgList = parseSpaceSeparatedList(newIssues, parseTypeArg)
+    const typeArgList = parseSpaceSeparatedList(newDiags, parseTypeArg)
 
     return new AST.TypeDeclRef({
       name: value(nameTk),
@@ -412,10 +401,10 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a type variable reference.
-  const parseTypeVarRef = (newIssues: Array<ParseIssue>): Optional<AST.TypeVarRef> => {
+  const parseTypeVarRef = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeVarRef> => {
     const labelTk = consumeKind(TokenKind.VarRef)
     if (labelTk === null) {
-      newIssues.push(expectedIssue('type variable'))
+      newDiags.push(expectedIssue('type variable'))
       return null
     }
 
@@ -426,9 +415,9 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parse a type signature.
-  const parseTypeSign = (newIssues: Array<ParseIssue>): Optional<AST.TypeSign> => {
+  const parseTypeSign = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeSign> => {
     // Parse a type reference first.
-    const left = parseTypeRef(newIssues)
+    const left = parseTypeRef(newDiags)
     if (left === null) {
       return null
     }
@@ -439,7 +428,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     if (consumeKind(TokenKind.Arrow) === null) {
       if (consumeKind(TokenKind.ThickArrow) !== null) {
         // A common mistake is to misuse the think arrow symbol in type signatures.
-        newIssues.push({
+        newDiags.push({
           message: 'arrow types should be written with \'->\' rather than \'=>\'',
           range: peek(-1).range,
         })
@@ -452,7 +441,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     // If the parsed reference is followed by an arrow, parse any type signature as the right part
     // of an arrow type.
     consumeManyNewlines()
-    const right = parseTypeSign(newIssues) || new AST.TypeDeclRef({
+    const right = parseTypeSign(newDiags) || new AST.TypeDeclRef({
       name: '__error',
       arguments: [],
       range: peek()?.range,
@@ -471,14 +460,14 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   // MARK: Term parsers.
 
   /// Parses a term.
-  const parseTerm = (newIssues: Array<ParseIssue>): Optional<AST.Term> => {
+  const parseTerm = (newDiags: Array<AST.Diagnostic>): Optional<AST.Term> => {
     return peek()?.kind === TokenKind.VarRef
-      ? parseVarRef(newIssues)
-      : parseExpr(newIssues)
+      ? parseVarRef(newDiags)
+      : parseExpr(newDiags)
   }
 
   /// Parses an expression.
-  const parseExpr = (newIssues: Array<ParseIssue>): Optional<AST.Expr> => {
+  const parseExpr = (newDiags: Array<AST.Diagnostic>): Optional<AST.Expr> => {
     // Parse the expression's label.
     const labelTk = peek()
     if (labelTk?.kind === TokenKind.Ident) {
@@ -487,27 +476,27 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     } else if (isKeywordKind(labelTk?.kind)) {
       // If the parsed token is a keyword, we emit an issue but commit nonetheless.
       consume()
-      newIssues.push({
+      newDiags.push({
         message: `${value(labelTk)} is not a valid type constructor identifier`,
         range: peek().range,
       })
     } else {
       // Otherwise, we completely give up.
-      newIssues.push(expectedIssue('type constructor identifier'))
+      newDiags.push(expectedIssue('type constructor identifier'))
       return null
     }
 
     // Parse an optional list of subterms. Note that we require the list to start on the same line.
     let subterms: Array<AST.Term> = []
     if (consumeKind(TokenKind.LeftParen) !== null) {
-      subterms = parseList(newIssues, TokenKind.Comma, parseTerm)
+      subterms = parseList(newDiags, TokenKind.Comma, parseTerm)
 
       // Parse the right parenthesis.
       const savePoint = currentTokenIndex
       consumeManyNewlines()
       if (consumeKind(TokenKind.RightParen) === null) {
         currentTokenIndex = savePoint
-        newIssues.push(expectedIssue('closing parenthesis \')\''))
+        newDiags.push(expectedIssue('closing parenthesis \')\''))
       }
     }
 
@@ -524,10 +513,10 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   }
 
   /// Parses a variable reference.
-  const parseVarRef = (newIssues: Array<ParseIssue>): Optional<AST.VarRef> => {
+  const parseVarRef = (newDiags: Array<AST.Diagnostic>): Optional<AST.VarRef> => {
     const labelTk = consumeKind(TokenKind.VarRef)
     if (labelTk === null) {
-      newIssues.push(expectedIssue('variable'))
+      newDiags.push(expectedIssue('variable'))
       return null
     }
 
@@ -546,24 +535,24 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   /// considers that the remainder of the stream is not part of the list and it returns the list of
   /// the elements it could parse so far.
   const parseSpaceSeparatedList = <Element extends {}>(
-    newIssues: Array<ParseIssue>,
-    parseElement: ((newIssues: Array<ParseIssue>) => Optional<Element>)
+    newDiags: Array<AST.Diagnostic>,
+    parseElement: ((newDiags: Array<AST.Diagnostic>) => Optional<Element>)
   ): Array<Element> => {
     const elements: Array<Element> = []
 
     // Parse as many elements as possible.
     while (true) {
       // Attempt to parse a new element.
-      const elementIssues: Array<ParseIssue> = []
-      const element = parseElement(elementIssues)
+      const elementDiags: Array<AST.Diagnostic> = []
+      const element = parseElement(elementDiags)
       if (element !== null) {
         // If we could parse an element (i.e. if the sub-parser committed), then keep it together
-        // with the issues we might have encountered.
-        newIssues.push(...elementIssues)
+        // with the diagnostics we might have encountered.
+        newDiags.push(...elementDiags)
         elements.push(element)
       } else {
         // If we couldn't parse an element at all (i.e. if the sub-parser didn't commit), then
-        // discard all issues and exit.
+        // discard all diagnostics and exit.
         break
       }
     }
@@ -578,9 +567,9 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   /// `parseElement` parameter) fails without committing, then this parser attempts to recover at
   /// the next list delimiter, unless none occurs before a statement delimiter.
   const parseList = <Element extends {}>(
-    newIssues: Array<ParseIssue>,
+    newDiags: Array<AST.Diagnostic>,
     delimiter: TokenKind,
-    parseElement: ((newIssues: Array<ParseIssue>) => Optional<Element>)
+    parseElement: ((newDiags: Array<AST.Diagnostic>) => Optional<Element>)
   ): Array<Element> => {
     const elements: Array<Element> = []
 
@@ -591,12 +580,12 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
       consumeManyNewlines()
 
       // Attempt to parse a new element.
-      const elementIssues: Array<ParseIssue> = []
-      const element = parseElement(elementIssues)
+      const elementDiags: Array<AST.Diagnostic> = []
+      const element = parseElement(elementDiags)
       if (element !== null) {
         // If we could parse an element (i.e. if the sub-parser committed), then keep it together
-        // with the issues we might have encountered.
-        newIssues.push(...elementIssues)
+        // with the diagnostics we might have encountered.
+        newDiags.push(...elementDiags)
         elements.push(element)
       } else {
         // If we couldn't parse an element at all (i.e. if the sub-parser didn't commit), then skip
@@ -608,7 +597,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
         // If the current token is a list delimiter, then assume we're still parsing the list and
         // simply recover from that point. Otherwise, backtrack and exit.
         if (peek().kind === delimiter) {
-          newIssues.push(...elementIssues)
+          newDiags.push(...elementDiags)
         } else {
           currentTokenIndex = savePoint
           break
@@ -631,38 +620,38 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
 
   /// Parses a parenthesized element.
   const parseParenthesized = <Element extends {}>(
-    newIssues: Array<ParseIssue>,
-    parseElement: ((newIssues: Array<ParseIssue>) => Optional<Element>)
+    newDiags: Array<AST.Diagnostic>,
+    parseElement: ((newDiags: Array<AST.Diagnostic>) => Optional<Element>)
   ): Optional<Element> => {
     if (peek()?.kind === TokenKind.LeftParen) {
       // If the current token is a left parenthesis, then we commit and parse an element enclosed
       // in parenthesis. The recursion ensures that we can parse any number of nested parenthesis.
       consume()
       consumeManyNewlines()
-      const element = parseParenthesized(newIssues, parseElement)
+      const element = parseParenthesized(newDiags, parseElement)
 
       // Parse the right parenthesis.
       const savePoint = currentTokenIndex
       consumeManyNewlines()
       if (consumeKind(TokenKind.RightParen) === null) {
         currentTokenIndex = savePoint
-        newIssues.push(expectedIssue('closing parenthesis \')\''))
+        newDiags.push(expectedIssue('closing parenthesis \')\''))
       }
 
       return element
     } else {
-      return parseElement(newIssues)
+      return parseElement(newDiags)
     }
   }
 
   // MARK: Program parsing.
 
-  const issues: Array<ParseIssue> = []
+  const diags: Array<AST.Diagnostic> = []
   const decls: Array<AST.TopDecl> = []
 
   while((peek() !== null) && (peek().kind !== TokenKind.EOF)) {
     consumeManyNewlines()
-    const decl = parseTopDecl(issues)
+    const decl = parseTopDecl(diags)
     if (decl !== null) {
       decls.push(decl)
     } else {
@@ -672,6 +661,6 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
     }
   }
 
-  return { issues, decls }
+  return { diagnostics: diags, decls: decls }
 
 }
