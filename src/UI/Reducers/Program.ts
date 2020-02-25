@@ -55,7 +55,7 @@ const reducer = (program: ReducerType = defaultProgram, action: AnyAction): Redu
 
     if (action.payload == InputMode.Textual) {
       // (re)build the program's textual form from its current AST.
-      return { ...program, source: unparse(program) }
+      return { ...program, source: unparse(program), parseIssues: [] }
     } else {
       // (re)build the program's visual form from its current source.
       return parseProgram(program.source)
