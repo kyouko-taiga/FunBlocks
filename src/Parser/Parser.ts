@@ -3,7 +3,7 @@ import { tokenize } from './Lexer'
 import { Token, TokenKind } from './Token'
 
 /// An issue encountered while parsing a construction.
-interface ParseIssue {
+export interface ParseIssue {
 
   /// The issue's message.
   readonly message: string

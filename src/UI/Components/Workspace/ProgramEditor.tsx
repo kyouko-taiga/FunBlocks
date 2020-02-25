@@ -7,6 +7,7 @@ import { Dispatch } from 'redux'
 import "ace-builds/webpack-resolver"
 import "ace-builds/src-noconflict/theme-github"
 
+import { ParseIssue } from 'FunBlocks/Parser/Parser'
 import { rebuildAST, updateProgramSource } from 'FunBlocks/UI/Actions/IDE'
 import { InputMode } from 'FunBlocks/UI/Reducers'
 import { RootState } from 'FunBlocks/UI/Store'
@@ -18,6 +19,7 @@ const styles = require('./Workspace.module')
 type Props = {
   inputMode: InputMode,
   source: string,
+  parseIssues: Array<ParseIssue>,
   rebuildAST(): void,
   updateProgramSource(source: string): void,
 }
@@ -49,6 +51,13 @@ class ProgramEditor extends React.PureComponent<Props> {
   }
 
   renderTextual() {
+    const annotations = this.props.parseIssues.map((issue) => ({
+      row: issue.range.lowerBound.line - 1,
+      column: issue.range.lowerBound.column - 1,
+      text: issue.message,
+      type: 'error',
+    }))
+
     return (
       <div className={ classNames(styles.programEditor, styles.textual) }>
         <AceEditor
@@ -59,6 +68,7 @@ class ProgramEditor extends React.PureComponent<Props> {
           height="100%"
           fontSize={ 16 }
           value={ this.props.source }
+          annotations={ annotations }
           onChange={ this.didSourceChange.bind(this) }
         />
       </div>
@@ -81,6 +91,7 @@ class ProgramEditor extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => ({
   inputMode: state.inputMode,
   source: state.program.source,
+  parseIssues: state.program.parseIssues,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
