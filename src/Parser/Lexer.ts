@@ -174,10 +174,12 @@ export const createLexer = (input: string): Iterator<Token> => {
         return result(kind, rangeFrom(startLoc))
       }
 
-      // Handle single character operators.
+      // Handle single character operators (note that ";" is processed earlier).
       switch (ch) {
       case '|': kind = TokenKind.Or; break
       case ',': kind = TokenKind.Comma; break
+      case '(': kind = TokenKind.LeftParen; break
+      case ')': kind = TokenKind.RightParen; break
       default: break
       }
 
@@ -199,7 +201,7 @@ export const createLexer = (input: string): Iterator<Token> => {
       switch (ident) {
       case 'type': kind = TokenKind.TypeKeyword; break
       case 'init': kind = TokenKind.InitKeyword; break
-      case 'decl': kind = TokenKind.DeclKeyword; break
+      case 'rule': kind = TokenKind.RuleKeyword; break
       case 'case': kind = TokenKind.CaseKeyword; break
       default:
         kind = ident[0] === '$'

@@ -19,8 +19,8 @@ export enum TokenKind {
   TypeKeyword,
   /// "init"
   InitKeyword,
-  /// "decl"
-  DeclKeyword,
+  /// "rule"
+  RuleKeyword,
   /// "case"
   CaseKeyword,
   /// "$" <ident-char> { <ident-char> }
@@ -39,6 +39,10 @@ export enum TokenKind {
   Comma,
   /// ";"
   Semicolon,
+  /// "("
+  LeftParen,
+  /// ")"
+  RightParen,
   /// "\n"
   Newline,
   /// <eof>
