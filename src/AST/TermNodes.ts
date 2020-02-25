@@ -1,3 +1,5 @@
+import { SourceRange } from './SourceRange'
+
 /// The abstract base class for all terms.
 export abstract class Term {
 
@@ -13,6 +15,9 @@ export abstract class Term {
 
   /// This term's type, if defined.
   public readonly type: Type
+
+  /// The range in the textual representation of the program that represents this node.
+  public readonly range: Optional<SourceRange>
 
   _parent: Expr = null
 
@@ -37,10 +42,17 @@ export abstract class Term {
   /// A textual description of this term.
   public abstract get description(): string
 
-  protected constructor(id: string, label: string, type?: Type) {
+  protected constructor(id: string, label: string, type?: Type, range?: SourceRange) {
     this.id = id
     this.label = label
     this.type = type
+    this.range = range || null
+  }
+
+  /// Returns whether this term is an ancestor of the given term.
+  public isAncestor(other: Term): boolean {
+    return (other.parent !== null)
+        && ((other.parent.id === this.id) || this.isAncestor(other.parent))
   }
 
   /// Returns this term renamed with the given label.
@@ -97,9 +109,15 @@ export class Expr extends Term {
     return result
   }
 
-  public constructor(args: { id?: string, label: string, type?: Type, subterms?: Term[] }) {
+  public constructor(args: {
+    id?: string,
+    label: string,
+    type?: Type,
+    subterms?: Term[],
+    range?: SourceRange,
+  }) {
     const id = args.id || `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    super(id, args.label, args.type)
+    super(id, args.label, args.type, args.range)
 
     this.subterms = args.subterms || []
     for (const subterm of this.subterms) {
@@ -231,9 +249,14 @@ export class VarRef extends Term {
     return `$${this.label}`
   }
 
-  public constructor(args: { id?: string, label: string, type?: Type }) {
+  public constructor(args: {
+    id?: string,
+    label: string,
+    type?: Type,
+    range?: SourceRange,
+  }) {
     const id = args.id || `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    super(id, args.label, args.type)
+    super(id, args.label, args.type, args.range)
   }
 
   public renamed(newLabel: string): Term {
