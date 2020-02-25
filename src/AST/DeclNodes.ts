@@ -1,5 +1,17 @@
+import { Diagnostic } from './Diagnostic'
 import { SourceRange } from './SourceRange'
 import { TypeRef, TypeSign, TypeVarRef } from './TypeNodes'
+
+/// A translation unit declaration.
+export interface TranslationUnitDecl {
+
+  /// The top-level declarations of this translation unit.
+  readonly decls: Array<TopDecl>
+
+  /// The diagnostics of this translation unit.
+  readonly diagnostics: Array<Diagnostic>
+
+}
 
 export type TopDecl = TypeDecl | InitStateDecl | RuleDecl | RuleCaseDecl
 

@@ -7,7 +7,7 @@ import { Dispatch } from 'redux'
 import "ace-builds/webpack-resolver"
 import "ace-builds/src-noconflict/theme-dracula"
 
-import { ParseIssue } from 'FunBlocks/Parser/Parser'
+import { Diagnostic } from 'FunBlocks/AST'
 import { rebuildAST, updateProgramSource } from 'FunBlocks/UI/Actions/IDE'
 import { RootState } from 'FunBlocks/UI/Store'
 import { FBMode } from './FBMode'
@@ -18,7 +18,7 @@ const styles = require('./Workspace.module')
 
 type Props = {
   source: string,
-  parseIssues: Array<ParseIssue>,
+  diagnostics: Array<Diagnostic>,
   rebuildAST(): void,
   updateProgramSource(source: string): void,
 }
@@ -29,10 +29,10 @@ class TextualProgramEditor extends React.PureComponent<Props> {
   private astConstructionRequestTimeout = 0
 
   render() {
-    const annotations = this.props.parseIssues.map((issue) => ({
-      row: issue.range.lowerBound.line - 1,
-      column: issue.range.lowerBound.column - 1,
-      text: issue.message,
+    const annotations = this.props.diagnostics.map((diag) => ({
+      row: diag.range.lowerBound.line - 1,
+      column: diag.range.lowerBound.column - 1,
+      text: diag.message,
       type: 'error',
     }))
 
@@ -78,7 +78,7 @@ class TextualProgramEditor extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => ({
   source: state.program.source,
-  parseIssues: state.program.parseIssues,
+  diagnostics: state.program.diagnostics,
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
