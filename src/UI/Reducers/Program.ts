@@ -1,6 +1,7 @@
 import { AnyAction, combineReducers } from 'redux'
 
 import * as AST from 'FunBlocks/AST'
+import { parse } from 'FunBlocks/Parser/Parser'
 import { unparse } from 'FunBlocks/Parser/Unparser'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
 import { InputMode } from './.'
@@ -12,13 +13,46 @@ const defaultProgram: ReducerType = {
   source: '',
 }
 
+/// Parse a program from the given input string.
+const parseProgram = (source: string): ReducerType => {
+  // Parse the sources
+  const { decls } = parse(source)
+
+  // Create a new program instance from the parsed top-level declarations.
+  const program: Dictionary = {
+    initialState: null,
+    ruleCases: [] as Array<AST.RuleCaseDecl>,
+    source: source,
+  }
+
+  for (const decl of decls) {
+    if ((decl instanceof AST.InitStateDecl) && (program.initialState === null)) {
+      program.initialState = decl.state
+    } else if (decl instanceof AST.RuleCaseDecl) {
+      program.ruleCases.push(decl)
+    }
+  }
+
+  return program as ReducerType
+}
+
 const reducer = (program: ReducerType = defaultProgram, action: AnyAction): ReducerType => {
   switch (action.type) {
   case ACTION_TYPES.CHANGE_INPUT_MODE:
+
+    // Implementation note:
+    // This reducer assumes that all actions of type CHANGE_INPUT_MODE it receives **actually**
+    // change the input mode. In other words, it assumes that if the action requests the IDE to
+    // move to the visual (resp. textual) mode, then the IDE is currently in textual (resp. visual)
+    // mode. This assumption should be enforced by a reducer that has access to the current input
+    // value of the IDE's input mode.
+
     if (action.payload == InputMode.Textual) {
-      // If we are moving from the visual to the textual mode, we have to build its textual from
-      // its current AST.
+      // (re)build the program's textual form from its current AST.
       return { ...program, source: unparse(program) }
+    } else {
+      // (re)build the program's visual form from its current source.
+      return parseProgram(program.source)
     }
 
   case ACTION_TYPES.UPDATE_PROGRAM:
@@ -27,6 +61,10 @@ const reducer = (program: ReducerType = defaultProgram, action: AnyAction): Redu
 
   case ACTION_TYPES.UPDATE_PROGRAM_SOURCE:
     return { ...program, source: action.payload }
+
+  case ACTION_TYPES.REBUILD_AST: {
+    return parseProgram(program.source)
+  }
 
   case ACTION_TYPES.UPDATE_INITIAL_STATE:
     return { ...program, initialState: action.payload }
