@@ -1,0 +1,208 @@
+.workspace {
+  flex-grow: 1;
+}
+
+.section-heading {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+// Edit Workspace
+
+.workspace.edit {
+  display: flex;
+}
+
+.toolbox {
+  padding: 16px 32px;
+  background: #515258;
+  color: white;
+
+  & > .input-mode {
+    padding-top: 8px;
+    padding-bottom: 16px;
+    text-align: center;
+
+    & .btn {
+      width: 96px;
+    }
+  }
+
+  & > .tool-matrix {
+    & .row {
+      display: flex;
+
+      &:not(:last-child) {
+        border-bottom: 1px groove white;
+      }
+    }
+
+    & .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 96px;
+      height: 96px;
+
+      &.colspan-2 {
+        width: 196px;
+        margin-right: none;
+      }
+
+      & > .btn-icon {
+        display: flex;
+        align-items: center;
+
+        & > svg {
+          margin: 0 16px;
+        }
+      }
+
+      & > span {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  & > .trash {
+    padding-top: 8px;
+    padding-bottom: 16px;
+    text-align: center;
+    color: #c8c8c8;
+
+    & > .trash-icon {
+      display: inline;
+    }
+  }
+}
+
+.program-editor {
+  flex-grow: 1;
+
+  &.visual {
+    padding: 16px 32px;
+  }
+
+  .state-editor {
+    display: flex;
+    margin-bottom: 24px;
+    overflow-x: scroll;
+  }
+
+  .rules-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 24px;
+
+    & > div {
+      margin-bottom: 12px;
+      overflow-x: scroll;
+    }
+  }
+
+  .object-placeholder {
+    display: flex;
+    align-items: center;
+    min-height: 32px; // This should be the height of a term-block.
+    padding: 0 16px;
+    border: 4px dotted #c8c8c8;
+    border-radius: 16px;
+    font-size: 1.2rem;
+    color: #c8c8c8;
+
+    & > .label {
+      margin-left: 8px;
+    }
+  }
+}
+
+// Debug Workspace
+
+.program-debugger {
+  padding: 16px 32px;
+}
+
+.state-viewer {
+  display: flex;
+  overflow-x: scroll;
+  margin-bottom: 24px;
+}
+
+.rules-viewer {
+  margin-bottom: 24px;
+
+  & > div:not(:last-child) {
+    margin-bottom: 8px;
+    overflow-x: scroll;
+  }
+
+  .rule-container {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: background-color 200ms linear;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #d8ebff;
+    }
+
+    &.selected {
+      background-color: darken(#d8ebff, 10);
+
+      & > .select-icon {
+        color: darken(#d8ebff, 20);
+      }
+    }
+
+    & > .select-icon {
+      margin: 0 8px;
+      color: #f0f0f0;
+      transition: color 200ms linear;
+    }
+  }
+}
+
+.rule-item {
+  & > *:first-child {
+    margin-right: 8px;
+  }
+}
+
+.history {
+  display: flex;
+  padding: 0 8px;
+  height: 34px;
+  background: #f0f0f0;
+
+  & > button {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 5px;
+    border-radius: 24px;
+    border: none;
+    font-size: 1rem;
+    background-color: #b3b3b3;
+    opacity: 0.25;
+    transition: opacity 200ms ease-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    &.selected {
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: 1px solid #fff;
+      outline-offset: -4px;
+    }
+  }
+}

@@ -1,10 +1,11 @@
-import { Expression, Rule, Variable } from './Terms'
+import { RuleCaseDecl } from './DeclNodes'
+import { Expr, VarRef } from './TermNodes'
 
 /// Serializes a program to a string.
 export function serialize(program: Program): string {
   const tree = {
     initialState: program.initialState.treeized,
-    rules: program.rules.map((rule: Rule) => ({
+    ruleCases: program.ruleCases.map((rule: RuleCaseDecl) => ({
       _objectType: 'Rule',
       id: rule.id,
       left: rule.left.treeized,
@@ -24,15 +25,15 @@ export function deserialize(input: string): Program {
   // Build the initial state.
   const initialState = tree.initialState && makeTerm(tree.initialState)
 
-  // Build the rules.
-  const rulesData = tree.rules || []
-  const rules = rulesData.map((subtree: Dictionary) => new Rule({
+  // Build the rule cases.
+  const rulesData = tree.ruleCases || []
+  const ruleCases = rulesData.map((subtree: Dictionary) => new RuleCaseDecl({
     id: subtree.id,
     left: subtree.left && makeTerm(subtree.left),
     right: subtree.right && makeTerm(subtree.right),
   }))
 
-  return { initialState, rules }
+  return { initialState, ruleCases }
 }
 
 // MARK: Parsing helper functions.
@@ -53,16 +54,16 @@ type VarArgs = {
 }
 
 function makeTerm(args: TermArgs): Term {
-  if (args._objectType === 'Expression') {
+  if (args._objectType === 'Expr') {
     const exprArgs = args as ExprArgs
-    return new Expression({
+    return new Expr({
       id: exprArgs.id,
       label: exprArgs.label,
       subterms: exprArgs.subterms.map(makeTerm),
     })
-  } else if (args._objectType === 'Variable') {
+  } else if (args._objectType === 'VarRef') {
     const varArgs = args as VarArgs
-    return new Variable({
+    return new VarRef({
       id: varArgs.id,
       label: varArgs.label,
     })
