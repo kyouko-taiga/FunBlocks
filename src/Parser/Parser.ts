@@ -93,7 +93,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
 
   /// Parses a single top-level declaration.
   const parseTopDecl = (newIssues: Array<ParseIssue>): Optional<AST.TopDecl> => {
-    switch (peek().kind) {
+    switch (peek()?.kind) {
     case TokenKind.TypeKeyword:
       return parseTypeDecl(newIssues)
 
@@ -660,7 +660,7 @@ export const parse = (input: string): { issues: Array<ParseIssue>, decls: Array<
   const issues: Array<ParseIssue> = []
   const decls: Array<AST.TopDecl> = []
 
-  while ((peek()?.kind !== null) && (peek()?.kind !== TokenKind.EOF)) {
+  while((peek() !== null) && (peek().kind !== TokenKind.EOF)) {
     consumeManyNewlines()
     const decl = parseTopDecl(issues)
     if (decl !== null) {
