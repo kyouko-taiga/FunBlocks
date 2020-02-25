@@ -1,3 +1,5 @@
 export * from './DeclNodes'
+export * from './SourceLocation'
+export * from './SourceRange'
 export * from './TermNodes'
 export * from './TypeNodes'
