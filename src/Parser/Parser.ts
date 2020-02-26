@@ -81,7 +81,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
   // MARK: Top-level declaration parsers.
 
   /// Parses a single top-level declaration.
-  const parseTopDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.TopDecl> => {
+  const parseTopLevelDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.TopLevelDecl> => {
     switch (peek()?.kind) {
     case TokenKind.TypeKeyword:
       return parseTypeDecl(newDiags)
@@ -647,11 +647,11 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
   // MARK: Program parsing.
 
   const diags: Array<AST.Diagnostic> = []
-  const decls: Array<AST.TopDecl> = []
+  const decls: Array<AST.TopLevelDecl> = []
 
   while((peek() !== null) && (peek().kind !== TokenKind.EOF)) {
     consumeManyNewlines()
-    const decl = parseTopDecl(diags)
+    const decl = parseTopLevelDecl(diags)
     if (decl !== null) {
       decls.push(decl)
     } else {

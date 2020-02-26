@@ -6,14 +6,14 @@ import { TypeRef, TypeSign, TypeVarRef } from './TypeNodes'
 export interface TranslationUnitDecl {
 
   /// The top-level declarations of this translation unit.
-  readonly decls: Array<TopDecl>
+  readonly decls: Array<TopLevelDecl>
 
   /// The diagnostics of this translation unit.
   readonly diagnostics: Array<Diagnostic>
 
 }
 
-export type TopDecl = TypeDecl | InitStateDecl | RuleDecl | RuleCaseDecl
+export type TopLevelDecl = TypeDecl | InitStateDecl | RuleDecl | RuleCaseDecl
 
 /// A type declaration.
 export class TypeDecl {
