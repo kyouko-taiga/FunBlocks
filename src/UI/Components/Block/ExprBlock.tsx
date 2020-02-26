@@ -114,8 +114,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     }
 
     // Generate the subterms, if any.
-    const term = this.props.term
-    const subterms = term.subterms
+    const subterms = this.props.term.subterms
       .map((subterm, i) => (
         <BlockContainer
           key={ i }
@@ -130,8 +129,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       ))
 
     // Generate a drop placeholder if necessary.
-    const { termID, placeholderIndex } = this.dropPlaceholderData()
-    if (termID === this.props.term.id) {
+    const { term, placeholderIndex } = this.dropPlaceholderData()
+    if (term === this.props.term) {
       subterms.splice(placeholderIndex, 0, (
         <div key="drop-placeholder" className={ styles.dropPlaceholder } />
       ))
@@ -140,8 +139,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     return subterms
   }
 
-  dropPlaceholderData(): { termID: string, placeholderIndex: number } {
-    return this.props.data?.dropPlaceholderPosition || { termID: null, placeholderIndex: -1 }
+  dropPlaceholderData(): { term: Optional<Term>, placeholderIndex: number } {
+    return this.props.data?.dropPlaceholderPosition || { term: null, placeholderIndex: -1 }
   }
 
   didMouseOver(e: React.MouseEvent<HTMLDivElement>) {
@@ -201,14 +200,14 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
 
     // Give up if either the ith or the (i-1)th subterm is the block being dragged.
     const subterms = this.props.term.subterms
-    if ((i < subterms.length) && (draggedTerm.id === subterms[i].id)) { return }
-    if ((i > 0) && (draggedTerm.id === subterms[i-1].id)) { return }
+    if ((i < subterms.length) && (draggedTerm === subterms[i])) { return }
+    if ((i > 0) && (draggedTerm === subterms[i-1])) { return }
 
     // Update the block data to show the drop placeholder.
-    const { termID, placeholderIndex } = this.dropPlaceholderData()
-    if ((termID !== this.props.term.id) || placeholderIndex != i) {
+    const { term, placeholderIndex } = this.dropPlaceholderData()
+    if ((term !== this.props.term) || placeholderIndex != i) {
       this.props.updateData({
-        dropPlaceholderPosition: { termID: this.props.term.id, placeholderIndex: i }
+        dropPlaceholderPosition: { term: this.props.term, placeholderIndex: i }
       })
     }
     e.stopPropagation()
@@ -224,7 +223,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     // Ignore this event unless this block is root, and a drop placeholder is being rendered in
     // either this block or one of its children.
     if (!this.props.data || !this.props.data.dropPlaceholderPosition) { return }
-    if (this.props.term.id !== this.props.term.root.id) { return }
+    if (this.props.term !== this.props.term.root) { return }
 
     // Check if the drag event is getting out of this block's bounding box.
     const box = e.currentTarget.getBoundingClientRect()
@@ -243,8 +242,8 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     if (this.props.isCollapsed) { return }
 
     // Ignore this event if this block is not the direct target of the drop.
-    const { termID, placeholderIndex } = this.dropPlaceholderData()
-    if (this.props.term.id !== termID) { return }
+    const { term, placeholderIndex } = this.dropPlaceholderData()
+    if (this.props.term !== term) { return }
 
     // Remove the drop placeholder.
     this.props.updateData({ dropPlaceholderPosition: null })
@@ -259,12 +258,12 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     const draggedTerm = this.props.draggedData.payload
     const newSubterms: Array<Term> = [ ...this.props.term.subterms ]
 
-    if (draggedTerm.parent?.id === this.props.term.id) {
+    if (draggedTerm.parent === this.props.term) {
       // If the dragged term is a direct child of this term, then we have to check its position
       // relative to the placeholder index and possibly offset it. If it should be moved to the
       // right (i.e. its current index in the array of subterms precedes the placeholder index),
       // then the placeholder index should be decremented to account for the subterm's removal.
-      const i = this.props.term.subterms.findIndex((subterm) => subterm.id === draggedTerm.id)
+      const i = this.props.term.subterms.findIndex((subterm) => subterm === draggedTerm)
       newSubterms.splice(i, 1)
       if (placeholderIndex <= i) {
         newSubterms.splice(placeholderIndex, 0, draggedTerm)
