@@ -20,8 +20,10 @@ $var-side: 28.2842712475px;
   padding: 0 ($term-height / 4);
   border: $border-width solid;
   border-radius: $term-height;
+  font-family: Monaco, Menlo, Consolas, monospace;
   font-size: ($term-height / 2);
   align-items: center;
+  text-align: center;
   cursor: default;
 
   // FIXME: `inline-flex` might be a better choice here. Unfortunately it seems to break dragging
@@ -42,6 +44,7 @@ $var-side: 28.2842712475px;
 .expr-label, .var-label {
   & > input {
     font-size: inherit;
+    font-family: inherit;
     text-align: center;
     border: none;
     background: none;
@@ -63,6 +66,7 @@ $var-side: 28.2842712475px;
 .var-inner {
   position: relative;
   height: $term-height;
+  font-family: Monaco, Menlo, Consolas, monospace;
   font-size: ($term-height / 2);
   display: inline-flex;
   align-items: center;
