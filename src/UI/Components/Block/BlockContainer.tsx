@@ -152,9 +152,9 @@ export class BlockContainer extends React.Component<BlockContainerProps, BlockCo
 
     // Modifiy the term's label.
     const newLabel = (e.target as HTMLInputElement).value
-    const newRoot = this.props.term.root.substituting({
-      [this.props.term.id]: this.props.term.renamed(newLabel)
-    })
+    const newRoot = this.props.term.root.substituting(
+      this.props.term,
+      this.props.term.renamed(newLabel))
     this.props.onChange?.(newRoot)
   }
 

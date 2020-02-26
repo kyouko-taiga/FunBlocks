@@ -42,7 +42,7 @@ class ObjectTrash extends React.PureComponent<ObjectTrashProps> {
     case 'Term': {
       // Modify the dragged term by removing it from its hierarchy.
       const draggedTerm = this.props.draggedData.payload
-      const newRoot = draggedTerm.root.substituting({ [draggedTerm.id]: null })
+      const newRoot = draggedTerm.root.substituting(draggedTerm, null)
       this.props.draggedData.callbacks?.onChange?.(newRoot)
       break
     }

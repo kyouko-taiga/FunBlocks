@@ -64,19 +64,8 @@ export abstract class Term {
   /// - Parameter mapping: A mapping from variable labels to terms.
   public abstract reified(mapping: Dictionary<Term>): Term
 
-  /// Returns a term in which occurrences of terms identified by the given IDs are substituted for
-  /// their corresponding term in the given mapping.
-  ///
-  /// - Parameter mapping:
-  ///   A mapping from term IDs to terms instances or `null`. The latter can be used to remove
-  ///   subterms.
-  ///
-  /// - Note:
-  ///   As terms are supposed to be immutable, all terms that are ancestor of a substituted subterm
-  ///   must also be substituted by a new term, invalidating their former identifiers. It follows
-  ///   that these identifiers cannot be used on subsequent calls to `substituting`. Instead, all
-  ///    substitutions should be applied at once.
-  public abstract substituting(mapping: Dictionary<Term>): Term
+  /// Returns a term in which the occurrence of the first argument is substituted for the second.
+  public abstract substituting(subject: Term, replacement: Optional<Term>): Optional<Term>
 
 }
 
@@ -199,31 +188,29 @@ export class Expr extends Term {
       : this
   }
 
-  public substituting(mapping: Dictionary<Term>): Term {
-    if (this.id in mapping) {
-      const nextMapping = { ...mapping }
-      delete nextMapping[this.id]
-      return mapping[this.id]?.substituting(nextMapping) || null
-    }
-
-    if (this.subterms.length == 0) {
+  public substituting(subject: Term, replacement: Optional<Term>): Optional<Term> {
+    if (this === subject) {
+      return replacement
+    } else if (this.subterms.length == 0) {
       return this
-    }
-
-    let mutated = false
-    const substitutedSubterms = []
-    for (let i = 0; i < this.subterms.length; ++i) {
-      const substituted = this.subterms[i].substituting(mapping)
-      if (substituted !== this.subterms[i]) {
-        mutated = true
-        if (substituted === null) { continue }
+    } else {
+      let mutated = false
+      const newSubterms: Array<Term> = []
+      for (let subterm of this.subterms) {
+        const substituted = subterm.substituting(subject, replacement)
+        mutated = mutated || (substituted !== subterm)
+        if (substituted) {
+          newSubterms.push(substituted)
+        }
       }
-      substitutedSubterms.push(substituted)
-    }
 
-    return mutated
-      ? new Expr({ label: this.label, type: this.type, subterms: substitutedSubterms })
-      : this
+      return !mutated ? this : new Expr({
+        label: this.label,
+        type: this.type,
+        subterms: newSubterms,
+        range: this.range,
+      })
+    }
   }
 
 }
@@ -269,9 +256,9 @@ export class VarRef extends Term {
       : this
   }
 
-  public substituting(mapping: Dictionary<Term>): Term {
-    return this.id in mapping
-      ? mapping[this.id]
+  public substituting(subject: Term, replacement: Optional<Term>): Optional<Term> {
+    return this === subject
+      ? replacement
       : this
   }
 

@@ -97,7 +97,7 @@ class DebugWorkspace extends React.PureComponent<Props> {
       // Compute the substitution.
       const result = rule.right.reified(mapping)
       const successor = this.props.history[this.props.historyIndex]
-        .substituting({ [expr.id]: result })
+        .substituting(expr, result)
       this.props.pushState(successor)
     }
   }

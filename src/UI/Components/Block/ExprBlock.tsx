@@ -275,7 +275,7 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
       // it from the later before we insert it as a direct child.
       for (let i = 0; i < newSubterms.length; ++i) {
         if (newSubterms[i].isAncestor(draggedTerm)) {
-          newSubterms[i] = newSubterms[i].substituting({ [draggedTerm.id]: null })
+          newSubterms[i] = newSubterms[i].substituting(draggedTerm, null)
           break
         }
       }
@@ -283,18 +283,18 @@ class ExprBlock extends React.PureComponent<ExprBlockProps> {
     } else {
       // If the dragged term is a sibling of this term or not related at all, then we should remove
       // it from its current parent using the `onChange` callback.
-      const draggedParent = draggedTerm.root.substituting({ [draggedTerm.id]: null })
+      const draggedParent = draggedTerm.root.substituting(draggedTerm, null)
       this.props.draggedData.callbacks?.onChange?.(draggedParent)
       newSubterms.splice(placeholderIndex, 0, draggedTerm)
     }
 
-    const newRoot = this.props.term.root.substituting({
-      [this.props.term.id]: new AST.Expr({
+    const newRoot = this.props.term.root.substituting(
+      this.props.term,
+      new AST.Expr({
         label: this.props.term.label,
         type: this.props.term.type,
         subterms: newSubterms,
-      })
-    })
+      }))
     this.props.onChange?.(newRoot)
   }
 
