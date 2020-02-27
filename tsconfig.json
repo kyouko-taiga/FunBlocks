@@ -2,6 +2,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "esModuleInterop": true,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
@@ -18,6 +19,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "es2016",
-    "types": ["webpack-env"]
+    "types": ["webpack-env", "jest"]
   }
 }
