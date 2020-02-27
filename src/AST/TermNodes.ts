@@ -1,8 +1,8 @@
-import { Node } from './Node'
+import { ObservableNode } from './Node'
 import { SourceRange } from './SourceRange'
 
 /// The abstract base class for all terms.
-export abstract class Term extends Node {
+export abstract class Term extends ObservableNode {
 
   /// This term's ID.
   ///
@@ -12,7 +12,15 @@ export abstract class Term extends Node {
   public readonly id: string
 
   /// This term's label.
-  public readonly label: string
+  public get label(): string { return this._label }
+
+  /// Sets this term's label and notifies all observers.
+  public set label(newValue: string) {
+    this._label = newValue
+    this.notify()
+  }
+
+  private _label: string
 
   /// This term's type, if defined.
   public readonly type: Optional<Type>
@@ -44,7 +52,7 @@ export abstract class Term extends Node {
   }) {
     super(range)
     this.id = id
-    this.label = label
+    this._label = label
     this.type = type || null
   }
 
@@ -72,7 +80,19 @@ export abstract class Term extends Node {
 export class Expr extends Term {
 
   /// The subterms of this expression.
-  public readonly subterms: Array<Term>
+  public get subterms(): Array<Term> {
+    const subterms = [ ...this._subterms ]
+    Object.freeze(subterms)
+    return subterms
+  }
+
+  /// Sets the subterms of this expression and notifies all observers.
+  public set subterms(newValue: Array<Term>) {
+    this._subterms = newValue
+    this.notify()
+  }
+
+  private _subterms: Array<Term>
 
   public get treeized(): Dictionary {
     return {
