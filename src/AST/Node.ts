@@ -27,6 +27,7 @@ export abstract class ObservableNode extends Node {
 
   protected constructor(range?: Optional<SourceRange>) {
     super(range)
+    this.observers = []
   }
 
   public subscribe(observer: ((node: Node) => void)) {
