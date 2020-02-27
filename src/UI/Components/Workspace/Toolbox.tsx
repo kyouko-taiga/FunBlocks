@@ -75,21 +75,24 @@ class Toolbox extends React.PureComponent<Props> {
   createExprData() {
     return {
       type: 'Term',
-      payload: this.dummyExpr.clone,
+      payload: new AST.Expr({ label: 'abc' }),
     }
   }
 
   createVarData() {
     return {
       type: 'Term',
-      payload: this.dummyVar.clone,
+      payload: new AST.VarRef({ label: 'x' }),
     }
   }
 
   createRuleData() {
     return {
       type: 'RuleCaseDecl',
-      payload: new AST.RuleCaseDecl({ left: this.dummyExpr.clone, right: this.dummyExpr.clone }),
+      payload: new AST.RuleCaseDecl({
+        left: new AST.Expr({ label: 'abc' }),
+        right: new AST.Expr({ label: 'abc' }),
+      }),
     }
   }
 

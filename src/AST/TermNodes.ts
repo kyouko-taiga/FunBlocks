@@ -30,9 +30,6 @@ export abstract class Term extends Node {
       : this
   }
 
-  /// A shallow copy of this term.
-  public abstract get clone(): Term
-
   /// Returns a tree-like representation of this term, suitable to be json-serialized.
   public abstract get treeized(): Dictionary
 
@@ -76,10 +73,6 @@ export class Expr extends Term {
 
   /// The subterms of this expression.
   public readonly subterms: Array<Term>
-
-  public get clone(): Expr {
-    return new Expr({ label: this.label, type: this.type, subterms: this.subterms })
-  }
 
   public get treeized(): Dictionary {
     return {
@@ -218,10 +211,6 @@ export class Expr extends Term {
 
 /// A variable.
 export class VarRef extends Term {
-
-  public get clone(): VarRef {
-    return new VarRef({ label: this.label, type: this.type })
-  }
 
   public get treeized(): Dictionary {
     return {
