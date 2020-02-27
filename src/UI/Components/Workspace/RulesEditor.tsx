@@ -11,15 +11,15 @@ import RuleBlock from 'FunBlocks/UI/Components/RuleBlock'
 
 const styles = require('./Workspace.module')
 
+type RuleCasePatch = { left?: Term, right?: Term }
+
 type Props = {
   ruleCases: Array<AST.RuleCaseDecl>,
   draggedData: { type: string, payload?: any, callbacks?: Dictionary<Function> },
   insertRuleCase(newRule: AST.RuleCaseDecl): void,
-  updateRuleCase(ruleCaseID: string, updates: { left?: Term, right?: Term }): void,
+  updateRuleCase(ruleCaseID: string, patch: RuleCasePatch): void,
   removeRuleCase(ruleCaseID: string): void,
 }
-
-type RuleCasePatch = { left?: Term, right?: Term }
 
 class RulesEditor extends React.PureComponent<Props> {
 

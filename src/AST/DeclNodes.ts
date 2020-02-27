@@ -1,9 +1,11 @@
 import { Diagnostic } from './Diagnostic'
+import { Node } from './Node'
 import { SourceRange } from './SourceRange'
+import { Term } from './TermNodes'
 import { TypeRef, TypeSign, TypeVarRef } from './TypeNodes'
 
 /// A translation unit declaration.
-export interface TranslationUnitDecl {
+export class TranslationUnitDecl extends Node {
 
   /// The top-level declarations of this translation unit.
   readonly decls: Array<TopLevelDecl>
@@ -11,101 +13,158 @@ export interface TranslationUnitDecl {
   /// The diagnostics of this translation unit.
   readonly diagnostics: Array<Diagnostic>
 
-}
-
-export type TopLevelDecl = TypeDecl | InitStateDecl | RuleDecl | RuleCaseDecl
-
-/// A type declaration.
-export class TypeDecl {
-
-  public readonly name: string
-  public readonly parameters: Array<TypeVarRef>
-  public readonly cases: Array<TypeCons>
-  public readonly range: Optional<SourceRange>
-
-  public constructor(args: {
-    name: string,
-    parameters?: Array<TypeVarRef>,
-    cases: Array<TypeCons>,
+  constructor({ range, decls, diagnostics }: {
     range?: SourceRange,
+    decls?: Array<TopLevelDecl>,
+    diagnostics?: Array<Diagnostic>,
   }) {
-    this.name = args.name
-    this.parameters = args.parameters || []
-    this.cases = args.cases
-    this.range = args.range || null
+    super(range)
+    this.decls = decls || []
+    this.diagnostics = diagnostics || []
   }
 
 }
 
-/// A type constructor.
-export class TypeCons {
+/// A top-level declaration.
+export type TopLevelDecl = TypeDecl | InitStateDecl | RuleDecl | RuleCaseDecl
 
-  public readonly label: String
-  public readonly arguments: Array<TypeRef>
-  public readonly range: Optional<SourceRange>
+/// A type declaration.
+///
+/// A type is defined by a set of type constructors which describe the profile of the expressions
+/// that constitute its domain. For instance, the type of a list of integer values can be defined
+/// as follows:
+///
+///     type IntList :: empty | cons Int (IntList)
+///
+/// In this example, the type `IntList` is defined by a set of two type constructors, `empty` and
+/// `cons`, that describe the profile of the terms that are of type `IntList`. The former does not
+/// have any parameter and describes an expression labeled by `empty` without any subterms. The
+/// latter has a two parameters referring to the types `Int` and `IntList` and describes an
+/// expression labeled `cons` with two subterms, one of type `Int` and the other of type `IntList`.
+///
+/// Types themselves may also have parameters, in which case they are said *generic*. A type
+/// parameter is merely a placeholder for another type. For instance, a generic list type can be
+/// defined as follows:
+///
+///     type List $T :: empty | cons $T (List $T)
+///
+/// Here, the type `List` is generic and accepts a single type argument `$T`. It can now be
+/// *instanciated* with any type `$T` to produce the type for a list of values of type `$T`. For
+/// instance, we could declare the following rule:
+///
+///     rule max :: List Int -> Int
+///
+/// In this example, the type `List` is instanciated with the type `Int` to produce a the type of a
+/// list of integer values, semantically equivalent to the `IntList` type we declared earlier.
+export class TypeDecl extends Node {
 
-  public constructor(args: { label : String, arguments : Array<TypeRef>, range?: SourceRange }) {
-    this.label = args.label
-    this.arguments = args.arguments
-    this.range = args.range || null
+  /// The name of the declared type.
+  readonly name: string
+
+  /// The parameters of the declared type if it is generic.
+  readonly parameters: Array<TypeVarRef>
+
+  /// The constructors of the declared type.
+  readonly cases: Array<TypeConsDecl>
+
+  constructor({ range, name, parameters, cases }: {
+    range?: SourceRange,
+    name: string,
+    parameters?: Array<TypeVarRef>,
+    cases?: Array<TypeConsDecl>,
+  }) {
+    super(range)
+    this.name = name
+    this.parameters = parameters || []
+    this.cases = cases || []
+  }
+
+}
+
+/// A type constructor declaration.
+export class TypeConsDecl extends Node {
+
+  /// The label of the constructor.
+  readonly label: String
+
+  /// The type arguments of the constructor.
+  readonly args: Array<TypeRef>
+
+  constructor({ range, label, args }: {
+    range?: SourceRange,
+    label: string,
+    args?: Array<TypeRef>,
+  }) {
+    super(range)
+    this.label = label
+    this.args = args || []
   }
 
 }
 
 /// The declaration of the program's initial state.
-export class InitStateDecl {
+export class InitStateDecl extends Node {
 
-  public readonly state: Term
-  public readonly range: Optional<SourceRange>
+  /// The declared state.
+  readonly state: Optional<Term>
 
-  public constructor(args: { state: Term, range?: SourceRange }) {
-    this.state = args.state
-    this.range = args.range || null
+  constructor({ range, state }: {
+    range?: SourceRange,
+    state?: Term,
+  }) {
+    super(range)
+    this.state = state || null
   }
 
 }
 
 /// A rule declaration (i.e. the declaration of its signature).
-export class RuleDecl {
+export class RuleDecl extends Node {
 
-  public readonly name: String
-  public readonly parameters: Array<TypeRef>
-  public readonly typeSign: TypeSign
-  public readonly range: Optional<SourceRange>
+  /// The name of the declared rule.
+  readonly name: String
 
-  public constructor(args: {
-    name: String,
-    parameters: Array<TypeRef>,
-    typeSign: TypeSign,
+  /// The type parameters of the declared rule, if it is generic.
+  readonly parameters: Array<TypeRef>
+
+  /// The type signature of the declared rule.
+  readonly signature: TypeSign
+
+  constructor({ range, name, parameters, signature }: {
     range?: SourceRange,
+    name: string,
+    parameters?: Array<TypeRef>,
+    signature: TypeSign,
   }) {
-    this.name = args.name
-    this.parameters = args.parameters
-    this.typeSign = args.typeSign
-    this.range = args.range || null
+    super(range)
+    this.name = name
+    this.parameters = parameters || []
+    this.signature = signature
   }
 
 }
 
 /// A rule case declaration.
-export class RuleCaseDecl {
+export class RuleCaseDecl extends Node {
 
-  /// A unique identifier for this rule case.
-  public readonly id: string
+  /// The unique identifier of this rule case declaration instance.
+  readonly id: string
 
   /// The left part of this rule case (i.e. the term that should be matched).
-  public readonly left: Term
+  readonly left: Optional<Term>
 
   /// The right part of this rule case (i.e. the term that is rewritten).
-  public readonly right: Term
+  readonly right: Optional<Term>
 
-  public readonly range: Optional<SourceRange>
-
-  public constructor(args: { id?: string, left: Term, right: Term, range?: SourceRange }) {
-    this.id = args.id || `rule/${Math.random().toString(36).substr(2, 9)}`
-    this.left = args.left
-    this.right = args.right
-    this.range = args.range || null
+  constructor({ range, left, right }: {
+    range?: SourceRange,
+    left?: Term,
+    right?: Term,
+  }) {
+    super(range)
+    this.id = `RuleCaseDecl/${Math.random().toString(36).substr(2, 9)}`
+    this.left = left || null
+    this.right = right || null
   }
 
 }

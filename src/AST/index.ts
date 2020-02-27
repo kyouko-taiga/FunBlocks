@@ -1,5 +1,6 @@
 export * from './DeclNodes'
 export * from './Diagnostic'
+export * from './Node'
 export * from './SourceLocation'
 export * from './SourceRange'
 export * from './TermNodes'

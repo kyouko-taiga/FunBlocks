@@ -62,6 +62,18 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
   }
 
+  /// Helper to create invalid expression nodes.
+  const invalidExpr = (): AST.Expr => new AST.Expr({
+    label: '__error',
+    range: peek()?.range,
+  })
+
+  /// Helper to create invalid type declaration references.
+  const invalidTypeDeclRef = (): AST.TypeDeclRef => new AST.TypeDeclRef({
+    name: '__error',
+    range: peek()?.range,
+  })
+
   /// Helper that builds diagnostics of the form 'expected <construction>'
   const expectedIssue = (expected: string): AST.Diagnostic => {
     return {
@@ -137,14 +149,12 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
 
     return new AST.TypeDecl({
-      name: nameTk !== null
-        ? value(nameTk)
-        : '__error',
+      name: (nameTk !== null) ? value(nameTk) : '__error',
       parameters: parameters,
       cases: cases,
       range: {
         lowerBound: startTk.range.lowerBound,
-        upperBound: endTk !== null
+        upperBound: (endTk !== null)
           ? endTk.range.upperBound
           : peek(-1).range.upperBound,
       },
@@ -173,8 +183,8 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
   }
 
   /// Parses a type declaration case.
-  const parseTypeDeclCase = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeCons> =>
-    parseParenthesized(newDiags, parseTypeCons)
+  const parseTypeDeclCase = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeConsDecl> =>
+    parseParenthesized(newDiags, parseTypeConsDecl)
 
   /// Parses an initial state declaration.
   const parseInitStateDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.InitStateDecl> => {
@@ -186,7 +196,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
 
     // Parse an expression.
-    const state = parseTerm(newDiags) || new AST.Expr({ label: '__error', range: peek()?.range })
+    const state = parseTerm(newDiags) || invalidExpr()
 
     /// Parse a statement delimiter.
     const endTk = consumeKind(TokenKind.Newline, TokenKind.Semicolon, TokenKind.EOF)
@@ -234,10 +244,10 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     // Parse a type signature.
     savePoint = currentTokenIndex
     consumeManyNewlines()
-    let typeSign = parseTypeSign(newDiags)
-    if (typeSign === null) {
+    let signature = parseTypeSign(newDiags)
+    if (signature === null) {
       currentTokenIndex = savePoint
-      typeSign = new AST.TypeDeclRef({ name: '__error', arguments: [], range: peek()?.range })
+      signature = invalidTypeDeclRef()
     }
 
     /// Parse a statement delimiter.
@@ -247,11 +257,9 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
 
     return new AST.RuleDecl({
-      name: nameTk !== null
-        ? value(nameTk)
-        : '__error',
+      name: (nameTk !== null) ? value(nameTk) : '__error',
       parameters: parameters,
-      typeSign: typeSign,
+      signature: signature,
       range: {
         lowerBound: startTk.range.lowerBound,
         upperBound: endTk !== null
@@ -271,7 +279,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
 
     // Parse the left term of the case.
-    const left = parseTerm(newDiags) || new AST.Expr({ label: '__error', range: peek()?.range })
+    const left = parseTerm(newDiags) || invalidExpr()
 
     // Parse `=>`.
     let savePoint = currentTokenIndex
@@ -295,7 +303,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     let right = parseTerm(newDiags)
     if (right === null) {
       currentTokenIndex = savePoint
-      right = new AST.Expr({ label: '__error', range: peek()?.range })
+      right = invalidExpr()
     }
 
     /// Parse a statement delimiter.
@@ -319,7 +327,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
   // MARK: Type definition parsers.
 
   /// Parses a type constructor.
-  const parseTypeCons = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeCons> => {
+  const parseTypeConsDecl = (newDiags: Array<AST.Diagnostic>): Optional<AST.TypeConsDecl> => {
     // Parse the constructor's label.
     const labelTk = peek()
     if (labelTk?.kind === TokenKind.Ident) {
@@ -342,9 +350,9 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     // Parse a possibly empty list of type arguments.
     const typeArgList = parseSpaceSeparatedList(newDiags, parseTypeArg)
 
-    return new AST.TypeCons({
+    return new AST.TypeConsDecl({
       label: value(labelTk),
-      arguments: typeArgList,
+      args: typeArgList,
       range: {
         lowerBound: labelTk.range.lowerBound,
         upperBound: (typeArgList.length > 0)
@@ -390,7 +398,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
 
     return new AST.TypeDeclRef({
       name: value(nameTk),
-      arguments: typeArgList,
+      args: typeArgList,
       range: {
         lowerBound: nameTk.range.lowerBound,
         upperBound: (typeArgList.length > 0)
@@ -441,11 +449,7 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     // If the parsed reference is followed by an arrow, parse any type signature as the right part
     // of an arrow type.
     consumeManyNewlines()
-    const right = parseTypeSign(newDiags) || new AST.TypeDeclRef({
-      name: '__error',
-      arguments: [],
-      range: peek()?.range,
-    })
+    const right = parseTypeSign(newDiags) || invalidTypeDeclRef()
 
     return new AST.ArrowTypeSign({
       left: left,
@@ -661,6 +665,13 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
   }
 
-  return { diagnostics: diags, decls: decls }
+  return {
+    diagnostics: diags,
+    decls: decls,
+    range: {
+      lowerBound: tokens[0].range.lowerBound,
+      upperBound: tokens[input.length - 1].range.upperBound,
+    },
+  }
 
 }

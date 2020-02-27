@@ -28,7 +28,6 @@ export function deserialize(input: string): Program {
   // Build the rule cases.
   const rulesData = tree.ruleCases || []
   const ruleCases = rulesData.map((subtree: Dictionary) => new RuleCaseDecl({
-    id: subtree.id,
     left: subtree.left && makeTerm(subtree.left),
     right: subtree.right && makeTerm(subtree.right),
   }))
@@ -57,14 +56,12 @@ function makeTerm(args: TermArgs): Term {
   if (args._objectType === 'Expr') {
     const exprArgs = args as ExprArgs
     return new Expr({
-      id: exprArgs.id,
       label: exprArgs.label,
       subterms: exprArgs.subterms.map(makeTerm),
     })
   } else if (args._objectType === 'VarRef') {
     const varArgs = args as VarArgs
     return new VarRef({
-      id: varArgs.id,
       label: varArgs.label,
     })
   } else {

@@ -1,7 +1,8 @@
+import { Node } from './Node'
 import { SourceRange } from './SourceRange'
 
 /// The abstract base class for all terms.
-export abstract class Term {
+export abstract class Term extends Node {
 
   /// This term's ID.
   ///
@@ -14,17 +15,13 @@ export abstract class Term {
   public readonly label: string
 
   /// This term's type, if defined.
-  public readonly type: Type
-
-  /// The range in the textual representation of the program that represents this node.
-  public readonly range: Optional<SourceRange>
-
-  _parent: Expr = null
+  public readonly type: Optional<Type>
 
   /// This term's parent, if any.
   public get parent(): Expr {
     return this._parent
   }
+  _parent: Expr = null
 
   /// This term's root.
   public get root(): Term {
@@ -42,11 +39,16 @@ export abstract class Term {
   /// A textual description of this term.
   public abstract get description(): string
 
-  protected constructor(id: string, label: string, type?: Type, range?: SourceRange) {
+  protected constructor({ range, id, label, type }: {
+    range?: SourceRange,
+    id: string,
+    label: string,
+    type?: Type,
+  }) {
+    super(range)
     this.id = id
     this.label = label
-    this.type = type
-    this.range = range || null
+    this.type = type || null
   }
 
   /// Returns whether this term is an ancestor of the given term.
@@ -98,17 +100,16 @@ export class Expr extends Term {
     return result
   }
 
-  public constructor(args: {
-    id?: string,
+  public constructor({ range, label, type, subterms }: {
+    range?: SourceRange,
     label: string,
     type?: Type,
-    subterms?: Term[],
-    range?: SourceRange,
+    subterms?: Array<Term>,
   }) {
-    const id = args.id || `expr/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    super(id, args.label, args.type, args.range)
+    const id = `Expr/${Math.random().toString(36).substr(2, 9)}-${label}`
+    super({ range, id, label, type })
 
-    this.subterms = args.subterms || []
+    this.subterms = subterms || []
     for (const subterm of this.subterms) {
       subterm._parent = this
     }
@@ -236,14 +237,13 @@ export class VarRef extends Term {
     return `$${this.label}`
   }
 
-  public constructor(args: {
-    id?: string,
+  public constructor({ range, label, type }: {
+    range?: SourceRange,
     label: string,
     type?: Type,
-    range?: SourceRange,
   }) {
-    const id = args.id || `var/${Math.random().toString(36).substr(2, 9)}-${args.label}`
-    super(id, args.label, args.type, args.range)
+    const id = `VarRef/${Math.random().toString(36).substr(2, 9)}-${label}`
+    super({ range, id, label, type })
   }
 
   public renamed(newLabel: string): Term {

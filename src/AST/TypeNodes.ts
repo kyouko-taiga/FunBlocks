@@ -1,58 +1,70 @@
+import { Node, NodeInterface } from './Node'
 import { SourceRange } from './SourceRange'
 
 /// A type signature.
-export interface TypeSign {
-
-  readonly range: Optional<SourceRange>
+export interface TypeSign extends NodeInterface {
 
 }
 
 /// A type reference signature.
 export interface TypeRef extends TypeSign {
 
-  readonly range: Optional<SourceRange>
-
 }
 
 /// The signature of an arrow type (i.e. a type of the form `A -> B`).
-export class ArrowTypeSign implements TypeSign {
+export class ArrowTypeSign extends Node implements TypeSign {
 
-  public readonly left: TypeSign
-  public readonly right: TypeSign
-  public readonly range: Optional<SourceRange>
+  /// This arrow type's domain.
+  readonly left: TypeSign
 
-  public constructor(args: { left: TypeSign, right: TypeSign, range?: SourceRange }) {
-    this.left = args.left
-    this.right = args.right
-    this.range = args.range || null
+  /// This arrow type's codomain.
+  readonly right: TypeSign
+
+  constructor({ range, left, right }: {
+    range?: SourceRange,
+    left: TypeSign,
+    right: TypeSign,
+  }) {
+    super(range)
+    this.left = left
+    this.right = right
   }
 
 }
 
 /// A reference to a type declaration.
-export class TypeDeclRef implements TypeRef {
+export class TypeDeclRef extends Node implements TypeRef {
 
-  public readonly name: string
-  public readonly arguments: Array<TypeRef>
-  public readonly range: Optional<SourceRange>
+  /// The name of the referred type.
+  readonly name: string
 
-  public constructor(args: { name: string, arguments: Array<TypeRef>, range?: SourceRange }) {
-    this.name = args.name
-    this.arguments = args.arguments
-    this.range = args.range || null
+  /// The type arguments used to specialize the referred type.
+  readonly arguments: Array<TypeRef>
+
+  constructor({ range, name, args }: {
+    range?: SourceRange,
+    name: string,
+    args?: Array<TypeRef>,
+  }) {
+    super(range)
+    this.name = name
+    this.arguments = args || []
   }
 
 }
 
 /// A reference to a type variable.
-export class TypeVarRef implements TypeRef {
+export class TypeVarRef extends Node implements TypeRef {
 
-  public readonly label: string
-  public readonly range: Optional<SourceRange>
+  /// This type variable's label.
+  readonly label: string
 
-  public constructor(args: { label: string, range?: SourceRange }) {
-    this.label = args.label
-    this.range = args.range || null
+  constructor({ range, label }: {
+    range?: SourceRange,
+    label: string,
+  }) {
+    super(range)
+    this.label = label
   }
 
 }
