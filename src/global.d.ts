@@ -1,5 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
-
 /// An optional value (i.e. a value of type `T` or `null`).
 type Optional<T> = T | null
 

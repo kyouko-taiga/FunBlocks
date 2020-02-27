@@ -13,7 +13,7 @@ describe("Lexer", () => {
 
     // token0 is the '\n' character
     const token0 = {
-      kind: 12, range: {
+      kind: 14, range: {
         lowerBound: { line: 1, column: 1, offset: 0 },
         upperBound: { line: 2, column: 1, offset: 1 }
       }
@@ -38,7 +38,7 @@ describe("Lexer", () => {
     expect(actual[2]).toEqual(token2);
     // token3 is '(' and it is Unrecognized 
     const token3 = {
-      kind: 14, range: {
+      kind: 12, range: {
         lowerBound: { line: 2, column: 14, offset: 14 },
         upperBound: { line: 2, column: 15, offset: 15 }
       }
@@ -70,7 +70,7 @@ describe("Lexer", () => {
     expect(actual[6]).toEqual(token6);
     // token7 is '(' and it is Unrecognized
     const token7 = {
-      kind: 14, range: {
+      kind: 12, range: {
         lowerBound: { line: 2, column: 22, offset: 22 },
         upperBound: { line: 2, column: 23, offset: 23 }
       }
@@ -101,6 +101,13 @@ describe("Lexer", () => {
     }
     expect(actual[10]).toEqual(token10);
     // token11 and token 12 are ')' : omitted
+    const token11 = {
+      kind: 13, range: {
+        lowerBound: { line: 2, column: 31, offset: 31 },
+        upperBound: { line: 2, column: 32, offset: 32 }
+      }
+    }
+    expect(actual[11]).toEqual(token11);
     // token 13 is the semicolon
     const token13 = {
       kind: 11, range: {
