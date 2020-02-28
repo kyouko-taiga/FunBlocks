@@ -119,7 +119,7 @@ export class Expr extends Term {
     type?: Type,
     subterms?: Array<Term>,
   }) {
-    const id = `Expr/${Math.random().toString(36).substr(2, 9)}-${label}`
+    const id = `Expr/${Math.random().toString(36).substr(2, 9)}`
     super({ range, id, label, type })
 
     this.subterms = subterms || []
@@ -251,7 +251,7 @@ export class VarRef extends Term {
     label: string,
     type?: Type,
   }) {
-    const id = `VarRef/${Math.random().toString(36).substr(2, 9)}-${label}`
+    const id = `VarRef/${Math.random().toString(36).substr(2, 9)}`
     super({ range, id, label, type })
   }
 

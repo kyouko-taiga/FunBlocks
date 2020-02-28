@@ -23,18 +23,18 @@ export abstract class Node implements NodeInterface {
 export abstract class ObservableNode extends Node {
 
   /// The observers subscribed to this node.
-  private observers: Array<(node: Node) => void>
+  private observers: Array<(node: ObservableNode) => void>
 
   protected constructor(range?: Optional<SourceRange>) {
     super(range)
     this.observers = []
   }
 
-  public subscribe(observer: ((node: Node) => void)) {
+  public subscribe(observer: ((node: ObservableNode) => void)) {
     this.observers.push(observer)
   }
 
-  public unsubscribe(observer: ((node: Node) => void)) {
+  public unsubscribe(observer: ((node: ObservableNode) => void)) {
     this.observers = this.observers.filter((obs) => observer !== obs)
   }
 

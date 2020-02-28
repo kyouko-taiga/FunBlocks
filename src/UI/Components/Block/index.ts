@@ -1,1 +1,3 @@
-export { default } from './RootBlock'
+import { TermViewRoot } from './TermViewRoot'
+
+export default TermViewRoot

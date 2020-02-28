@@ -19,7 +19,7 @@ function hueToRGB(p: number, q: number, t: number): number {
 }
 
 /// A color.
-class Color {
+export class Color {
 
   /// The hue value.
   public readonly h: number
@@ -116,5 +116,3 @@ class Color {
   public static orange  = Color.rgb(255, 152, 0)
 
 }
-
-export default Color

@@ -7,14 +7,14 @@ interface Observable {
 
 type RCT<Props> = React.ComponentType<Props>
 
-export const subscribe = <Subject extends Observable, ObservedProps extends object>(
+export const connectObservable = <Subject extends Observable, ObservedProps extends object>(
   subject: Subject,
   observe: ((subject: Subject) => ObservedProps)
 ) => {
   return <Props>(Component: RCT<Props & ObservedProps>): RCT<Omit<Props, keyof ObservedProps>> => {
     return class Subscribed extends React.Component<Props> {
 
-      static displayName = 'Subscribed' + Component.displayName
+      static displayName = 'Connected' + Component.displayName
 
       private observer: () => void
 
@@ -27,7 +27,7 @@ export const subscribe = <Subject extends Observable, ObservedProps extends obje
         subject.subscribe(this.observer)
       }
 
-      public componentWIllUnmount() {
+      public componentWillUnmount() {
         subject.unsubscribe(this.observer)
       }
 

@@ -3,7 +3,7 @@ import { AnyAction } from 'redux'
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/DraggedData'
 
 export type DraggedData = {
-  type: string,
+  type: Optional<string>,
   payload?: any,
   callbacks?: Dictionary<Function>,
 }

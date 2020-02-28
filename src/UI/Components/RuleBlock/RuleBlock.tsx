@@ -69,7 +69,7 @@ class RuleBlock extends React.Component<RuleBlockProps> {
 
   block(term: Term, onChange: (newTerm: Term) => void, allowsVariables: boolean): React.ReactNode {
     return term && (
-      <Block term={ term } editable={ this.props.editable } onChange={ onChange } />
+      <Block term={ term } editable={ this.props.editable } /* onChange={ onChange } */ />
     ) || this.props.editable && (
       <BlockPlaceholder onDrop={ onChange } allowsVariables={ allowsVariables } />
     ) || <FontAwesomeIcon icon="ban" size="lg" />

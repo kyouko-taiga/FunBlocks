@@ -1,17 +1,41 @@
 import { Diagnostic } from './Diagnostic'
-import { Node } from './Node'
+import { Node, ObservableNode } from './Node'
 import { SourceRange } from './SourceRange'
 import { Term } from './TermNodes'
 import { TypeRef, TypeSign, TypeVarRef } from './TypeNodes'
 
 /// A translation unit declaration.
-export class TranslationUnitDecl extends Node {
+export class TranslationUnitDecl extends ObservableNode {
 
   /// The top-level declarations of this translation unit.
-  readonly decls: Array<TopLevelDecl>
+  public get decls(): Array<TopLevelDecl> {
+    const decls = [ ...this._decls ]
+    Object.freeze(decls)
+    return decls
+  }
+
+  /// Sets the top-level declarations of this translation unit and notifies all observers.
+  public set decls(newValue: Array<TopLevelDecl>) {
+    this._decls = newValue
+    this.notify()
+  }
+
+  private _decls: Array<TopLevelDecl>
 
   /// The diagnostics of this translation unit.
-  readonly diagnostics: Array<Diagnostic>
+  public get diagnostics(): Array<Diagnostic> {
+    const diagnostics = [ ...this._diagnostics ]
+    Object.freeze(diagnostics)
+    return diagnostics
+  }
+
+  /// Sets the diagnostics of this translation unit and notifies all observers.
+  public set diagnostics(newValue: Array<Diagnostic>) {
+    this._diagnostics = newValue
+    this.notify()
+  }
+
+  private _diagnostics: Array<Diagnostic>
 
   constructor({ range, decls, diagnostics }: {
     range?: SourceRange,
@@ -19,8 +43,17 @@ export class TranslationUnitDecl extends Node {
     diagnostics?: Array<Diagnostic>,
   }) {
     super(range)
-    this.decls = decls || []
-    this.diagnostics = diagnostics || []
+    this._decls = decls || []
+    this._diagnostics = diagnostics || []
+  }
+
+  /// Inserts a top-level declaration in this translation unit.
+  insertDecl(decl: TopLevelDecl) {
+    // Make sure that the declaration does not already belong to this translation unit.
+    if (this._decls.indexOf(decl) == -1) {
+      this._decls.push(decl)
+      this.notify()
+    }
   }
 
 }

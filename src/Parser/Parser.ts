@@ -665,13 +665,13 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
     }
   }
 
-  return {
+  return new AST.TranslationUnitDecl({
     diagnostics: diags,
     decls: decls,
     range: {
       lowerBound: tokens[0].range.lowerBound,
       upperBound: tokens[input.length - 1].range.upperBound,
     },
-  }
+  })
 
 }

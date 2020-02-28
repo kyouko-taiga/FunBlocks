@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Color from 'FunBlocks/UI/Utils/Color'
+import { Color } from 'FunBlocks/UI/Utils/Color'
 
 class SVGTerm extends React.PureComponent {
 
