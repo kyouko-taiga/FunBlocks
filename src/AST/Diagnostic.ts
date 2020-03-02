@@ -7,6 +7,6 @@ export interface Diagnostic {
   readonly message: string
 
   /// The source range related to this diagnostic.
-  readonly range: AST.SourceRange
+  readonly range: SourceRange
 
 }
