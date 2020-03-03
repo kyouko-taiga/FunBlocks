@@ -664,13 +664,14 @@ export const parse = (input: string): AST.TranslationUnitDecl => {
       }
     }
   }
-
+  
   return {
     diagnostics: diags,
     decls: decls,
     range: {
       lowerBound: tokens[0].range.lowerBound,
-      upperBound: tokens[input.length - 1].range.upperBound,
+      // upperBound: tokens[input.length - 1].range.upperBound,
+      upperBound: tokens[tokens.length - 1].range.upperBound,
     },
   }
 

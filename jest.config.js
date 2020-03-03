@@ -1,7 +1,7 @@
 module.exports = {
     // The root of your source code, typically /src
     // `<rootDir>` is a token Jest substitutes
-    // I put the root of the test code, since we will have all tests there.
+    // MY-CUSTOM: I put the root of the test code, since we will have all tests there.
     roots: ["<rootDir>/test"],
   
     // Jest transformations -- this adds support for TypeScript
@@ -9,6 +9,14 @@ module.exports = {
     transform: {
       "^.+\\.tsx?$": "ts-jest"
     },
+
+    moduleNameMapper: {
+      '^FunBlocks/(.*)$' : "<rootDir>/src/$1"
+    },
+
+    preset: 'ts-jest/presets/js-with-babel',
+
+    moduleDirectories: ['node_modules', 'src'],
   
     // Runs special logic, such as cleaning up components
     // when using React Testing Library and adds special

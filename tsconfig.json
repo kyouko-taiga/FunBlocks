@@ -13,7 +13,7 @@
     "noImplicitAny": true,
     "outDir": "./dist/build/",
     "paths": {
-      "FunBlocks/*": ["./*"]
+      "FunBlocks/*": ["./*"],
     },
     "removeComments": false,
     "skipLibCheck": true,
