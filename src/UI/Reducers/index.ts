@@ -7,6 +7,8 @@ import { editContext } from './Contexts/EditContext'
 import { runContext } from './Contexts/RunContext'
 import { draggedData } from './DraggedData'
 import { program } from './Program'
+import * as AST from 'FunBlocks/AST'
+import * as funview from 'FunBlocks/FUNVIEW'
 
 /// An enumeration of the workspaces of the IDE.
 export enum IDEWorkspace { Edit, Debug, Run }
@@ -52,6 +54,32 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
     let initialContext: Dictionary = {}
     switch (newWorkspace) {
     case IDEWorkspace.Debug:
+      let canvas = new funview.DrawingCanvas
+      canvas.clearCanvas()
+      
+      let Root = newState.program.initialState as AST.Expr
+      let couleur1 = new AST.Expr({label: 'Bleu'})
+      let couleur2 = new AST.Expr({label: 'Rouge'})
+      let couleur3 = new AST.Expr({label: 'Jaune'})
+      let couleur4 = new AST.Expr({label: 'Vert'})
+
+      let forme1 = new AST.Expr({label: 'Carre'})
+      let forme2 = new AST.Expr({label: 'Rond'})
+      let forme3 = new AST.Expr({label: 'Triangle'})
+
+      let Shape1 = new AST.Expr({label: 'Shape', subterms: [forme1, couleur1]})
+      let Shape2 = new AST.Expr({label: 'Shape', subterms: [forme2, couleur2]})
+      let Shape3 = new AST.Expr({label: 'Shape', subterms: [forme3, couleur3]})
+      let Shape4 = new AST.Expr({label: 'empty', subterms: [forme1, couleur4]})
+
+      let func1 = new AST.Expr({label: 'cons', subterms: [Shape1, Shape2]})
+      let func2 = new AST.Expr({label: 'cons', subterms: [Shape3, Shape4]})
+
+      //let Root = new AST.Expr({label: 'cons', subterms: [func1, func2]})
+
+
+      let drawing = new funview.DrawnState
+      drawing.explore(Root)
       initialContext = { selectedRuleID: null }
       if (state.program.initialState !== null) {
         initialContext.history = [state.program.initialState]

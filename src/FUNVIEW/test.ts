@@ -1,52 +1,15 @@
- import * as AST from 'FunBlocks/AST'
-/*
-/// The abstract base class for all terms.
-abstract class Term {
+import * as AST from 'FunBlocks/AST'
 
-  /// This term's label.
-  public readonly label: string
-
-  protected constructor(label: string) {
-
-    this.label = label
-
-  }
-
-  _parent: Expr = null
-
-  /// This term's parent, if any.
-  public get parent(): Expr {
-    return this._parent
-  }
-
-}
-
-/// An expression.
-class Expr extends Term {
-
-    /// The subterms of this expression.
-    public readonly subterms: Array<Term>
-
-    public constructor(args: {
-        label: string,
-        subterms?: Term[],
-      }) {
-        super(args.label)
-    
-        this.subterms = args.subterms || []
-        for (const subterm of this.subterms) {
-          subterm._parent = this
-        }
-      }
-}  
-*/
-
-class DrawingCanvas {
+export class DrawingCanvas {
  
     private canvas: HTMLCanvasElement;
     private context: CanvasRenderingContext2D;
     private posX: number
     private posY: number
+
+    public clearCanvas(){
+        this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
+    }
 
     public Y(i?: number){
         if (i==-1){
@@ -75,7 +38,14 @@ class DrawingCanvas {
     }
 
     public draw(Shape: string) {
-        if (Shape == 'Carre'){
+        if (Shape == 'no Expr'){
+            this.context.font = "30px Arial";
+            this.context.fillText("No Expression to draw", 10, 50)
+        }else if (Shape == 'empty'){
+            this.context.font = "50px Arial";
+            this.context.fillStyle ="black";
+            this.context.fillText("[]", this.posX, this.posY+37)
+        }else if (Shape == 'Carre'){
             this.context.beginPath();
             this.context.rect(this.posX, this.posY, 50, 50);
         }else if (Shape == 'Rond'){
@@ -115,6 +85,9 @@ class DrawingCanvas {
         }else if(Color == 'Vert') {
             this.context.fillStyle = "green"
             this.context.fill();
+        }else if (Color == 'Noir') {
+            this.context.fillStyle = "black"
+            this.context.fill();
         }
     }
 
@@ -131,90 +104,78 @@ class DrawingCanvas {
 
 
 
-class Main {
+export class DrawnState {
+
+    drawing = new DrawingCanvas();
 
     public explore(Ex: AST.Expr){
-        console.log('branche : ', Ex.label)
-        let label = Ex.label
-        if (label == 'Carre'){
-            drawing.draw(label)
-        }
-        if (label == 'Rond'){
-            drawing.draw(label)
-        }
-        if (label == 'Triangle'){
-            drawing.draw(label)
-        }
-        if (label == 'Bleu'){
-            drawing.paint(label)
-        }
-        if (label == 'Rouge'){
-            drawing.paint(label)
-        }
-        if (label == 'Jaune'){
-            drawing.paint(label)
-        }
-        if (label == 'Vert'){
-            drawing.paint(label)
-        }
-        
-        if (label == 'Shape'){
-            this.explore(Ex.subterms[0] as AST.Expr)
-            this.explore(Ex.subterms[1] as AST.Expr)
-        }
-        if (label == 'over'){
-            this.explore(Ex.subterms[0] as AST.Expr)
-            drawing.Y()
-            this.explore(Ex.subterms[1] as AST.Expr)
-            drawing.Y(-1)
-        }
-        if (label == 'under'){
-            this.explore(Ex.subterms[1] as AST.Expr)
-            drawing.Y()
-            this.explore(Ex.subterms[0] as AST.Expr)
-            drawing.Y(-1)
-        }
+        console.log('branche : ', Ex)
+        if (Ex == null){
+            this.drawing.draw('no Expr')
+        }else{
+            console.log('branche : ', Ex.label)
+            let label = Ex.label
+            if (label == 'Carre'){
+                this.drawing.draw(label)
+            }
+            if (label == 'Rond'){
+                this.drawing.draw(label)
+            }
+            if (label == 'Triangle'){
+                this.drawing.draw(label)
+            }
+            if (label == 'Bleu'){
+                this.drawing.paint(label)
+            }
+            if (label == 'Rouge'){
+                this.drawing.paint(label)
+            }
+            if (label == 'Jaune'){
+                this.drawing.paint(label)
+            }
+            if (label == 'Vert'){
+                this.drawing.paint(label)
+            }
+            
+            if (label == 'Shape'){
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.explore(Ex.subterms[1] as AST.Expr)
+            }
+            if (label == 'over'){
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.drawing.Y()
+                this.explore(Ex.subterms[1] as AST.Expr)
+                this.drawing.Y(-1)
+            }
+            if (label == 'under'){
+                this.explore(Ex.subterms[1] as AST.Expr)
+                this.drawing.Y()
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.drawing.Y(-1)
+            }
 
-        if (label == 'rightof'){
-            this.explore(Ex.subterms[1] as AST.Expr)
-            drawing.X()
-            this.explore(Ex.subterms[0] as AST.Expr)
-            drawing.X(-1)
-        }
-        if (label == 'leftof'){
-            this.explore(Ex.subterms[0] as AST.Expr)
-            drawing.X()
-            this.explore(Ex.subterms[1] as AST.Expr)
-            drawing.X(-1)
-        }
-        
+            if (label == 'rightof'){
+                this.explore(Ex.subterms[1] as AST.Expr)
+                this.drawing.X()
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.drawing.X(-1)
+            }
+            if (label == 'leftof'){
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.drawing.X()
+                this.explore(Ex.subterms[1] as AST.Expr)
+                this.drawing.X(-1)
+            }
+            if (label == 'cons'){
+                this.explore(Ex.subterms[0] as AST.Expr)
+                this.drawing.X()
+                this.explore(Ex.subterms[1] as AST.Expr)
+                
+            }
+            if (label == 'empty'){
+                this.drawing.draw('empty')
+                
+            }
+        }   
     }
 }
-
-
-
-
-let couleur1 = new AST.Expr({label: 'Bleu'})
-let couleur2 = new AST.Expr({label: 'Rouge'})
-let couleur3 = new AST.Expr({label: 'Jaune'})
-let couleur4 = new AST.Expr({label: 'Vert'})
-
-let forme1 = new AST.Expr({label: 'Carre'})
-let forme2 = new AST.Expr({label: 'Rond'})
-let forme3 = new AST.Expr({label: 'Triangle'})
-
-let Shape1 = new AST.Expr({label: 'Shape', subterms: [forme1, couleur1]})
-let Shape2 = new AST.Expr({label: 'Shape', subterms: [forme2, couleur2]})
-let Shape3 = new AST.Expr({label: 'Shape', subterms: [forme3, couleur3]})
-let Shape4 = new AST.Expr({label: 'Shape', subterms: [forme1, couleur4]})
-
-let func1 = new AST.Expr({label: 'leftof', subterms: [Shape1, Shape2]})
-let func2 = new AST.Expr({label: 'leftof', subterms: [Shape3, Shape4]})
-
-let Root = new AST.Expr({label: 'over', subterms: [func1, func2]})
-
-let drawing = new DrawingCanvas();
-let test = new Main
-test.explore(Root)
-
-

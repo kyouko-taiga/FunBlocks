@@ -1,5 +1,6 @@
 import { AnyAction, combineReducers } from 'redux'
 
+import * as funview from 'FunBlocks/FUNVIEW'
 import * as AST from 'FunBlocks/AST'
 import { parse, ParseIssue } from 'FunBlocks/Parser/Parser'
 import { unparse } from 'FunBlocks/Parser/Unparser'
