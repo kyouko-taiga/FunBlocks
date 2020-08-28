@@ -15,10 +15,11 @@ export const debugContext = (state: DebugContext, action: AnyAction): DebugConte
   case ACTION_TYPES.PUSH_STATE: {
     // Keep the history up to the current index and append the new state.
     const { history, historyIndex, ...rest } = state
+    
     let canvas = new funview.DrawingCanvas
     canvas.clearCanvas()
-    let drawing = new funview.DrawnState
-    drawing.explore(action.payload as AST.Expr)
+    let parser = new funview.Parser
+    parser.explore(action.payload as AST.Expr)
 
     return {
       ...rest,
@@ -33,8 +34,9 @@ export const debugContext = (state: DebugContext, action: AnyAction): DebugConte
   case ACTION_TYPES.SET_HISTORY_INDEX: {
     let canvas = new funview.DrawingCanvas
     canvas.clearCanvas()
-    let drawing = new funview.DrawnState
-    drawing.explore(state.history[action.payload] as AST.Expr)
+    let parser = new funview.Parser
+    // we want the state with historyIndex as index
+    parser.explore(state.history[action.payload] as AST.Expr)
     return { ...state, historyIndex: action.payload }
   }
 
