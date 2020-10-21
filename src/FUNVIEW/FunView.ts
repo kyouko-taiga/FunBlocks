@@ -200,21 +200,7 @@ export class Parser {
                 
             }
 
-            // Handle the function Offset, Offset( X, Y), used in Draw function primarly. It only change the PosX or PosY given X and Y
-            if (label == 'Offset'){
-                let l = Ex.subterms.length
-                let coord = Ex.subterms
-                if (!(l==2)){
-                    this.drawing.draw("ErrorOs")
-                    
-                }else if(isNaN(Number(coord[0].label)) || isNaN(Number(coord[1].label))){
-                    this.drawing.draw("ErrorNaN")
-                }else{
-                    // convert label to number and suppress the -. the negative values are handled in the function Draw
-                    this.drawing.X(Math.abs(Number(coord[0].label)))
-                    this.drawing.Y(Math.abs(Number(coord[1].label)))
-                }
-            }
+
 
             
             // Handle the function Group, Group(Forms(Shape(...),...), Pos(X,Y,...)). 
@@ -245,6 +231,22 @@ export class Parser {
                 
             }
 
+            // Handle the function Offset, Offset( X, Y), used in Draw function primarly. It only change the PosX or PosY given X and Y
+            if (label == 'Offset'){
+                let l = Ex.subterms.length
+                let coord = Ex.subterms
+                if (!(l==2)){
+                    this.drawing.draw("ErrorOs")
+                    
+                }else if(isNaN(Number(coord[0].label)) || isNaN(Number(coord[1].label))){
+                    this.drawing.draw("ErrorNaN")
+                }else {
+                    // convert label to number and suppress the -. the negative values are handled in the function Draw
+                    this.drawing.X(Math.abs(Number(coord[0].label)))
+                    this.drawing.Y(Math.abs(Number(coord[1].label)))
+                }
+            }
+
             // Handle the function Draw, Draw( Expr, Expr, Offset(X,Y)). Expr can be a function or a Shape. As such we can create a lot of rafinated structure. 
             if (label == 'Draw'){
                 let l = Ex.subterms.length
@@ -252,16 +254,44 @@ export class Parser {
                     this.drawing.draw("ErrorDr")
                 }else{
                     let offset = Ex.subterms[2] as AST.Expr
-                    // Here we handle the negative value present in the function Offset. It allows us to draw a term before another if you want to place them over or on the left. Graphicaly having an negativ Offset is the same as having a positiv Offset while interverting the two expressions.
-                    if (Number(offset.subterms[0].label) > 0 || Number(offset.subterms[1].label) > 0){
-                        this.explore(Ex.subterms[1] as AST.Expr)
-                        this.explore(offset)
-                        this.explore(Ex.subterms[0] as AST.Expr)
+                    let x = Number(offset.subterms[0].label)
+                    let y = Number(offset.subterms[1].label)
+                    // here we have the different situation when x or y are < 0. 
+                    // x is found in offset.subterms[0].label and y in offset.subterms[1].label
+                    if (Number(offset.subterms[0].label) < 0 ){
+                        if(Number(offset.subterms[1].label) < 0){
+                            this.drawing.Y(-y)
+                            this.explore(Ex.subterms[1] as AST.Expr)
+                            this.drawing.Y(y)
+                            this.drawing.X(-x)
+                            this.explore(Ex.subterms[0] as AST.Expr)
+                            this.drawing.X(x)
+                        }else{
+                            this.explore(Ex.subterms[1] as AST.Expr)
+                            this.drawing.Y(y)
+                            this.drawing.X(-x)
+                            this.explore(Ex.subterms[0] as AST.Expr)
+                            this.drawing.Y(-y)
+                            this.drawing.X(x)
+                        }   
                     }else{
-                    this.explore(Ex.subterms[0] as AST.Expr)
-                    this.explore(offset)
-                    this.explore(Ex.subterms[1] as AST.Expr)
+                        if(Number(offset.subterms[1].label) < 0){
+                            this.explore(Ex.subterms[0] as AST.Expr)
+                            this.drawing.Y(-y)
+                            this.drawing.X(x)
+                            this.explore(Ex.subterms[1] as AST.Expr)
+                            this.drawing.Y(y)
+                            this.drawing.X(-x)
+                        }else{
+                            this.drawing.Y(y)
+                            this.explore(Ex.subterms[0] as AST.Expr)
+                            this.drawing.Y(-y)
+                            this.drawing.X(x)
+                            this.explore(Ex.subterms[1] as AST.Expr)
+                            this.drawing.X(-x)
+                        } 
                     }
+                    
                 }
             }
 
