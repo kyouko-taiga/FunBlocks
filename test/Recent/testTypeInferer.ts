@@ -42,36 +42,36 @@ const stringifyRuleCaseTypes = (label : string, types : Array<AST.TypeRef>) : st
 
 
 describe("TypeInferer", () =>{
-//   test("1. ajoute to list, no rule references", () => {
-//
-//     // const programInput = `
-//     // type List $T :: empty | cons $T (List $T)
-//     //
-//     // case ajoute($x, cons($y, $tail)) => cons($y, ajoute($x, $tail))`;
-//
-//     // const programInput = `
-//     // type List $T :: empty | cons $T (List $T)
-//     //
-//     // case ajoute($x, cons($y, $tail)) => empty`;
-//
-//     const programInput = `
-//     type List $T :: empty | cons $T (List $T)
-//     rule ajoute $T :: $T -> List $T => List $T
-//     case ajoute($x, cons($y, $tail)) => cons($y, $tail)`;
-//
-//     const inputAST = parse(programInput);
-//     const typeInfo : TypeInfo = recordTypes(inputAST);
-//     const typeInformation : Dictionary<Array<AST.TypeRef>> = typeInfo.ruleTypes;
-//
-//     const actual0 = stringifyRuleCaseTypes('ajoute', typeInformation['ajoute']);
-//     console.log(actual0);
-//     const expected0 = 'ajoute ($A) (List $B)(List $C)';
-// // ajoute $T0 $B (List $T2 )
-//     //const ruleCaseDecl = inputAST.decls[1] as AST.RuleCaseDecl;
-//
-//     //console.log(ruleCaseDecl.left);
-//   }),
-//
+  test("ajoute to list, no rule references", () => {
+
+    // const programInput = `
+    // type List $T :: empty | cons $T (List $T)
+    //
+    // case ajoute($x, cons($y, $tail)) => cons($y, ajoute($x, $tail))`;
+
+    // const programInput = `
+    // type List $T :: empty | cons $T (List $T)
+    //
+    // case ajoute($x, cons($y, $tail)) => empty`;
+
+    const programInput = `
+    type List $T :: empty | cons $T (List $T)
+    rule ajoute $T :: $T -> List $T => List $T
+    case ajoute($x, cons($y, $tail)) => cons($y, $tail)`;
+
+    const inputAST = parse(programInput);
+    const typeInfo : TypeInfo = recordTypes(inputAST);
+    const typeInformation : Dictionary<Array<AST.TypeRef>> = typeInfo.ruleTypes;
+
+    const actual = stringifyRuleCaseTypes('ajoute', typeInformation['ajoute']);
+    console.log(actual);
+    const expected = 'ajoute ($A) (List $B)(List $C)';
+// ajoute $T0 $B (List $T2 )
+    //const ruleCaseDecl = inputAST.decls[1] as AST.RuleCaseDecl;
+
+    //console.log(ruleCaseDecl.left);
+  });
+
 
 
 // test("ajoute to list, no rule reference", () => {
@@ -151,6 +151,27 @@ describe("TypeInferer", () =>{
       const programInput = `
       type List $T :: empty | cons $T (List $T)
       case ajoute($x, cons($y, $tail)) => sth($y, cons($x, $tail))
+      case ajoute($x, empty) => cons($x, empty)
+      case sth($x, cons($y, $tail)) => ajoute($y, empty)`;
+
+      const inputAST = parse(programInput);
+
+      const typeInfo : TypeInfo = recordTypes(inputAST);
+      const typeInformation : Dictionary<Array<AST.TypeRef>> = typeInfo.ruleTypes;
+
+      const ajoute = stringifyRuleCaseTypes('ajoute', typeInformation['ajoute']);
+      const sth = stringifyRuleCaseTypes('sth', typeInformation['sth']);
+      console.log(ajoute);
+      console.log(sth);
+      const expected = 'ajoute ($A) (List $B)(List $C)';
+
+    });
+
+    test("rule references with type undefined", () => {
+
+      const programInput = `
+      type List $T :: empty | cons $T (List $T)
+      case ajoute($x, cons($y, $tail)) => sth($y, cons($x))
       case ajoute($x, empty) => cons($x, empty)
       case sth($x, cons($y, $tail)) => ajoute($y, empty)`;
 

@@ -93,10 +93,6 @@ const deep = <T>(target: T): T => {
 };
 
 
-const DEBUG : number = 1;
-
-
-
 /**
  * Records types found in AST.
  * @param input The output of parsing, i.e. an array of declarations
@@ -165,7 +161,6 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
     // store the types found for the case
     typeInfo.casesTypes.set(ruleCase, typeOfCase(ruleCase, typeInfo));
 
-
   }
 
   // basically, we should first infer types of untyped rules, so that their types are known
@@ -227,6 +222,9 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
       if(typeInfo.ruleTypes[ruleName] != null && typeInfo.ruleTypes[ruleName].length != caseTypes.length){
         console.log(`Rule case at ${nodeDiagnostic(caseDecl)} has a different number of arguments than the one expected.`);
         continue;
+      } else if (typeInfo.ruleTypes[ruleName] == null){
+        // initialize ruée types array
+        typeInfo.ruleTypes[ruleName] = new Array<AST.TypeRef>(caseTypes.length);
       }
 
       const caseTypeAssignments = new Map<AST.TypeRef, AST.TypeRef>();
@@ -242,12 +240,10 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
         if( isUndefined(caseTypes[i]) ){
 
           // find the term corresponding to i
-          let term : AST.Expr = null
-          if(i == (caseTypes.length -1) ) {
-            term = caseDecl.right as AST.Expr;
-          } else{
-            term = leftTerm.subterms[i] as AST.Expr;
-          }
+          //
+          const term = i == (caseTypes.length - 1)  ?
+            caseDecl.right as AST.Expr :
+            leftTerm.subterms[i] as AST.Expr;
 
           const ruleReferenceName : string = term.label;
           // if term is a rule reference
@@ -296,8 +292,7 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
           // if it is not a rule reference,
           // then a type error was found in the caseType
           else {
-            // set this type to undefined
-            argTypes[i] = caseTypes[i];
+            // keep this type to undefined
             continue;
           }
 
@@ -305,7 +300,7 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
 
         // if rule is untyped, infer its type
         if( ! typeInfo.typedRules.has(ruleName) ){
-          argTypes[i] = findCommonSuperType(caseTypes[i], argTypes[i], caseTypeAssignments, ruleTypeAssignments, typeInfo);
+          typeInfo.ruleTypes[ruleName][i] = findCommonSuperType(caseTypes[i], typeInfo.ruleTypes[ruleName][i], caseTypeAssignments, ruleTypeAssignments, typeInfo);
         }
         // if rule is typed, match it to declared type
         else {
@@ -316,10 +311,6 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
             continue;
           }
         }
-      }
-
-      if( ! typeInfo.typedRules.has(ruleName) ){
-        typeInfo.ruleTypes[ruleName] = argTypes;
       }
 
     }
@@ -355,7 +346,10 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
         continue;
       }
     }
+  }
 
+  for(let termid in typeInfo.termToType){
+    typeInfo.termToType[termid] = getCurrentTypeOfTypeRef(typeInfo.termToType[termid], typeInfo);
   }
 
   return typeInfo;
@@ -363,33 +357,24 @@ export const recordTypes = (input: AST.TranslationUnitDecl): TypeInfo => {
 
 
 
-
 const isUndefined = (type : AST.TypeRef) : boolean => {
-  // return (type instanceof AST.TypeVarRef && (type as AST.TypeVarRef).label == 'undefined' ) ? true : false ;
   return (type == null) ? true : false ;
 }
 
-const setUndefined = (type : AST.TypeRef) : AST.TypeRef => {
-  // return new AST.TypeVarRef({ label : 'undefined' });
-  return null;
-}
+const setUndefined = () : AST.TypeRef => { return null; }
 
 
-const flattenArrowType = (typeSign: AST.TypeSign, array?: Array<AST.TypeRef> ): Array<AST.TypeRef> => {
-  // the first time that it is called has to init the array
-  if(array == null){
-    array = new Array<AST.TypeRef>();
-  }
+
+const flattenArrowType = (typeSign: AST.TypeSign): Array<AST.TypeRef> => {
+
   // if typeSign is a type reference, push it to array and return;
   if( ! (typeSign instanceof AST.ArrowTypeSign) ){
-      array.push(typeSign);
-      return  array;
+      return [typeSign];
   }
   // else, call the function for left and right parts
-  flattenArrowType((<AST.ArrowTypeSign> typeSign).left, array );
-  flattenArrowType((<AST.ArrowTypeSign> typeSign).right, array);
-
-  return array;
+  else {
+    return [...flattenArrowType((<AST.ArrowTypeSign> typeSign).left), ...flattenArrowType((<AST.ArrowTypeSign> typeSign).right)];
+  }
 }
 
 // return the wider type
@@ -449,7 +434,6 @@ const findCommonSuperType = (caseType: AST.TypeRef, ruleType: AST.TypeRef,
   if( ruleType == null) {
     return deep<AST.TypeRef>(caseType);
   }
-
   // check if types are equal
   if(typesEqual(caseType, ruleType)){
     return ruleType;
@@ -510,14 +494,15 @@ const findCommonSuperType = (caseType: AST.TypeRef, ruleType: AST.TypeRef,
 
 
 const renameType = (type : AST.TypeRef, typeAssignments: Map<AST.TypeRef, AST.TypeRef>, namespace: Namespace) :AST.TypeRef =>{
+
   if(typeAssignments.has(type)){
     return typeAssignments.get(type);
   }
 
   if(type instanceof AST.TypeDeclRef){
     for( let i in (type as AST.TypeDeclRef).arguments){
-      let typeArg = (type as AST.TypeDeclRef).arguments[i];
-      (type as AST.TypeDeclRef).arguments[i] = renameType(typeArg, typeAssignments, namespace);
+      let typeArg = (<AST.TypeDeclRef> type).arguments[i];
+      (<AST.TypeDeclRef> type).arguments[i] = renameType(typeArg, typeAssignments, namespace);
     }
   }
 
@@ -569,27 +554,17 @@ const typeOfCase = (ruleCase: AST.RuleCaseDecl, typeInfo: TypeInfo ): Array<AST.
   // reset the types of variables
   typeInfo.varToType = {};
 
-  // check if the rule is typed, to pass the types for check
-  const expectedTypes : Array<AST.TypeRef> = (ruleCase.id in typeInfo.typedRules) ?
-          typeInfo.ruleTypes[ruleCase.id] : null;
-
-  if(expectedTypes != null && left.subterms.length != expectedTypes.length - 1) {// -1 is to exempt the return type
-      console.log('The number of parameters of the rule case is not correct.')
-  }
-
   // for all the subterms of the expression (which are the parameters of the rule)
   for(let i in left.subterms){
-    const expectedType = (expectedTypes == null) ? null : expectedTypes[i];
+    // const expectedType = (expectedTypes == null) ? null : expectedTypes[i];
     // infer the type of the subterm
-    const returnedType = matchTerm(left.subterms[i], ruleCase, expectedType, typeInfo);
+    const returnedType = matchTerm(left.subterms[i], ruleCase, null, typeInfo);
     // save the mapping of the term to the inferred type
     typesList.push(returnedType);
   }
 
-
-  const expectedType = (expectedTypes == null) ? null : expectedTypes[expectedTypes.length-1];
   // infer the type of the right term of the rule case (which is the return of the rule)
-  const returnedType = matchTerm(right, ruleCase, expectedType, typeInfo);
+  const returnedType = matchTerm(right, ruleCase, null, typeInfo);
   // save the mapping of the term to the inferred type
   typesList.push(returnedType);
 
@@ -598,10 +573,6 @@ const typeOfCase = (ruleCase: AST.RuleCaseDecl, typeInfo: TypeInfo ): Array<AST.
     // if the inferred type was null, i.e. the type 'any'
     if(typesList[i]==null){
         // // assign undefined as the type of the term
-        // typesList[i]= new AST.TypeVarRef({
-        //   // TODO: make sure this letter does not collide with an explicit typeVarRef
-        //   label: 'undefined'
-        // });
     } else{
       typesList[i] = getCurrentTypeOfTypeRef(typesList[i], typeInfo);
     }
@@ -622,9 +593,8 @@ const renameTypeVar = (arg: AST.TypeRef, typeInfo: TypeInfo, renameDict: Diction
     const subargs : Array<AST.TypeRef> = (<AST.TypeDeclRef> arg).arguments
     for (let i in subargs ){
       const newType = renameTypeVar(subargs[i], typeInfo, renameDict);
-      if (newType!=null){
-        subargs[i] = newType;
-      }
+      subargs[i] = newType || subargs[i];
+
     }
   }
   return null;
@@ -654,37 +624,6 @@ const typeRefFromDecl = (decl : AST.TypeDecl, typeInfo : TypeInfo, renameDict : 
 
 }
 
-// return the wider type
-const matchToSupertype2 = (type1Arg : AST.TypeRef, type2Arg : AST.TypeRef, typeInfo: TypeInfo, returnNewType1 : boolean = false) : AST.TypeRef =>{
-  const type1 = getCurrentTypeOfTypeVar(type1Arg, typeInfo);
-  const type2 = getCurrentTypeOfTypeVar(type2Arg, typeInfo);
-
-  if(type2 instanceof AST.TypeVarRef){
-    // do nothing
-  }
-  // if the term type is variable, it has to be degraded to type2
-  else if(type1 instanceof AST.TypeVarRef && type2 instanceof AST.TypeDeclRef){
-    assignType(type1, type2, typeInfo);
-  }
-  // if both are type declarations
-  else {
-    const typeDecl1 : AST.TypeDeclRef = type1 as AST.TypeDeclRef;
-    const typeDecl2 : AST.TypeDeclRef = type2 as AST.TypeDeclRef;
-    if(typeDecl1.name != typeDecl1.name || typeDecl1.arguments.length != typeDecl2.arguments.length){
-      return null;
-    }
-    for (let i in typeDecl2.arguments){
-      if(matchToSupertype2(typeDecl1.arguments[i], typeDecl2.arguments[i], typeInfo) == null){
-        return null;
-      }
-
-    }
-
-  }
-
-  return (returnNewType1) ? type1 : type2 ;
-}
-
 
 /**
  * This function is called to infer the type of Expr terms.
@@ -705,14 +644,10 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
     typeInfo.ruleReferences.add(term);
   }
 
-
   // if the term is a rule reference and it's top level term in the case (i.e. only then typeRef == null)
   if( isRuleReference && typeRef == null){
       // fill argTypes
       argTypes = new Array<AST.TypeRef>(term.subterms.length);
-      for(let i in term.subterms){
-        argTypes[i] = null;
-      }
 
       // if term refers to an untyped rule
       if(!typeInfo.typedRules.has(term.label)){
@@ -762,9 +697,7 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
           // rename any variables present in the types of children, based on the map
           for(let i in argTypes) {
             const newType : AST.TypeRef = renameTypeVar(argTypes[i], typeInfo, renameDict);
-            if(newType != null){
-              argTypes[i] = newType;
-            }
+            argTypes[i] = newType || argTypes[i];
 
           }
         }
@@ -793,8 +726,8 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
       typeInfo.ruleReferences.has(term.subterms[i] as AST.Expr) ){
         // do nothing, subterm's type is pending
     } else if (isUndefined(subtermType)){
-      console.log(`Term at ${nodeDiagnostic(term)} is of type undefined, since its subterm ${(i+1)} did not match the expected type.`);
-      foundType = setUndefined(term);
+      console.log(`Term at ${nodeDiagnostic(term)} is of type undefined, since its subterm at ${nodeDiagnostic(term.subterms[i])} did not match the expected type.`);
+      foundType = setUndefined();
     }
   }
 
@@ -842,9 +775,7 @@ const getCurrentTypeOfTypeRef = (type: AST.TypeRef, typeInfo: TypeInfo) : AST.Ty
     for(let i in subterms ){
       const current = getCurrentTypeOfTypeRef(subterms[i], typeInfo);
 
-      if(current != null && current != subterms[i]){
-        subterms[i] = current;
-      }
+      subterms[i] = current || subterms[i];
     }
     return type;
   }
@@ -858,7 +789,9 @@ const getCurrentTypeOfTypeVar = (type: AST.TypeRef, typeInfo: TypeInfo) : AST.Ty
     // if current is a non-variableType
     if(current instanceof AST.TypeDeclRef){
       break;
-    } else {
+    }
+    // if current is a type variable
+    else {
       // if current has a descendant type
       if ((<AST.TypeVarRef> current).label in typeInfo.typeVarToType){
         current = typeInfo.typeVarToType[(<AST.TypeVarRef> current).label];
@@ -983,7 +916,7 @@ const matchVarRef = (term: AST.Term, typeRef: AST.TypeRef, typeInfo: TypeInfo) :
   } else {
     foundType = unifyTypes(typeInScope, typeRef, typeInfo);
   }
-  
+
   if(typeInScope == null){
     typeInfo.varToType[(<AST.VarRef> term).label] = foundType;
   }
