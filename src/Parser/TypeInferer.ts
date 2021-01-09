@@ -657,12 +657,13 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
         }
         typeInfo.ruleReferenceDependencies.get(dependentRuleName).push(term.label);
       }
-
   }
 
   else{
 
     for(let decl of typeInfo.typeDeclArray){
+
+
 
       // if expression is bound to a type, skip type declarations with different names
       if(typeRef!=null && typeRef instanceof AST.TypeDeclRef
@@ -677,6 +678,9 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
 
         // skip constructors whose label does not match the expression's label and arity
         if( (! isRuleReference && term.label != constructor.label ) || term.subterms.length != constructor.args.length ){
+          if(term.range.lowerBound.column == 20){
+            console.log(cons);
+          }
           continue;
         }
 
@@ -702,6 +706,8 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
           }
         }
 
+        console.log(foundType);
+
         // if term is bound to a type declaration, unify types,
         // i.e. so that type arguments of typeDecl are associated those of typeRef
         // e.g. typeRef = List Cars , foundType = List $T0 => then $T0 = Cars
@@ -711,12 +717,11 @@ const matchExpr = (term: AST.Expr, caseDecl: AST.RuleCaseDecl, typeRef: AST.Type
        break;
 
       }
-      break;
-
+      if(foundType){
+        break;
+      }
     }
-
   }
-
   // try to match each child to its type argument
   for(let i in argTypes ) {
 
