@@ -1,6 +1,8 @@
 import { AnyAction } from 'redux'
 
 import { ACTION_TYPES } from 'FunBlocks/UI/Actions/IDE'
+import * as AST from 'FunBlocks/AST'
+import * as funview from 'FunBlocks/FUNVIEW'
 
 export type DebugContext = {
   history: Array<Term>,
@@ -13,6 +15,12 @@ export const debugContext = (state: DebugContext, action: AnyAction): DebugConte
   case ACTION_TYPES.PUSH_STATE: {
     // Keep the history up to the current index and append the new state.
     const { history, historyIndex, ...rest } = state
+    
+    let canvas = new funview.DrawingCanvas
+    canvas.clearCanvas()
+    let parser = new funview.Parser
+    parser.explore(action.payload as AST.Expr)
+
     return {
       ...rest,
       history: history.slice(0, historyIndex + 1).concat([ action.payload ]),
@@ -24,6 +32,11 @@ export const debugContext = (state: DebugContext, action: AnyAction): DebugConte
     return { ...state, selectedRuleID: action.payload }
 
   case ACTION_TYPES.SET_HISTORY_INDEX: {
+    let canvas = new funview.DrawingCanvas
+    canvas.clearCanvas()
+    let parser = new funview.Parser
+    // we want the state with historyIndex as index
+    parser.explore(state.history[action.payload] as AST.Expr)
     return { ...state, historyIndex: action.payload }
   }
 

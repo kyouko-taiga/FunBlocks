@@ -7,6 +7,8 @@ import { editContext } from './Contexts/EditContext'
 import { runContext } from './Contexts/RunContext'
 import { draggedData } from './DraggedData'
 import { program } from './Program'
+import * as AST from 'FunBlocks/AST'
+import * as funview from 'FunBlocks/FUNVIEW'
 
 /// An enumeration of the workspaces of the IDE.
 export enum IDEWorkspace { Edit, Debug, Run }
@@ -52,6 +54,10 @@ const ide = (state: IDEState = initialState, action: AnyAction): IDEState => {
     let initialContext: Dictionary = {}
     switch (newWorkspace) {
     case IDEWorkspace.Debug:
+      let canvas = new funview.DrawingCanvas
+      canvas.clearCanvas()
+      let parser = new funview.Parser
+      parser.explore(newState.program.initialState as AST.Expr)
       initialContext = { selectedRuleID: null }
       if (state.program.initialState !== null) {
         initialContext.history = [state.program.initialState]
