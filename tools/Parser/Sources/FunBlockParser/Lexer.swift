@@ -41,8 +41,8 @@ func tokenize(_ stream: String) throws -> [Token] {
       let token: Token
       switch substring {
       case "type": token = Token(kind: .type, value: substring)
-      case "init": token = Token(kind: ._init, value: substring)
-      case "decl": token = Token(kind: .decl, value: substring)
+      case "init": token = Token(kind: .init_, value: substring)
+      case "case": token = Token(kind: .case_, value: substring)
       case "rule": token = Token(kind: .rule, value: substring)
       default    : token = Token(kind: .identifier, value: substring)
       }

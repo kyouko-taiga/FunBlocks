@@ -15,8 +15,8 @@ public struct Token {
     case identifier
     case variableIdentifier
     case type
-    case _init
-    case decl
+    case init_
+    case case_
     case rule
     case eof
     case error

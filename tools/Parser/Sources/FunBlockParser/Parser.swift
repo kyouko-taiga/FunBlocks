@@ -34,7 +34,7 @@ enum FunBlockParser {
   static let topLevelStmt = typeDecl.map({ $0 as AST })
     .else(initStateDecl.map({ $0 as AST }))
     .else(ruleDecl.map({ $0 as AST }))
-    .else(ruleDef.map({ $0 as AST }))
+    .else(ruleCase.map({ $0 as AST }))
 
   /// Parses a type declaration.
   static let typeDecl = token(.type)
@@ -54,14 +54,14 @@ enum FunBlockParser {
     })
 
   /// Parses an initial state declaration.
-  static let initStateDecl = token(._init)
+  static let initStateDecl = token(.init_)
     .then(newline.many)
     .then(expr, combine: { _, b in b })
     .then(terminator, combine: { a, _ in a })
     .map({ state in InitStateDecl(state: state) })
 
   /// Parses a rule declaration.
-  static let ruleDecl = token(.decl)
+  static let ruleDecl = token(.rule)
     .then(newline.many)
     .then(token(.identifier), combine: { _, b in b })
     .then(newline.many, combine: { a, _ in a })
@@ -79,8 +79,8 @@ enum FunBlockParser {
         right: args.1)
     })
 
-  /// Parses a rule definition.
-  static let ruleDef = token(.rule)
+  /// Parses a rule case declaration.
+  static let ruleCase = token(.case_)
     .then(newline.many)
     .then(expr.else(parenthesized(expr)), combine: { _, b in b })
     .then(token(.thickArrow).surrounded(by: newline.many), combine: { a, _ in a })
